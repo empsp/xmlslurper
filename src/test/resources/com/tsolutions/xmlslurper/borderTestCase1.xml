@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ObjectTree>
+    <Object attr1="SOMEOBJ" attr2="E=1">
+        <OtherObject attr1="OTHEROBJ"/>
+    </Object>
+    <OtherObject attr1="OTHEROBJ"/>
+    <Object attr3="123">
+        <OtherObject attr2="OTHER=2"/>
+    </Object>
+</ObjectTree>
