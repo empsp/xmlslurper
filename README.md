@@ -1,2 +1,2 @@
-# xmlslurper
-An attempt to port Groovy XmlSlurper library into Java
+# Java XmlSlurper
+An attempt to port Groovy XmlSlurper kind of functionality into Java with StAX parser
