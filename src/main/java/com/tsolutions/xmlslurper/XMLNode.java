@@ -1,4 +1,4 @@
-package com.tsolutions.xmlslurper.path;
+package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by mturski on 11/8/2016.
  */
-public interface Node {
+public interface XMLNode {
     long getId();
 
     void setName(@NotNull String name);

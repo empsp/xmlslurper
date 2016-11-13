@@ -2,7 +2,6 @@ package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import com.tsolutions.xmlslurper.path.Node;
 
 import java.util.Map;
 
@@ -11,7 +10,7 @@ import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 /**
  * Created by mturski on 11/9/2016.
  */
-public final class StAXNode implements Node {
+public final class StAXNode implements XMLNode {
     private final long id;
 
     private String name;
@@ -73,10 +72,10 @@ public final class StAXNode implements Node {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof Node))
+        if (!(o instanceof XMLNode))
             return false;
 
-        return id == ((Node)o).getId();
+        return id == ((XMLNode)o).getId();
     }
 
     @Override

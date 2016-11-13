@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public interface XMLSlurper {
     @NotNull
-    SlurpNode parse(@NotNull String filepath) throws XMLStreamException, IOException;
+    SlurpNode getNodes();
 
-    void close() throws XMLStreamException, IOException;
+    void parse(@NotNull String filepath) throws XMLStreamException, IOException;
 }

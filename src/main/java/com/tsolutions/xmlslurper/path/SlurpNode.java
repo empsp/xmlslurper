@@ -10,8 +10,5 @@ public interface SlurpNode extends Slurp {
     SlurpNode node(@NotNull String name);
 
     @NotNull
-    SlurpExcludedNode notNode(@NotNull String name);
-
-    @NotNull
     SlurpAttribute attr(@NotNull String name);
 }

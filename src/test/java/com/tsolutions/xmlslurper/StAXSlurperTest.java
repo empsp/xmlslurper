@@ -1,7 +1,5 @@
 package com.tsolutions.xmlslurper;
 
-import com.tsolutions.xmlslurper.event.SlurpListener;
-import com.tsolutions.xmlslurper.path.Node;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,7 +25,7 @@ public class StAXSlurperTest {
     private XMLSlurper slurper = StAXSlurperFactory.getInstance().createXMLSlurper();
 
     @Test
-    public void givenInitialSlurpNodeFindAllReturnsAllNodesInOrder() throws Exception {
+    public void givenInitialSlurpNodeFindReturnsAllNodesInOrder() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -35,8 +33,8 @@ public class StAXSlurperTest {
         parse("simpleTestCase.xml", listener);
 
         // then
-        Node root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
-        Node firstObject = nodeFactory.createNode(1L, "Object", emptyMap());
+        XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
+        XMLNode firstObject = nodeFactory.createNode(1L, "Object", emptyMap());
 
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener).onNode(null, root);
@@ -46,7 +44,7 @@ public class StAXSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeWithRootNodeSetFindAllReturnsRootNodeOnly() throws Exception {
+    public void givenSlurpNodeWithRootNodeSetFindReturnsRootNodeOnly() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -59,7 +57,7 @@ public class StAXSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeWithChildNodeSetFindAllReturnsOnlyThatChild() throws Exception {
+    public void givenSlurpNodeWithChildNodeSetFindReturnsOnlyThatChild() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -67,8 +65,8 @@ public class StAXSlurperTest {
         parse("simpleTestCase.xml", listener, "ObjectTree", "Object");
 
         // then
-        Node root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
-        Node object = nodeFactory.createNode(1L, "Object", emptyMap());
+        XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
+        XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
 
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener, times(2)).onNode(root, object);
@@ -76,7 +74,7 @@ public class StAXSlurperTest {
     }
 
     @Test
-    public void givenXmlFileSlurpNodeFindAllReturnsCompleteData() throws Exception {
+    public void givenXmlFileSlurpNodeFindReturnsCompleteData() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -84,22 +82,22 @@ public class StAXSlurperTest {
         parse("simpleTestCase.xml", listener, "ObjectTree", "Object");
 
         // then
-        ArgumentCaptor<Node> nodeCaptor = ArgumentCaptor.forClass(Node.class);
+        ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
         verify(listener, times(2)).onNode(nodeCaptor.capture(), nodeCaptor.capture());
-        List<Node> actualNodes = nodeCaptor.getAllValues();
+        List<XMLNode> actualNodes = nodeCaptor.getAllValues();
 
         Map<String, String> expectedAttributes = new HashMap<String, String>();
         expectedAttributes.put("attr1", "SOMEOBJ");
         expectedAttributes.put("attr2", "E=1");
 
-        Node actualObject = actualNodes.get(1);
+        XMLNode actualObject = actualNodes.get(1);
         assertThat(actualObject.getName(), is("Object"));
         assertThat(actualObject.getText(), is("attrValue"));
         assertThat(actualObject.getAttributes(), is(expectedAttributes));
     }
 
     @Test
-    public void givenSpecificDepthOfNodeFindAllReturnsNodesFromThatSpecificDepthOnly() throws Exception {
+    public void givenSpecificDepthOfNodeFindReturnsNodesFromThatSpecificDepthOnly() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -107,10 +105,10 @@ public class StAXSlurperTest {
         parse("borderTestCase1.xml", listener, "ObjectTree", "Object", "OtherObject");
 
         // then
-        Node object = nodeFactory.createNode(1L, "Object", emptyMap());
-        Node other = nodeFactory.createNode(2L, "OtherObject", emptyMap());
-        Node object2nd = nodeFactory.createNode(4L, "Object", emptyMap());
-        Node other2nd = nodeFactory.createNode(5L, "OtherObject", emptyMap());
+        XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
+        XMLNode other = nodeFactory.createNode(2L, "OtherObject", emptyMap());
+        XMLNode object2nd = nodeFactory.createNode(4L, "Object", emptyMap());
+        XMLNode other2nd = nodeFactory.createNode(5L, "OtherObject", emptyMap());
 
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener, times(2)).onNode(object, other);
@@ -119,7 +117,7 @@ public class StAXSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeSetForChildNodeButOmittedRootNodeFindAllReturnsNothing() throws Exception {
+    public void givenSlurpNodeSetForChildNodeButOmittedRootNodeFindReturnsNothing() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -130,16 +128,47 @@ public class StAXSlurperTest {
         verifyNoMoreInteractions(listener);
     }
 
+    @Test
+    public void givenTwoListenersSetOnDifferentSlurpNodesFindReturnsRelevantNodesForBothListeners() throws Exception {
+        // given
+        SlurpListener objectListener = mock(SlurpListener.class);
+        SlurpListener otherObjectListener = mock(SlurpListener.class);
+
+        // when
+        SlurpNode objectSlurpNode = slurper.getNodes().node("ObjectTree").node("Object");
+        objectSlurpNode.find(objectListener);
+        objectSlurpNode.node("OtherObject").find(otherObjectListener);
+
+        slurper.parse(getResourcePath("borderTestCase1.xml"));
+
+        // then
+        XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
+        XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
+        XMLNode other = nodeFactory.createNode(2L, "OtherObject", emptyMap());
+        XMLNode object2nd = nodeFactory.createNode(4L, "Object", emptyMap());
+        XMLNode other2nd = nodeFactory.createNode(5L, "OtherObject", emptyMap());
+
+        InOrder inOrder = inOrder(objectListener, otherObjectListener);
+        inOrder.verify(objectListener).onNode(root, object);
+        inOrder.verify(otherObjectListener, times(2)).onNode(object, other);
+        inOrder.verify(objectListener).onNode(root, object2nd);
+        inOrder.verify(otherObjectListener, times(2)).onNode(object2nd, other2nd);
+        inOrder.verify(objectListener).onNode(root, object2nd);
+        inOrder.verifyNoMoreInteractions();
+    }
+
     private String getResourcePath(String resourceName) {
         return getClass().getResource(resourceName).getPath();
     }
 
     private void parse(String resourcePath, SlurpListener listener, String... nodePath) throws IOException, XMLStreamException {
-        SlurpNode slurpNode = slurper.parse(getResourcePath(resourcePath));
+        SlurpNode slurpNode = slurper.getNodes();
 
         for(String nodeName : nodePath)
             slurpNode = slurpNode.node(nodeName);
 
         slurpNode.find(listener);
+
+        slurper.parse(getResourcePath(resourcePath));
     }
 }

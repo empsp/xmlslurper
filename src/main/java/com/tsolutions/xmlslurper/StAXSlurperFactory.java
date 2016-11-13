@@ -1,7 +1,5 @@
 package com.tsolutions.xmlslurper;
 
-import com.tsolutions.xmlslurper.path.Node;
-
 import javax.xml.stream.XMLInputFactory;
 import java.util.Map;
 
@@ -28,7 +26,7 @@ public class StAXSlurperFactory {
     static NodeFactory getStAXNodeFactory() {
         return new NodeFactory() {
             @Override
-            public Node createNode(long id, String name, Map<String, String> attributeByName) {
+            public XMLNode createNode(long id, String name, Map<String, String> attributeByName) {
                 return new StAXNode(id, name, attributeByName);
             }
         };

@@ -1,8 +1,6 @@
 package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
-import com.tsolutions.xmlslurper.event.SlurpListener;
-import com.tsolutions.xmlslurper.path.Node;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
 import javax.xml.stream.XMLInputFactory;
@@ -27,7 +25,8 @@ public class StAXSlurper implements XMLSlurper {
     private FileInputStream fis;
     private XMLStreamReader parser;
 
-    private Deque<Node> descendants;
+    private Deque<XMLNode> descendants;
+    private Map<NodePathHandler, SlurpListener> handlerListenerTuples = new HashMap<NodePathHandler, SlurpListener>();
 
     StAXSlurper(XMLInputFactory xmlInputFactory, NodeFactory nodeFactory) {
         this.xmlInputFactory = requireNonNull(xmlInputFactory);
@@ -35,77 +34,86 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     @Override
-    public SlurpNode parse(@NotNull String filepath) throws XMLStreamException, IOException {
-        requireNonNull(filepath);
-
-        close();
-
-        descendants = new LinkedList<Node>();
-        fis = new FileInputStream(filepath);
-        parser = xmlInputFactory.createXMLStreamReader(fis);
-
+    public SlurpNode getNodes() {
         return new StAXSlurpNode(this, new ArrayList<String>());
     }
 
-    void searchFor(StAXSlurpNode slurpNode, SlurpListener slurpListener) throws XMLStreamException {
+    @Override
+    public void parse(@NotNull String filepath) throws XMLStreamException, IOException {
+        requireNonNull(filepath);
+
+        descendants = new LinkedList<XMLNode>();
+
+        fis = new FileInputStream(filepath);
+        parser = xmlInputFactory.createXMLStreamReader(fis);
+
         while (parser.hasNext()) {
             parser.next();
 
             switch (parser.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
-                    onStartElement(parser, slurpNode, slurpListener);
+                    onStartElement();
                     break;
                 case XMLStreamConstants.CHARACTERS:
-                    onCharacters(parser);
+                    onCharacters();
                     break;
                 case XMLStreamConstants.END_ELEMENT:
-                    onEndElement(parser, slurpNode, slurpListener);
+                    onEndElement();
                     break;
             }
         }
+
+        close();
     }
 
-    private void onStartElement(XMLStreamReader parser, StAXSlurpNode slurpNode, SlurpListener slurpListener) {
-        Node parent = descendants.peekLast();
-        Node child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes(parser));
+    void registerSlurpListener(NodePathHandler nodePathHandler, SlurpListener slurpListener) {
+        handlerListenerTuples.put(nodePathHandler, slurpListener);
+    }
+
+    private void onStartElement() {
+        XMLNode parent = descendants.peekLast();
+        XMLNode child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes(parser));
         descendants.addLast(child);
 
-        if (slurpNode.areNodePathsAligned(parent, child, descendants.size()))
-            slurpListener.onNode(parent, child);
+        for (Map.Entry<NodePathHandler, SlurpListener> handlerListenerTuple : handlerListenerTuples.entrySet())
+            if(handlerListenerTuple.getKey().areNodePathsAligned(child, descendants.size()))
+                handlerListenerTuple.getValue().onNode(parent, child);
     }
 
     private Map<String, String> parseAttributes(XMLStreamReader parser) {
         Map<String, String> attributeByName = new HashMap<String, String>();
 
-        for(int index = 0; index < parser.getAttributeCount(); index++)
+        for (int index = 0; index < parser.getAttributeCount(); index++)
             attributeByName.put(parser.getAttributeLocalName(index).intern(), parser.getAttributeValue(index));
 
         return attributeByName;
     }
 
-    private void onCharacters(XMLStreamReader parser) {
+    private void onCharacters() {
         String text = parser.getText();
-        Node previous = descendants.peekLast();
+        XMLNode previous = descendants.peekLast();
 
         previous.setText(text);
     }
 
-    private void onEndElement(XMLStreamReader parser, StAXSlurpNode slurpNode, SlurpListener slurpListener) {
+    private void onEndElement() {
         // important to get depthLevel of descendants before any operation
         int depthLevel = descendants.size();
-        Node child = descendants.removeLast();
-        Node parent = descendants.peekLast();
+        XMLNode child = descendants.removeLast();
+        XMLNode parent = descendants.peekLast();
 
-        if (slurpNode.areNodePathsAligned(parent, child, depthLevel))
-            slurpListener.onNode(parent, child);
+        for (Map.Entry<NodePathHandler, SlurpListener> handlerListenerTuple : handlerListenerTuples.entrySet())
+            if(handlerListenerTuple.getKey().areNodePathsAligned(child, depthLevel))
+                handlerListenerTuple.getValue().onNode(parent, child);
     }
 
-    @Override
-    public void close() throws XMLStreamException, IOException {
+    private void close() throws XMLStreamException, IOException {
         idFeed = 0L;
 
         if (descendants != null)
             descendants = null;
+
+        handlerListenerTuples.clear();
 
         if (fis != null)
             fis.close();
