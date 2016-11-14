@@ -1,5 +1,6 @@
 package com.tsolutions.xmlslurper;
 
+import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

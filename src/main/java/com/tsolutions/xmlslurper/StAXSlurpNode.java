@@ -1,6 +1,7 @@
 package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
+import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpAttribute;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 

@@ -1,6 +1,7 @@
 package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
+import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
 import javax.xml.stream.XMLInputFactory;
@@ -30,8 +31,8 @@ public class StAXSlurper implements XMLSlurper {
     private Map<NodePath, SlurpListener> nodePathSlurpListenerTuples = new HashMap<NodePath, SlurpListener>();
 
     StAXSlurper(XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, NodePathFactory nodePathFactory) {
-        this.xmlInputFactory = requireNonNull(xmlInputFactory);
-        this.nodeFactory = requireNonNull(nodeFactory);
+        this.xmlInputFactory = xmlInputFactory;
+        this.nodeFactory = nodeFactory;
         this.nodePathFactory = nodePathFactory;
     }
 
