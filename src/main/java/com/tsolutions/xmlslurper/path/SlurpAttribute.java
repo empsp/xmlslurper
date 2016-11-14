@@ -7,8 +7,8 @@ import com.sun.istack.NotNull;
  */
 public interface SlurpAttribute extends Slurp {
     @NotNull
-    SlurpAttribute is(@NotNull String value);
+    Slurp is(@NotNull String value);
 
     @NotNull
-    SlurpAttribute isNot(@NotNull String value);
+    Slurp isNot(@NotNull String value);
 }
