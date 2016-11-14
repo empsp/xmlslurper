@@ -30,4 +30,6 @@ public interface XMLNode {
 
     @Nullable
     String getAttribute(@Nullable String name);
+
+    boolean hasAttribute(@NotNull String name);
 }

@@ -3,6 +3,7 @@ package com.tsolutions.xmlslurper;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
@@ -50,7 +51,14 @@ public final class StAXNode implements XMLNode {
 
     @Override
     public void setAttributes(@NotNull Map<String, String> attributeByName) {
-        this.attributeByName = requireNonNull(attributeByName);
+        this.attributeByName = new HashMap<String, String>();
+
+        for(Map.Entry<String, String> entry : attributeByName.entrySet()) {
+            String attrName = requireNonNull(entry.getKey());
+            String attrValue = requireNonNull(entry.getValue());
+
+            this.attributeByName.put(attrName, attrValue);
+        }
     }
 
     @Override
@@ -66,6 +74,13 @@ public final class StAXNode implements XMLNode {
     @Override
     public String getAttribute(@Nullable String name) {
         return attributeByName.get(name);
+    }
+
+    @Override
+    public boolean hasAttribute(@NotNull String name) {
+        requireNonNull(name);
+
+        return attributeByName.containsKey(name);
     }
 
     @Override

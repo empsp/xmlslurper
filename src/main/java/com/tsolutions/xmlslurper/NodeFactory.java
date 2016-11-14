@@ -5,6 +5,6 @@ import java.util.Map;
 /**
  * Created by mturski on 11/8/2016.
  */
-public interface NodeFactory {
-    XMLNode createNode(long id, String name, Map<String, String> attributeByName);
+abstract class NodeFactory {
+    abstract XMLNode createNode(long id, String name, Map<String, String> attributeByName);
 }

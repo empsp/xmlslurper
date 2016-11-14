@@ -4,32 +4,40 @@ import com.sun.istack.NotNull;
 import com.tsolutions.xmlslurper.path.SlurpAttribute;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
-import java.util.List;
+import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/11/2016.
  */
 public class StAXSlurpNode implements SlurpNode {
     private final StAXSlurper slurper;
-    private final NodePathHandler nodePathHandler;
+    private NodePathFactory nodePathFactory;
+    private NodePath nodePath;
 
-    StAXSlurpNode(StAXSlurper slurper, List<String> nodePath) {
+    StAXSlurpNode(StAXSlurper slurper, NodePathFactory nodePathFactory, NodePath nodePath) {
         this.slurper = slurper;
-        this.nodePathHandler = new NodePathHandler(nodePath);
+        this.nodePathFactory = nodePathFactory;
+        this.nodePath = nodePath;
     }
 
     @Override
     public SlurpNode node(@NotNull String name) {
-        return new StAXSlurpNode(slurper, nodePathHandler.createNodePathFromExisting(name));
+        requireNonNull(name);
+
+        return new StAXSlurpNode(slurper, nodePathFactory, nodePathFactory.copyNodePathAndAddNode(nodePath, name));
     }
 
     @Override
     public SlurpAttribute attr(@NotNull String name) {
-        throw new UnsupportedOperationException();
+        requireNonNull(name);
+
+        return new StAXSlurpAttribute(slurper, nodePathFactory, nodePathFactory.copyNodePathAndAddAttr(nodePath, name));
     }
 
     @Override
-    public void find(SlurpListener slurpListener) {
-        slurper.registerSlurpListener(nodePathHandler, slurpListener);
+    public void findAll(@NotNull SlurpListener slurpListener) {
+        requireNonNull(slurpListener);
+
+        slurper.registerSlurpListener(nodePath, slurpListener);
     }
 }

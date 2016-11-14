@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by mturski on 11/8/2016.
  */
-public class StAXSlurperFactory {
+public final class StAXSlurperFactory {
     private static StAXSlurperFactory instance;
 
     public static StAXSlurperFactory getInstance() {
@@ -20,15 +20,19 @@ public class StAXSlurperFactory {
     }
 
     public XMLSlurper createXMLSlurper() {
-        return new StAXSlurper(XMLInputFactory.newInstance(), getStAXNodeFactory());
+        return new StAXSlurper(XMLInputFactory.newInstance(), getStAXNodeFactory(), getNodePathFactory());
     }
 
     static NodeFactory getStAXNodeFactory() {
         return new NodeFactory() {
             @Override
-            public XMLNode createNode(long id, String name, Map<String, String> attributeByName) {
+            XMLNode createNode(long id, String name, Map<String, String> attributeByName) {
                 return new StAXNode(id, name, attributeByName);
             }
         };
+    }
+
+    public NodePathFactory getNodePathFactory() {
+        return new NodePathFactory();
     }
 }

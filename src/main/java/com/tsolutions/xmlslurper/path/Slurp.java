@@ -7,5 +7,5 @@ import com.tsolutions.xmlslurper.SlurpListener;
  * Created by mturski on 11/8/2016.
  */
 public interface Slurp {
-    void find(@NotNull SlurpListener slurpListener);
+    void findAll(@NotNull SlurpListener slurpListener);
 }

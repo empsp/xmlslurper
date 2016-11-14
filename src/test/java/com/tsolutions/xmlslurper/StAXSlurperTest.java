@@ -25,7 +25,7 @@ public class StAXSlurperTest {
     private XMLSlurper slurper = StAXSlurperFactory.getInstance().createXMLSlurper();
 
     @Test
-    public void givenInitialSlurpNodeFindReturnsAllNodesInOrder() throws Exception {
+    public void givenInitialSlurpNodeFindAllReturnsAllNodesInOrder() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -44,7 +44,7 @@ public class StAXSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeWithRootNodeSetFindReturnsRootNodeOnly() throws Exception {
+    public void givenSlurpNodeWithRootNodeSetFindAllReturnsRootNodeOnly() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -57,7 +57,7 @@ public class StAXSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeWithChildNodeSetFindReturnsOnlyThatChild() throws Exception {
+    public void givenSlurpNodeWithChildNodeSetFindAllReturnsOnlyThatChild() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -74,7 +74,7 @@ public class StAXSlurperTest {
     }
 
     @Test
-    public void givenXmlFileSlurpNodeFindReturnsCompleteData() throws Exception {
+    public void givenXmlFileSlurpNodeFindAllReturnsCompleteData() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
@@ -97,64 +97,169 @@ public class StAXSlurperTest {
     }
 
     @Test
-    public void givenSpecificDepthOfNodeFindReturnsNodesFromThatSpecificDepthOnly() throws Exception {
+    public void givenSpecificDepthOfNodeFindAllReturnsNodesFromThatSpecificDepthOnly() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
         // when
-        parse("borderTestCase1.xml", listener, "ObjectTree", "Object", "OtherObject");
+        parse("borderTestCase.xml", listener, "ObjectTree", "Object", "OtherObject");
 
         // then
         XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
         XMLNode other = nodeFactory.createNode(2L, "OtherObject", emptyMap());
-        XMLNode object2nd = nodeFactory.createNode(4L, "Object", emptyMap());
-        XMLNode other2nd = nodeFactory.createNode(5L, "OtherObject", emptyMap());
 
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener, times(2)).onNode(object, other);
-        inOrder.verify(listener, times(2)).onNode(object2nd, other2nd);
         inOrder.verifyNoMoreInteractions();
     }
 
     @Test
-    public void givenSlurpNodeSetForChildNodeButOmittedRootNodeFindReturnsNothing() throws Exception {
+    public void givenSlurpNodeSetForChildNodeButOmittedRootNodeFindAllReturnsNothing() throws Exception {
         // given
         SlurpListener listener = mock(SlurpListener.class);
 
         // when
-        parse("borderTestCase1.xml", listener, "Object");
+        parse("borderTestCase.xml", listener, "Object");
 
         // then
         verifyNoMoreInteractions(listener);
     }
 
     @Test
-    public void givenTwoListenersSetOnDifferentSlurpNodesFindReturnsRelevantNodesForBothListeners() throws Exception {
+    public void givenTwoListenersSetOnDifferentSlurpNodesFindAllReturnsRelevantNodesForBothListeners() throws Exception {
         // given
         SlurpListener objectListener = mock(SlurpListener.class);
         SlurpListener otherObjectListener = mock(SlurpListener.class);
 
         // when
         SlurpNode objectSlurpNode = slurper.getNodes().node("ObjectTree").node("Object");
-        objectSlurpNode.find(objectListener);
-        objectSlurpNode.node("OtherObject").find(otherObjectListener);
+        objectSlurpNode.findAll(objectListener);
+        objectSlurpNode.node("OtherObject").findAll(otherObjectListener);
 
-        slurper.parse(getResourcePath("borderTestCase1.xml"));
+        slurper.parse(getResourcePath("borderTestCase.xml"));
 
         // then
         XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
         XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
         XMLNode other = nodeFactory.createNode(2L, "OtherObject", emptyMap());
-        XMLNode object2nd = nodeFactory.createNode(4L, "Object", emptyMap());
-        XMLNode other2nd = nodeFactory.createNode(5L, "OtherObject", emptyMap());
 
         InOrder inOrder = inOrder(objectListener, otherObjectListener);
         inOrder.verify(objectListener).onNode(root, object);
         inOrder.verify(otherObjectListener, times(2)).onNode(object, other);
-        inOrder.verify(objectListener).onNode(root, object2nd);
-        inOrder.verify(otherObjectListener, times(2)).onNode(object2nd, other2nd);
-        inOrder.verify(objectListener).onNode(root, object2nd);
+        inOrder.verify(objectListener).onNode(root, object);
         inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void givenSlurpAttributeSetFindAllReturnsNodesWithRelevantAttributeSet() throws Exception {
+        // given
+        SlurpListener listener = mock(SlurpListener.class);
+
+        // when
+        slurper.getNodes().node("ObjectTree").node("Object").attr("attr2").findAll(listener);
+        slurper.parse(getResourcePath("borderTestCase.xml"));
+
+        // then
+        XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
+        XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
+
+        verify(listener, times(2)).onNode(root, object);
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void givenSlurpAttributeSetForNonExistentAttributeFindAllReturnsNothing() throws Exception {
+        // given
+        SlurpListener listener = mock(SlurpListener.class);
+
+        // when
+        slurper.getNodes().node("ObjectTree").node("Object").attr("attr3").findAll(listener);
+        slurper.parse(getResourcePath("borderTestCase.xml"));
+
+        // then
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void givenSlurpNodeSetForSiblingsOfRootNodeFindAllReturnsAllSiblingsForThatDepthLevel() throws Exception {
+        // given
+        SlurpListener listener = mock(SlurpListener.class);
+
+        // when
+        parse("siblingsTestCase.xml", listener, "Transport", "*");
+
+        // then
+        XMLNode root = nodeFactory.createNode(0L, "Transport", emptyMap());
+        XMLNode sibling1st = nodeFactory.createNode(1L, "Car", emptyMap());
+        XMLNode sibling2nd = nodeFactory.createNode(5L, "Plane", emptyMap());
+
+        InOrder inOrder = inOrder(listener);
+        inOrder.verify(listener, times(2)).onNode(root, sibling1st);
+        inOrder.verify(listener, times(2)).onNode(root, sibling2nd);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void givenSlurpNodeSetForSiblingsOfChildNodeButOmittedRootNodeFindAllReturnsNothing() throws Exception {
+        // given
+        SlurpListener listener = mock(SlurpListener.class);
+
+        // when
+        parse("siblingsTestCase.xml", listener, "Car", "*");
+
+        // then
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void givenSlurpAttributeWithNodeSetForSiblingsOfRootNodeFindAllReturnsRelevantNodes() throws Exception {
+        // given
+        SlurpListener listener = mock(SlurpListener.class);
+
+        // when
+        slurper.getNodes().node("Transport").node("*").attr("modelVersion").findAll(listener);
+        slurper.parse(getResourcePath("siblingsTestCase.xml"));
+
+        // then
+        XMLNode root = nodeFactory.createNode(0L, "Transport", emptyMap());
+        XMLNode object = nodeFactory.createNode(1L, "Car", emptyMap());
+
+        verify(listener, times(2)).onNode(root, object);
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void givenSlurpAttributeWithValueSetAndNodeSetForSiblingsOfRootNodeFindAllReturnsRelevantNodes() throws Exception {
+        // given
+        SlurpListener listener = mock(SlurpListener.class);
+
+        // when
+        slurper.getNodes().node("Transport").node("*").attr("manufacturer").is("Boeing").findAll(listener);
+        slurper.parse(getResourcePath("siblingsTestCase.xml"));
+
+        // then
+        XMLNode root = nodeFactory.createNode(0L, "Transport", emptyMap());
+        XMLNode object = nodeFactory.createNode(5L, "Plane", emptyMap());
+
+        verify(listener, times(2)).onNode(root, object);
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void givenSlurpAttributeWithExcludedValueSetAndNodeSetForChildNodeOfSiblingsOfRootNodeFindAllReturnsRelevantNodes() throws Exception {
+        // given
+        SlurpListener listener = mock(SlurpListener.class);
+
+        // when
+        slurper.getNodes().node("Transport").node("*").node("Engine").attr("type").isNot("Turbofan").findAll(listener);
+        slurper.parse(getResourcePath("siblingsTestCase.xml"));
+
+        // then
+        XMLNode object = nodeFactory.createNode(1L, "Car", emptyMap());
+        XMLNode child = nodeFactory.createNode(2L, "Engine", emptyMap());
+
+        verify(listener, times(2)).onNode(object, child);
+        verifyNoMoreInteractions(listener);
     }
 
     private String getResourcePath(String resourceName) {
@@ -167,7 +272,7 @@ public class StAXSlurperTest {
         for(String nodeName : nodePath)
             slurpNode = slurpNode.node(nodeName);
 
-        slurpNode.find(listener);
+        slurpNode.findAll(listener);
 
         slurper.parse(getResourcePath(resourcePath));
     }
