@@ -13,5 +13,5 @@ public interface XMLSlurper {
     @NotNull
     SlurpNode getNodes();
 
-    void parse(@NotNull String filepath) throws XMLStreamException, IOException;
+    void parse(@NotNull String filepath) throws Exception;
 }

@@ -6,8 +6,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +18,10 @@ import static org.mockito.Mockito.*;
 /**
  * Created by mturski on 11/10/2016.
  */
-public class StAXSlurperTest {
-    private static final NodeFactory nodeFactory = StAXSlurperFactory.getStAXNodeFactory();
+public class XMLSlurperTest {
+    private static final NodeFactory nodeFactory = XMLSlurperFactory.getNodeFactory();
 
-    private XMLSlurper slurper = StAXSlurperFactory.getInstance().createXMLSlurper();
+    private XMLSlurper parser = XMLSlurperFactory.getInstance().createXMLSlurper();
 
     @Test
     public void givenInitialSlurpNodeFindAllReturnsAllNodesInOrder() throws Exception {
@@ -133,11 +131,11 @@ public class StAXSlurperTest {
         SlurpListener otherObjectListener = mock(SlurpListener.class);
 
         // when
-        SlurpNode objectSlurpNode = slurper.getNodes().node("ObjectTree").node("Object");
+        SlurpNode objectSlurpNode = parser.getNodes().node("ObjectTree").node("Object");
         objectSlurpNode.findAll(objectListener);
         objectSlurpNode.node("OtherObject").findAll(otherObjectListener);
 
-        slurper.parse(getResourcePath("borderTestCase.xml"));
+        parser.parse(getResourcePath("borderTestCase.xml"));
 
         // then
         XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
@@ -157,8 +155,8 @@ public class StAXSlurperTest {
         SlurpListener listener = mock(SlurpListener.class);
 
         // when
-        slurper.getNodes().node("ObjectTree").node("Object").attr("attr2").findAll(listener);
-        slurper.parse(getResourcePath("borderTestCase.xml"));
+        parser.getNodes().node("ObjectTree").node("Object").attr("attr2").findAll(listener);
+        parser.parse(getResourcePath("borderTestCase.xml"));
 
         // then
         XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
@@ -174,8 +172,8 @@ public class StAXSlurperTest {
         SlurpListener listener = mock(SlurpListener.class);
 
         // when
-        slurper.getNodes().node("ObjectTree").node("Object").attr("attr3").findAll(listener);
-        slurper.parse(getResourcePath("borderTestCase.xml"));
+        parser.getNodes().node("ObjectTree").node("Object").attr("attr3").findAll(listener);
+        parser.parse(getResourcePath("borderTestCase.xml"));
 
         // then
         verifyNoMoreInteractions(listener);
@@ -218,8 +216,8 @@ public class StAXSlurperTest {
         SlurpListener listener = mock(SlurpListener.class);
 
         // when
-        slurper.getNodes().node("Transport").node("*").attr("modelVersion").findAll(listener);
-        slurper.parse(getResourcePath("siblingsTestCase.xml"));
+        parser.getNodes().node("Transport").node("*").attr("modelVersion").findAll(listener);
+        parser.parse(getResourcePath("siblingsTestCase.xml"));
 
         // then
         XMLNode root = nodeFactory.createNode(0L, "Transport", emptyMap());
@@ -235,8 +233,8 @@ public class StAXSlurperTest {
         SlurpListener listener = mock(SlurpListener.class);
 
         // when
-        slurper.getNodes().node("Transport").node("*").attr("manufacturer").is("Boeing").findAll(listener);
-        slurper.parse(getResourcePath("siblingsTestCase.xml"));
+        parser.getNodes().node("Transport").node("*").attr("manufacturer").is("Boeing").findAll(listener);
+        parser.parse(getResourcePath("siblingsTestCase.xml"));
 
         // then
         XMLNode root = nodeFactory.createNode(0L, "Transport", emptyMap());
@@ -252,8 +250,8 @@ public class StAXSlurperTest {
         SlurpListener listener = mock(SlurpListener.class);
 
         // when
-        slurper.getNodes().node("Transport").node("*").node("Engine").attr("type").isNot("Turbofan").findAll(listener);
-        slurper.parse(getResourcePath("siblingsTestCase.xml"));
+        parser.getNodes().node("Transport").node("*").node("Engine").attr("type").isNot("Turbofan").findAll(listener);
+        parser.parse(getResourcePath("siblingsTestCase.xml"));
 
         // then
         XMLNode object = nodeFactory.createNode(1L, "Car", emptyMap());
@@ -267,14 +265,14 @@ public class StAXSlurperTest {
         return getClass().getResource(resourceName).getPath();
     }
 
-    private void parse(String resourcePath, SlurpListener listener, String... nodePath) throws IOException, XMLStreamException {
-        SlurpNode slurpNode = slurper.getNodes();
+    private void parse(String resourcePath, SlurpListener listener, String... nodePath) throws Exception {
+        SlurpNode slurpNode = parser.getNodes();
 
         for(String nodeName : nodePath)
             slurpNode = slurpNode.node(nodeName);
 
         slurpNode.findAll(listener);
 
-        slurper.parse(getResourcePath(resourcePath));
+        parser.parse(getResourcePath(resourcePath));
     }
 }

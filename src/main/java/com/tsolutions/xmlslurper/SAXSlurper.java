@@ -3,35 +3,38 @@ package com.tsolutions.xmlslurper;
 import com.sun.istack.NotNull;
 import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
-
-import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
- * Created by mturski on 11/8/2016.
+ * Created by mturski on 11/15/2016.
  */
-public class StAXSlurper implements XMLSlurper {
+public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private static long idFeed;
 
-    private final XMLInputFactory xmlInputFactory;
+    private final SAXParserFactory saxParserFactory;
     private final NodeFactory nodeFactory;
     private final SlurpAlignmentFactory slurpAlignmentFactory;
 
     private FileInputStream fis;
-    private XMLStreamReader parser;
+    private SAXParser parser;
 
     private Deque<XMLNode> descendants = new LinkedList<XMLNode>();
     private Map<SlurpAlignment, SlurpListener> slurpAlignmentListenerTuples = new HashMap<SlurpAlignment, SlurpListener>();
 
-    StAXSlurper(XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpAlignmentFactory slurpAlignmentFactory) {
-        this.xmlInputFactory = xmlInputFactory;
+    SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpAlignmentFactory slurpAlignmentFactory) {
+        this.saxParserFactory = saxParserFactory;
         this.nodeFactory = nodeFactory;
         this.slurpAlignmentFactory = slurpAlignmentFactory;
     }
@@ -43,33 +46,18 @@ public class StAXSlurper implements XMLSlurper {
 
     @Override
     public void parse(@NotNull String filepath) throws Exception {
-        requireNonNull(filepath);
-
         fis = new FileInputStream(filepath);
-        parser = xmlInputFactory.createXMLStreamReader(fis);
+        parser = saxParserFactory.newSAXParser();
 
-        while (parser.hasNext()) {
-            parser.next();
-
-            switch (parser.getEventType()) {
-                case XMLStreamConstants.START_ELEMENT:
-                    onStartElement();
-                    break;
-                case XMLStreamConstants.CHARACTERS:
-                    onCharacters();
-                    break;
-                case XMLStreamConstants.END_ELEMENT:
-                    onEndElement();
-                    break;
-            }
-        }
+        parser.parse(fis, this);
 
         close();
     }
 
-    private void onStartElement() {
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         XMLNode parent = descendants.peekLast();
-        XMLNode child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes());
+        XMLNode child = nodeFactory.createNode(idFeed++, qName.intern(), parseAttributes(attributes));
         descendants.addLast(child);
 
         for (Map.Entry<SlurpAlignment, SlurpListener> tuple : slurpAlignmentListenerTuples.entrySet())
@@ -77,23 +65,16 @@ public class StAXSlurper implements XMLSlurper {
                 tuple.getValue().onNode(parent, child);
     }
 
-    private Map<String, String> parseAttributes() {
-        Map<String, String> attributeByName = new HashMap<String, String>();
-
-        for (int index = 0; index < parser.getAttributeCount(); index++)
-            attributeByName.put(parser.getAttributeLocalName(index).intern(), parser.getAttributeValue(index));
-
-        return attributeByName;
-    }
-
-    private void onCharacters() {
-        String text = parser.getText();
+    @Override
+    public void characters(char ch[], int start, int length) throws SAXException {
+        String text = new String(ch, start, length);
         XMLNode previous = descendants.peekLast();
 
         previous.setText(text);
     }
 
-    private void onEndElement() {
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
         // important to get depthLevel of descendants before any operation
         int depthLevel = descendants.size();
         XMLNode child = descendants.removeLast();
@@ -102,6 +83,15 @@ public class StAXSlurper implements XMLSlurper {
         for (Map.Entry<SlurpAlignment, SlurpListener> tuple : slurpAlignmentListenerTuples.entrySet())
             if(tuple.getKey().checkAlignment(child, depthLevel))
                 tuple.getValue().onNode(parent, child);
+    }
+
+    private Map<String, String> parseAttributes(Attributes attributes) {
+        Map<String, String> attributeByName = new HashMap<String, String>();
+
+        for (int index = 0; index < attributes.getLength(); index++)
+            attributeByName.put(attributes.getQName(index).intern(), attributes.getValue(index));
+
+        return attributeByName;
     }
 
     private void close() throws XMLStreamException, IOException {
@@ -114,6 +104,6 @@ public class StAXSlurper implements XMLSlurper {
             fis.close();
 
         if (parser != null)
-            parser.close();
+            parser = null;
     }
 }

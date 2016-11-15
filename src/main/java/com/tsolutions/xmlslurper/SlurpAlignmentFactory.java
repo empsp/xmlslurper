@@ -27,16 +27,16 @@ final class SlurpAlignmentFactory {
         return new SlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), attrName);
     }
 
-    SlurpAttributeAlignment copyAlignmentAndAddAttributeValue(SlurpAttributeAlignment attrNodePath, String attrValue) {
-        List<String> namePath = new ArrayList<String>(attrNodePath.getPath());
+    SlurpAttributeAlignment copyAlignmentAndAddAttributeValue(SlurpAttributeAlignment slurpAttributeAlignment, String attrValue) {
+        List<String> namePath = new ArrayList<String>(slurpAttributeAlignment.getPath());
 
-        return new ValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), attrNodePath.getAttribute(), attrValue);
+        return new ValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), slurpAttributeAlignment.getAttribute(), attrValue);
     }
 
-    SlurpAttributeAlignment copyAlignmentAndAddAttributeExcludedValue(SlurpAttributeAlignment attrNodePath, String attrValue) {
-        List<String> namePath = new ArrayList<String>(attrNodePath.getPath());
+    SlurpAttributeAlignment copyAlignmentAndAddAttributeExcludedValue(SlurpAttributeAlignment slurpAttributeAlignment, String attrValue) {
+        List<String> namePath = new ArrayList<String>(slurpAttributeAlignment.getPath());
 
-        return new ExcludedValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), attrNodePath.getAttribute(), attrValue);
+        return new ExcludedValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), slurpAttributeAlignment.getAttribute(), attrValue);
     }
 
     private SlurpAlignment getSlurpAlignment(List<String> namePath) {

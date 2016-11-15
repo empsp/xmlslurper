@@ -11,14 +11,14 @@ import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 /**
  * Created by mturski on 11/9/2016.
  */
-public final class StAXNode implements XMLNode {
+public final class XMLNodeImpl implements XMLNode {
     private final long id;
 
     private String name;
     private String text;
     private Map<String, String> attributeByName;
 
-    StAXNode(long id, String name, Map<String, String> attributeByName) {
+    XMLNodeImpl(long id, String name, Map<String, String> attributeByName) {
         this.id = id;
         this.name = requireNonNull(name);
         this.attributeByName = requireNonNull(attributeByName);
@@ -100,7 +100,7 @@ public final class StAXNode implements XMLNode {
 
     @Override
     public String toString() {
-        return "StAXNode{" +
+        return "XMLNodeImpl{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", text='" + text + '\'' +
