@@ -11,12 +11,12 @@ import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
  */
 public class StAXSlurpAttribute implements SlurpAttribute {
     private final StAXSlurper slurper;
-    private final NodePathFactory nodePathFactory;
-    private AttributeNodePath attrNodePath;
+    private final SlurpAlignmentFactory slurpAlignmentFactory;
+    private SlurpAttributeAlignment attrNodePath;
 
-    StAXSlurpAttribute(StAXSlurper slurper, NodePathFactory nodePathFactory, AttributeNodePath attrNodePath) {
+    StAXSlurpAttribute(StAXSlurper slurper, SlurpAlignmentFactory slurpAlignmentFactory, SlurpAttributeAlignment attrNodePath) {
         this.slurper = slurper;
-        this.nodePathFactory = nodePathFactory;
+        this.slurpAlignmentFactory = slurpAlignmentFactory;
         this.attrNodePath = attrNodePath;
     }
 
@@ -24,14 +24,14 @@ public class StAXSlurpAttribute implements SlurpAttribute {
     public SlurpAttribute is(@NotNull String value) {
         requireNonNull(value);
 
-        return new StAXSlurpAttribute(slurper, nodePathFactory, nodePathFactory.copyNodePathAndAddAttrValue(attrNodePath, value));
+        return new StAXSlurpAttribute(slurper, slurpAlignmentFactory, slurpAlignmentFactory.copyAlignmentAndAddAttributeValue(attrNodePath, value));
     }
 
     @Override
     public SlurpAttribute isNot(@NotNull String value) {
         requireNonNull(value);
 
-        return new StAXSlurpAttribute(slurper, nodePathFactory, nodePathFactory.copyNodePathAndAddAttrExcludedValue(attrNodePath, value));
+        return new StAXSlurpAttribute(slurper, slurpAlignmentFactory, slurpAlignmentFactory.copyAlignmentAndAddAttributeExcludedValue(attrNodePath, value));
     }
 
     @Override

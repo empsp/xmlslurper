@@ -6,47 +6,47 @@ import java.util.List;
 /**
  * Created by mturski on 11/13/2016.
  */
-final class NodePathFactory {
+final class SlurpAlignmentFactory {
     private static final String SIBLINGSCHECK_MARKER = "*";
     private static final String DEPTHCHECK_MARKER = "**";
 
-    NodePath createEmpty() {
-        return new RootNodePath();
+    SlurpAlignment createEmpty() {
+        return new DefaultSlurpAlignment();
     }
 
-    NodePath copyNodePathAndAddNode(NodePath nodePath, String nodeName) {
-        List<String> namePath = new ArrayList<String>(nodePath.getPath());
+    SlurpAlignment copyAlignmentAndAddNode(SlurpAlignment slurpAlignment, String nodeName) {
+        List<String> namePath = new ArrayList<String>(slurpAlignment.getPath());
         namePath.add(nodeName);
 
-        return getNodePath(namePath);
+        return getSlurpAlignment(namePath);
     }
 
-    AttributeNodePath copyNodePathAndAddAttr(NodePath nodePath, String attrName) {
-        List<String> namePath = new ArrayList<String>(nodePath.getPath());
+    SlurpAttributeAlignment copyAlignmentAndAddAttribute(SlurpAlignment slurpAlignment, String attrName) {
+        List<String> namePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new AttributeNodePathWrapper(getNodePath(namePath), attrName);
+        return new SlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), attrName);
     }
 
-    AttributeNodePath copyNodePathAndAddAttrValue(AttributeNodePath attrNodePath, String attrValue) {
+    SlurpAttributeAlignment copyAlignmentAndAddAttributeValue(SlurpAttributeAlignment attrNodePath, String attrValue) {
         List<String> namePath = new ArrayList<String>(attrNodePath.getPath());
 
-        return new AttributeValueNodePathWrapper(getNodePath(namePath), attrNodePath.getAttribute(), attrValue);
+        return new ValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), attrNodePath.getAttribute(), attrValue);
     }
 
-    AttributeNodePath copyNodePathAndAddAttrExcludedValue(AttributeNodePath attrNodePath, String attrValue) {
+    SlurpAttributeAlignment copyAlignmentAndAddAttributeExcludedValue(SlurpAttributeAlignment attrNodePath, String attrValue) {
         List<String> namePath = new ArrayList<String>(attrNodePath.getPath());
 
-        return new AttributeExcludedValueNodePathWrapper(getNodePath(namePath), attrNodePath.getAttribute(), attrValue);
+        return new ExcludedValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), attrNodePath.getAttribute(), attrValue);
     }
 
-    private NodePath getNodePath(List<String> namePath) {
+    private SlurpAlignment getSlurpAlignment(List<String> namePath) {
         if (namePath.contains(SIBLINGSCHECK_MARKER))
-            return new SiblingsNodePath(namePath);
+            return new SiblingsSlurpAlignment(namePath);
         else
-            return new SimpleNodePath(namePath);
+            return new SimpleSlurpAlignment(namePath);
     }
 
-    private class RootNodePath extends NodePath {
+    private class DefaultSlurpAlignment extends SlurpAlignment {
         @Override
         public boolean checkAlignment(XMLNode node, int depthLevel) {
             return true;
@@ -58,13 +58,13 @@ final class NodePathFactory {
         }
     }
 
-    private class SimpleNodePath extends NodePath {
+    private class SimpleSlurpAlignment extends SlurpAlignment {
         private final List<String> namePath;
 
         private boolean areMisaligned;
         private int misalignmentDepthLevel;
 
-        private SimpleNodePath(List<String> namePath) {
+        private SimpleSlurpAlignment(List<String> namePath) {
             this.namePath = namePath;
         }
 
@@ -96,13 +96,13 @@ final class NodePathFactory {
         }
     }
 
-    private class SiblingsNodePath extends NodePath {
+    private class SiblingsSlurpAlignment extends SlurpAlignment {
         private final List<String> namePath;
 
         private boolean areMisaligned;
         private int misalignmentDepthLevel;
 
-        public SiblingsNodePath(List<String> namePath) {
+        public SiblingsSlurpAlignment(List<String> namePath) {
             this.namePath = namePath;
         }
 
@@ -135,23 +135,23 @@ final class NodePathFactory {
         }
     }
 
-    private class AttributeNodePathWrapper extends AttributeNodePath {
-        private final NodePath nodePath;
+    private class SlurpAttributeAlignmentWrapper extends SlurpAttributeAlignment {
+        private final SlurpAlignment slurpAlignment;
         private final String attrName;
 
-        public AttributeNodePathWrapper(NodePath nodePath, String attrName) {
-            this.nodePath = nodePath;
+        public SlurpAttributeAlignmentWrapper(SlurpAlignment slurpAlignment, String attrName) {
+            this.slurpAlignment = slurpAlignment;
             this.attrName = attrName;
         }
 
         @Override
         boolean checkAlignment(XMLNode node, int depthLevel) {
-            return nodePath.checkAlignment(node, depthLevel) && node.hasAttribute(attrName);
+            return slurpAlignment.checkAlignment(node, depthLevel) && node.hasAttribute(attrName);
         }
 
         @Override
         List<String> getPath() {
-            return nodePath.getPath();
+            return slurpAlignment.getPath();
         }
 
         @Override
@@ -160,25 +160,25 @@ final class NodePathFactory {
         }
     }
 
-    private class AttributeValueNodePathWrapper extends AttributeNodePath {
-        private final NodePath nodePath;
+    private class ValueSlurpAttributeAlignmentWrapper extends SlurpAttributeAlignment {
+        private final SlurpAlignment slurpAlignment;
         private final String attrName;
         private final String attrValue;
 
-        public AttributeValueNodePathWrapper(NodePath nodePath, String attrName, String attrValue) {
-            this.nodePath = nodePath;
+        public ValueSlurpAttributeAlignmentWrapper(SlurpAlignment slurpAlignment, String attrName, String attrValue) {
+            this.slurpAlignment = slurpAlignment;
             this.attrName = attrName;
             this.attrValue = attrValue;
         }
 
         @Override
         boolean checkAlignment(XMLNode node, int depthLevel) {
-            return nodePath.checkAlignment(node, depthLevel) && attrValue.equals(node.getAttribute(attrName));
+            return slurpAlignment.checkAlignment(node, depthLevel) && attrValue.equals(node.getAttribute(attrName));
         }
 
         @Override
         List<String> getPath() {
-            return nodePath.getPath();
+            return slurpAlignment.getPath();
         }
 
         @Override
@@ -187,25 +187,25 @@ final class NodePathFactory {
         }
     }
 
-    private class AttributeExcludedValueNodePathWrapper extends AttributeNodePath {
-        private final NodePath nodePath;
+    private class ExcludedValueSlurpAttributeAlignmentWrapper extends SlurpAttributeAlignment {
+        private final SlurpAlignment slurpAlignment;
         private final String attrName;
         private final String attrValue;
 
-        public AttributeExcludedValueNodePathWrapper(NodePath nodePath, String attrName, String attrValue) {
-            this.nodePath = nodePath;
+        public ExcludedValueSlurpAttributeAlignmentWrapper(SlurpAlignment slurpAlignment, String attrName, String attrValue) {
+            this.slurpAlignment = slurpAlignment;
             this.attrName = attrName;
             this.attrValue = attrValue;
         }
 
         @Override
         boolean checkAlignment(XMLNode node, int depthLevel) {
-            return nodePath.checkAlignment(node, depthLevel) && !attrValue.equals(node.getAttribute(attrName));
+            return slurpAlignment.checkAlignment(node, depthLevel) && !attrValue.equals(node.getAttribute(attrName));
         }
 
         @Override
         List<String> getPath() {
-            return nodePath.getPath();
+            return slurpAlignment.getPath();
         }
 
         @Override

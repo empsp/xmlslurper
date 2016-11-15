@@ -3,6 +3,7 @@ package com.tsolutions.xmlslurper;
 import com.sun.istack.NotNull;
 import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -22,23 +23,23 @@ public class StAXSlurper implements XMLSlurper {
 
     private final XMLInputFactory xmlInputFactory;
     private final NodeFactory nodeFactory;
-    private final NodePathFactory nodePathFactory;
+    private final SlurpAlignmentFactory slurpAlignmentFactory;
 
     private FileInputStream fis;
     private XMLStreamReader parser;
 
     private Deque<XMLNode> descendants;
-    private Map<NodePath, SlurpListener> nodePathSlurpListenerTuples = new HashMap<NodePath, SlurpListener>();
+    private Map<SlurpAlignment, SlurpListener> nodePathSlurpListenerTuples = new HashMap<SlurpAlignment, SlurpListener>();
 
-    StAXSlurper(XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, NodePathFactory nodePathFactory) {
+    StAXSlurper(XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpAlignmentFactory slurpAlignmentFactory) {
         this.xmlInputFactory = xmlInputFactory;
         this.nodeFactory = nodeFactory;
-        this.nodePathFactory = nodePathFactory;
+        this.slurpAlignmentFactory = slurpAlignmentFactory;
     }
 
     @Override
     public SlurpNode getNodes() {
-        return new StAXSlurpNode(this, nodePathFactory, nodePathFactory.createEmpty());
+        return new StAXSlurpNode(this, slurpAlignmentFactory, slurpAlignmentFactory.createEmpty());
     }
 
     @Override
@@ -69,8 +70,8 @@ public class StAXSlurper implements XMLSlurper {
         close();
     }
 
-    void registerSlurpListener(NodePath nodePath, SlurpListener slurpListener) {
-        nodePathSlurpListenerTuples.put(nodePath, slurpListener);
+    void registerSlurpListener(SlurpAlignment slurpAlignment, SlurpListener slurpListener) {
+        nodePathSlurpListenerTuples.put(slurpAlignment, slurpListener);
     }
 
     private void onStartElement() {
@@ -78,7 +79,7 @@ public class StAXSlurper implements XMLSlurper {
         XMLNode child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes(parser));
         descendants.addLast(child);
 
-        for (Map.Entry<NodePath, SlurpListener> tuple : nodePathSlurpListenerTuples.entrySet())
+        for (Map.Entry<SlurpAlignment, SlurpListener> tuple : nodePathSlurpListenerTuples.entrySet())
             if(tuple.getKey().checkAlignment(child, descendants.size()))
                 tuple.getValue().onNode(parent, child);
     }
@@ -88,6 +89,20 @@ public class StAXSlurper implements XMLSlurper {
 
         for (int index = 0; index < parser.getAttributeCount(); index++)
             attributeByName.put(parser.getAttributeLocalName(index).intern(), parser.getAttributeValue(index));
+
+        return attributeByName;
+    }
+
+    @SuppressWarnings("unused")
+    private String[][] parseAttributesAsTable(XMLStreamReader parser) {
+        int attributeCount = parser.getAttributeCount();
+
+        if (attributeCount == 0)
+            return new String[0][];
+
+        String[][] attributeByName = new String[attributeCount][];
+        for (int index = 0; index < attributeCount; index++)
+            attributeByName[index] = new String[] {parser.getAttributeLocalName(index).intern(), parser.getAttributeValue(index)};
 
         return attributeByName;
     }
@@ -105,7 +120,7 @@ public class StAXSlurper implements XMLSlurper {
         XMLNode child = descendants.removeLast();
         XMLNode parent = descendants.peekLast();
 
-        for (Map.Entry<NodePath, SlurpListener> tuple : nodePathSlurpListenerTuples.entrySet())
+        for (Map.Entry<SlurpAlignment, SlurpListener> tuple : nodePathSlurpListenerTuples.entrySet())
             if(tuple.getKey().checkAlignment(child, depthLevel))
                 tuple.getValue().onNode(parent, child);
     }

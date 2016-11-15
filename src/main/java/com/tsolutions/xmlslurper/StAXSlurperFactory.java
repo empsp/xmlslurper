@@ -29,10 +29,15 @@ public final class StAXSlurperFactory {
             XMLNode createNode(long id, String name, Map<String, String> attributeByName) {
                 return new StAXNode(id, name, attributeByName);
             }
+
+            @Override
+            XMLNode createNode(long id, String name, String[][] attributeByName) {
+                return new StAXNodeLite(id, name, attributeByName);
+            }
         };
     }
 
-    public NodePathFactory getNodePathFactory() {
-        return new NodePathFactory();
+    public SlurpAlignmentFactory getNodePathFactory() {
+        return new SlurpAlignmentFactory();
     }
 }
