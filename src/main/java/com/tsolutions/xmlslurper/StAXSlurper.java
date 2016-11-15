@@ -76,7 +76,7 @@ public class StAXSlurper implements XMLSlurper {
 
     private void onStartElement() {
         XMLNode parent = descendants.peekLast();
-        XMLNode child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes(parser));
+        XMLNode child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributesAsTable(parser));
         descendants.addLast(child);
 
         for (Map.Entry<SlurpAlignment, SlurpListener> tuple : nodePathSlurpListenerTuples.entrySet())
@@ -93,7 +93,6 @@ public class StAXSlurper implements XMLSlurper {
         return attributeByName;
     }
 
-    @SuppressWarnings("unused")
     private String[][] parseAttributesAsTable(XMLStreamReader parser) {
         int attributeCount = parser.getAttributeCount();
 

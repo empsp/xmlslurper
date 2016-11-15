@@ -11,7 +11,6 @@ import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 /**
  * Created by mturski on 11/15/2016.
  */
-@SuppressWarnings("unused")
 public class StAXNodeLite implements XMLNode {
     private static final int ATTRIBUTE_TABLE_EXTENSION_CAPACITY = 10;
 
