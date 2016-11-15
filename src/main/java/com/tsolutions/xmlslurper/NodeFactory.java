@@ -7,7 +7,4 @@ import java.util.Map;
  */
 abstract class NodeFactory {
     abstract XMLNode createNode(long id, String name, Map<String, String> attributeByName);
-
-    @SuppressWarnings("unused")
-    abstract XMLNode createNode(long id, String name, String[][] attributeByName);
 }

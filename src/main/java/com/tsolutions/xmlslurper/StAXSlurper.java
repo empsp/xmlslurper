@@ -93,20 +93,6 @@ public class StAXSlurper implements XMLSlurper {
         return attributeByName;
     }
 
-    @SuppressWarnings("unused")
-    private String[][] parseAttributesAsTable(XMLStreamReader parser) {
-        int attributeCount = parser.getAttributeCount();
-
-        if (attributeCount == 0)
-            return new String[0][];
-
-        String[][] attributeByName = new String[attributeCount][];
-        for (int index = 0; index < attributeCount; index++)
-            attributeByName[index] = new String[] {parser.getAttributeLocalName(index).intern(), parser.getAttributeValue(index)};
-
-        return attributeByName;
-    }
-
     private void onCharacters() {
         String text = parser.getText();
         XMLNode previous = descendants.peekLast();
