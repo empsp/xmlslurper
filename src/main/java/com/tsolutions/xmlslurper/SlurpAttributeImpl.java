@@ -3,6 +3,7 @@ package com.tsolutions.xmlslurper;
 import com.sun.istack.NotNull;
 import com.tsolutions.xmlslurper.XMLSlurperFactory.SlurpAlignmentListenerTuple;
 import com.tsolutions.xmlslurper.listener.SlurpListener;
+import com.tsolutions.xmlslurper.path.Slurp;
 import com.tsolutions.xmlslurper.path.SlurpAttribute;
 
 import java.util.List;
@@ -15,32 +16,32 @@ import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 public class SlurpAttributeImpl implements SlurpAttribute {
     private final List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples;
     private final SlurpAlignmentFactory slurpAlignmentFactory;
-    private final SlurpAttributeAlignment slurpAttributeAlignment;
+    private final SlurpAlignment slurpAlignment;
 
-    SlurpAttributeImpl(List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples, SlurpAlignmentFactory slurpAlignmentFactory, SlurpAttributeAlignment slurpAttributeAlignment) {
+    SlurpAttributeImpl(List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples, SlurpAlignmentFactory slurpAlignmentFactory, SlurpAlignment slurpAlignment) {
         this.slurpAlignmentListenerTuples = slurpAlignmentListenerTuples;
         this.slurpAlignmentFactory = slurpAlignmentFactory;
-        this.slurpAttributeAlignment = slurpAttributeAlignment;
+        this.slurpAlignment = slurpAlignment;
     }
 
     @Override
-    public SlurpAttribute is(@NotNull String value) {
+    public Slurp is(@NotNull String value) {
         requireNonNull(value);
 
-        return new SlurpAttributeImpl(slurpAlignmentListenerTuples, slurpAlignmentFactory, slurpAlignmentFactory.copyAlignmentAndAddAttributeValue(slurpAttributeAlignment, value));
+        return new SlurpAttributeImpl(slurpAlignmentListenerTuples, slurpAlignmentFactory, slurpAlignmentFactory.copyAlignmentAndAddAttributeValue(slurpAlignment, value));
     }
 
     @Override
-    public SlurpAttribute isNot(@NotNull String value) {
+    public Slurp isNot(@NotNull String value) {
         requireNonNull(value);
 
-        return new SlurpAttributeImpl(slurpAlignmentListenerTuples, slurpAlignmentFactory, slurpAlignmentFactory.copyAlignmentAndAddAttributeExcludedValue(slurpAttributeAlignment, value));
+        return new SlurpAttributeImpl(slurpAlignmentListenerTuples, slurpAlignmentFactory, slurpAlignmentFactory.copyAlignmentAndAddAttributeExcludedValue(slurpAlignment, value));
     }
 
     @Override
     public void findAll(@NotNull SlurpListener slurpListener) {
         requireNonNull(slurpListener);
 
-        slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAttributeAlignment, slurpListener));
+        slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, slurpListener));
     }
 }

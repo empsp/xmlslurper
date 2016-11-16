@@ -21,22 +21,22 @@ final class SlurpAlignmentFactory {
         return getSlurpAlignment(namePath);
     }
 
-    SlurpAttributeAlignment copyAlignmentAndAddAttribute(SlurpAlignment slurpAlignment, String attrName) {
+    SlurpAlignment copyAlignmentAndAddAttribute(SlurpAlignment slurpAlignment, String attrName) {
         List<String> namePath = new ArrayList<String>(slurpAlignment.getPath());
 
         return new SlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), attrName);
     }
 
-    SlurpAttributeAlignment copyAlignmentAndAddAttributeValue(SlurpAttributeAlignment slurpAttributeAlignment, String attrValue) {
-        List<String> namePath = new ArrayList<String>(slurpAttributeAlignment.getPath());
+    SlurpAlignment copyAlignmentAndAddAttributeValue(SlurpAlignment slurpAlignment, String attrValue) {
+        List<String> namePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new ValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), slurpAttributeAlignment.getAttribute(), attrValue);
+        return new ValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName, attrValue);
     }
 
-    SlurpAttributeAlignment copyAlignmentAndAddAttributeExcludedValue(SlurpAttributeAlignment slurpAttributeAlignment, String attrValue) {
-        List<String> namePath = new ArrayList<String>(slurpAttributeAlignment.getPath());
+    SlurpAlignment copyAlignmentAndAddAttributeExcludedValue(SlurpAlignment slurpAlignment, String attrValue) {
+        List<String> namePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new ExcludedValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), slurpAttributeAlignment.getAttribute(), attrValue);
+        return new ExcludedValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName, attrValue);
     }
 
     private SlurpAlignment getSlurpAlignment(List<String> namePath) {
@@ -135,7 +135,7 @@ final class SlurpAlignmentFactory {
         }
     }
 
-    private class SlurpAttributeAlignmentWrapper extends SlurpAttributeAlignment {
+    private class SlurpAttributeAlignmentWrapper extends SlurpAlignment {
         private final SlurpAlignment slurpAlignment;
         private final String attrName;
 
@@ -153,14 +153,9 @@ final class SlurpAlignmentFactory {
         List<String> getPath() {
             return slurpAlignment.getPath();
         }
-
-        @Override
-        String getAttribute() {
-            return attrName;
-        }
     }
 
-    private class ValueSlurpAttributeAlignmentWrapper extends SlurpAttributeAlignment {
+    private class ValueSlurpAttributeAlignmentWrapper extends SlurpAlignment {
         private final SlurpAlignment slurpAlignment;
         private final String attrName;
         private final String attrValue;
@@ -180,14 +175,9 @@ final class SlurpAlignmentFactory {
         List<String> getPath() {
             return slurpAlignment.getPath();
         }
-
-        @Override
-        String getAttribute() {
-            return attrName;
-        }
     }
 
-    private class ExcludedValueSlurpAttributeAlignmentWrapper extends SlurpAttributeAlignment {
+    private class ExcludedValueSlurpAttributeAlignmentWrapper extends SlurpAlignment {
         private final SlurpAlignment slurpAlignment;
         private final String attrName;
         private final String attrValue;
@@ -206,11 +196,6 @@ final class SlurpAlignmentFactory {
         @Override
         List<String> getPath() {
             return slurpAlignment.getPath();
-        }
-
-        @Override
-        String getAttribute() {
-            return attrName;
         }
     }
 }
