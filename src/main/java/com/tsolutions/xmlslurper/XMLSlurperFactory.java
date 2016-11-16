@@ -1,5 +1,7 @@
 package com.tsolutions.xmlslurper;
 
+import com.tsolutions.xmlslurper.listener.SlurpListener;
+
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import java.util.Map;
@@ -50,5 +52,23 @@ public final class XMLSlurperFactory {
 
     public SlurpAlignmentFactory getSlurpAlignmentFactory() {
         return new SlurpAlignmentFactory();
+    }
+
+    static class SlurpAlignmentListenerTuple {
+        private final SlurpAlignment slurpAlignment;
+        private final SlurpListener slurpListener;
+
+        SlurpAlignmentListenerTuple(SlurpAlignment slurpAlignment, SlurpListener slurpListener) {
+            this.slurpAlignment = slurpAlignment;
+            this.slurpListener = slurpListener;
+        }
+
+        SlurpAlignment getSlurpAlignment() {
+            return slurpAlignment;
+        }
+
+        SlurpListener getSlurpListener() {
+            return slurpListener;
+        }
     }
 }

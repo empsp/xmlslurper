@@ -1,5 +1,7 @@
 package com.tsolutions.xmlslurper;
 
+import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.junit.Test;

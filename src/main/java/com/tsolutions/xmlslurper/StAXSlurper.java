@@ -1,6 +1,7 @@
 package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
+import com.tsolutions.xmlslurper.XMLSlurperFactory.SlurpAlignmentListenerTuple;
 import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
@@ -28,7 +29,7 @@ public class StAXSlurper implements XMLSlurper {
     private XMLStreamReader parser;
 
     private Deque<XMLNode> descendants = new LinkedList<XMLNode>();
-    private Map<SlurpAlignment, SlurpListener> slurpAlignmentListenerTuples = new HashMap<SlurpAlignment, SlurpListener>();
+    private List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
 
     StAXSlurper(XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpAlignmentFactory slurpAlignmentFactory) {
         this.xmlInputFactory = xmlInputFactory;
@@ -72,9 +73,9 @@ public class StAXSlurper implements XMLSlurper {
         XMLNode child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes());
         descendants.addLast(child);
 
-        for (Map.Entry<SlurpAlignment, SlurpListener> tuple : slurpAlignmentListenerTuples.entrySet())
-            if(tuple.getKey().checkAlignment(child, descendants.size()))
-                tuple.getValue().onNode(parent, child);
+        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
+            if(tuple.getSlurpAlignment().checkAlignment(child, descendants.size()))
+                tuple.getSlurpListener().onNode(parent, child);
     }
 
     private Map<String, String> parseAttributes() {
@@ -99,9 +100,9 @@ public class StAXSlurper implements XMLSlurper {
         XMLNode child = descendants.removeLast();
         XMLNode parent = descendants.peekLast();
 
-        for (Map.Entry<SlurpAlignment, SlurpListener> tuple : slurpAlignmentListenerTuples.entrySet())
-            if(tuple.getKey().checkAlignment(child, depthLevel))
-                tuple.getValue().onNode(parent, child);
+        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
+            if(tuple.getSlurpAlignment().checkAlignment(child, depthLevel))
+                tuple.getSlurpListener().onNode(parent, child);
     }
 
     private void close() throws XMLStreamException, IOException {

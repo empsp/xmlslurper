@@ -1,7 +1,7 @@
 package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
-import com.tsolutions.xmlslurper.listener.SlurpListener;
+import com.tsolutions.xmlslurper.XMLSlurperFactory.SlurpAlignmentListenerTuple;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -12,10 +12,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by mturski on 11/15/2016.
@@ -31,7 +28,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private SAXParser parser;
 
     private Deque<XMLNode> descendants = new LinkedList<XMLNode>();
-    private Map<SlurpAlignment, SlurpListener> slurpAlignmentListenerTuples = new HashMap<SlurpAlignment, SlurpListener>();
+    private List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
 
     SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpAlignmentFactory slurpAlignmentFactory) {
         this.saxParserFactory = saxParserFactory;
@@ -60,9 +57,9 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         XMLNode child = nodeFactory.createNode(idFeed++, qName.intern(), parseAttributes(attributes));
         descendants.addLast(child);
 
-        for (Map.Entry<SlurpAlignment, SlurpListener> tuple : slurpAlignmentListenerTuples.entrySet())
-            if(tuple.getKey().checkAlignment(child, descendants.size()))
-                tuple.getValue().onNode(parent, child);
+        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
+            if(tuple.getSlurpAlignment().checkAlignment(child, descendants.size()))
+                tuple.getSlurpListener().onNode(parent, child);
     }
 
     @Override
@@ -80,9 +77,9 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         XMLNode child = descendants.removeLast();
         XMLNode parent = descendants.peekLast();
 
-        for (Map.Entry<SlurpAlignment, SlurpListener> tuple : slurpAlignmentListenerTuples.entrySet())
-            if(tuple.getKey().checkAlignment(child, depthLevel))
-                tuple.getValue().onNode(parent, child);
+        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
+            if(tuple.getSlurpAlignment().checkAlignment(child, depthLevel))
+                tuple.getSlurpListener().onNode(parent, child);
     }
 
     private Map<String, String> parseAttributes(Attributes attributes) {

@@ -4,8 +4,9 @@ import com.sun.istack.NotNull;
 import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpAttribute;
 import com.tsolutions.xmlslurper.path.SlurpNode;
+import com.tsolutions.xmlslurper.XMLSlurperFactory.SlurpAlignmentListenerTuple;
 
-import java.util.Map;
+import java.util.List;
 
 import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 
@@ -13,11 +14,11 @@ import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
  * Created by mturski on 11/11/2016.
  */
 public class SlurpNodeImpl implements SlurpNode {
-    private final Map<SlurpAlignment, SlurpListener> slurpAlignmentListenerTuples;
+    private final List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples;
     private final SlurpAlignmentFactory slurpAlignmentFactory;
     private final SlurpAlignment slurpAlignment;
 
-    SlurpNodeImpl(Map<SlurpAlignment, SlurpListener> slurpAlignmentListenerTuples, SlurpAlignmentFactory slurpAlignmentFactory, SlurpAlignment slurpAlignment) {
+    SlurpNodeImpl(List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples, SlurpAlignmentFactory slurpAlignmentFactory, SlurpAlignment slurpAlignment) {
         this.slurpAlignmentListenerTuples = slurpAlignmentListenerTuples;
         this.slurpAlignmentFactory = slurpAlignmentFactory;
         this.slurpAlignment = slurpAlignment;
@@ -41,6 +42,6 @@ public class SlurpNodeImpl implements SlurpNode {
     public void findAll(@NotNull SlurpListener slurpListener) {
         requireNonNull(slurpListener);
 
-        slurpAlignmentListenerTuples.put(slurpAlignment, slurpListener);
+        slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, slurpListener));
     }
 }
