@@ -2,7 +2,8 @@ package com.tsolutions.xmlslurper;
 
 import org.junit.Test;
 
-import static java.util.Collections.emptyMap;
+import java.util.Collections;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -65,7 +66,36 @@ public class SlurpAlignmentFactoryTest {
         assertTrue(alignment.checkAlignment(createNode("Child"), 2));
     }
 
+    @Test
+    public void givenSiblingAlignmentCheckAlignmentReturnsTrueOnlyWhenPathsAreEqualOnRespectiveDepthLevel() {
+        // when
+        SlurpAlignment alignment = alignmentFactory.copyAlignmentAndAddNode(
+                alignmentFactory.copyAlignmentAndAddNode(alignmentFactory.createEmpty(), "Root"), "*");
+
+        // then
+
+        // paths align
+        assertFalse(alignment.checkAlignment(createNode("Root"), 1));
+        assertTrue(alignment.checkAlignment(createNode("Child"), 2));
+
+        // root other than 'Root'
+        assertFalse(alignment.checkAlignment(createNode("OtherRoot"), 1));
+        assertFalse(alignment.checkAlignment(createNode("Child"), 2));
+
+        // sibling and then the paths align
+        assertFalse(alignment.checkAlignment(createNode("Root"), 1));
+        assertTrue(alignment.checkAlignment(createNode("Sibling"), 2));
+        assertTrue(alignment.checkAlignment(createNode("Child"), 2));
+
+        // sibling's child named 'Child' and other child and then the paths align
+        assertFalse(alignment.checkAlignment(createNode("Root"), 1));
+        assertTrue(alignment.checkAlignment(createNode("Sibling"), 2));
+        assertFalse(alignment.checkAlignment(createNode("Child"), 3));
+        assertFalse(alignment.checkAlignment(createNode("SiblingsChild"), 3));
+        assertTrue(alignment.checkAlignment(createNode("Child"), 2));
+    }
+
     private XMLNode createNode(String name) {
-        return nodeFactory.createNode(idFeed++, name, emptyMap());
+        return nodeFactory.createNode(idFeed++, name, Collections.emptyMap());
     }
 }

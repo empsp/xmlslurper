@@ -7,7 +7,7 @@ import java.util.List;
  * Created by mturski on 11/13/2016.
  */
 final class SlurpAlignmentFactory {
-    private static final String SIBLINGSCHECK_MARKER = "*";
+    private static final String SIBLINGCHECK_MARKER = "*";
     private static final String DEPTHCHECK_MARKER = "**";
 
     SlurpAlignment createEmpty() {
@@ -40,7 +40,7 @@ final class SlurpAlignmentFactory {
     }
 
     private SlurpAlignment getSlurpAlignment(List<String> namePath) {
-        if (namePath.contains(SIBLINGSCHECK_MARKER))
+        if (namePath.contains(SIBLINGCHECK_MARKER))
             return new SiblingsSlurpAlignment(namePath);
         else
             return new SimpleSlurpAlignment(namePath);
@@ -92,7 +92,7 @@ final class SlurpAlignmentFactory {
     private class SiblingsSlurpAlignment extends SlurpAlignment {
         private final List<String> namePath;
 
-        private int misalignmentDepthLevel;
+        private int misalignmentDepthLevel = Integer.MAX_VALUE;
 
         public SiblingsSlurpAlignment(List<String> namePath) {
             this.namePath = namePath;
@@ -104,7 +104,7 @@ final class SlurpAlignmentFactory {
                 return false;
 
             String expectedNodeName = namePath.get(depthLevel - 1);
-            if (expectedNodeName.equals(node.getName()) || expectedNodeName.equals(SIBLINGSCHECK_MARKER)) {
+            if (expectedNodeName.equals(SIBLINGCHECK_MARKER) || expectedNodeName.equals(node.getName())) {
                 misalignmentDepthLevel = Integer.MAX_VALUE;
 
                 if (depthLevel == namePath.size()) // if partially aligned and names match, check if depths are the same, they are fully aligned if so

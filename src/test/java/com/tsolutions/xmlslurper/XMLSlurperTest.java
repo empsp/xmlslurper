@@ -1,18 +1,16 @@
 package com.tsolutions.xmlslurper;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
 import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
@@ -34,8 +32,8 @@ public class XMLSlurperTest {
         parse("simpleTestCase.xml", listener);
 
         // then
-        XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
-        XMLNode firstObject = nodeFactory.createNode(1L, "Object", emptyMap());
+        XMLNode root = createNode(0L, "ObjectTree");
+        XMLNode firstObject = createNode(1L, "Object");
 
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener).onNode(null, root);
@@ -53,7 +51,7 @@ public class XMLSlurperTest {
         parse("simpleTestCase.xml", listener, "ObjectTree");
 
         // then
-        verify(listener, times(2)).onNode(null, nodeFactory.createNode(0L, "ObjectTree", emptyMap()));
+        verify(listener, times(2)).onNode(null, createNode(0L, "ObjectTree"));
         verifyNoMoreInteractions(listener);
     }
 
@@ -66,8 +64,8 @@ public class XMLSlurperTest {
         parse("simpleTestCase.xml", listener, "ObjectTree", "Object");
 
         // then
-        XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
-        XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
+        XMLNode root = createNode(0L, "ObjectTree");
+        XMLNode object = createNode(1L, "Object");
 
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener, times(2)).onNode(root, object);
@@ -106,8 +104,8 @@ public class XMLSlurperTest {
         parse("borderTestCase.xml", listener, "ObjectTree", "Object", "OtherObject");
 
         // then
-        XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
-        XMLNode other = nodeFactory.createNode(2L, "OtherObject", emptyMap());
+        XMLNode object = createNode(1L, "Object");
+        XMLNode other = createNode(2L, "OtherObject");
 
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener, times(2)).onNode(object, other);
@@ -140,9 +138,9 @@ public class XMLSlurperTest {
         parser.parse(getResourcePath("borderTestCase.xml"));
 
         // then
-        XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
-        XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
-        XMLNode other = nodeFactory.createNode(2L, "OtherObject", emptyMap());
+        XMLNode root = createNode(0L, "ObjectTree");
+        XMLNode object = createNode(1L, "Object");
+        XMLNode other = createNode(2L, "OtherObject");
 
         InOrder inOrder = inOrder(objectListener, otherObjectListener);
         inOrder.verify(objectListener).onNode(root, object);
@@ -161,8 +159,8 @@ public class XMLSlurperTest {
         parser.parse(getResourcePath("borderTestCase.xml"));
 
         // then
-        XMLNode root = nodeFactory.createNode(0L, "ObjectTree", emptyMap());
-        XMLNode object = nodeFactory.createNode(1L, "Object", emptyMap());
+        XMLNode root = createNode(0L, "ObjectTree");
+        XMLNode object = createNode(1L, "Object");
 
         verify(listener, times(2)).onNode(root, object);
         verifyNoMoreInteractions(listener);
@@ -190,9 +188,9 @@ public class XMLSlurperTest {
         parse("siblingsTestCase.xml", listener, "Transport", "*");
 
         // then
-        XMLNode root = nodeFactory.createNode(0L, "Transport", emptyMap());
-        XMLNode sibling1st = nodeFactory.createNode(1L, "Car", emptyMap());
-        XMLNode sibling2nd = nodeFactory.createNode(5L, "Plane", emptyMap());
+        XMLNode root = createNode(0L, "Transport");
+        XMLNode sibling1st = createNode(1L, "Car");
+        XMLNode sibling2nd = createNode(5L, "Plane");
 
         InOrder inOrder = inOrder(listener);
         inOrder.verify(listener, times(2)).onNode(root, sibling1st);
@@ -222,8 +220,8 @@ public class XMLSlurperTest {
         parser.parse(getResourcePath("siblingsTestCase.xml"));
 
         // then
-        XMLNode root = nodeFactory.createNode(0L, "Transport", emptyMap());
-        XMLNode object = nodeFactory.createNode(1L, "Car", emptyMap());
+        XMLNode root = createNode(0L, "Transport");
+        XMLNode object = createNode(1L, "Car");
 
         verify(listener, times(2)).onNode(root, object);
         verifyNoMoreInteractions(listener);
@@ -239,8 +237,8 @@ public class XMLSlurperTest {
         parser.parse(getResourcePath("siblingsTestCase.xml"));
 
         // then
-        XMLNode root = nodeFactory.createNode(0L, "Transport", emptyMap());
-        XMLNode object = nodeFactory.createNode(5L, "Plane", emptyMap());
+        XMLNode root = createNode(0L, "Transport");
+        XMLNode object = createNode(5L, "Plane");
 
         verify(listener, times(2)).onNode(root, object);
         verifyNoMoreInteractions(listener);
@@ -256,8 +254,8 @@ public class XMLSlurperTest {
         parser.parse(getResourcePath("siblingsTestCase.xml"));
 
         // then
-        XMLNode object = nodeFactory.createNode(1L, "Car", emptyMap());
-        XMLNode child = nodeFactory.createNode(2L, "Engine", emptyMap());
+        XMLNode object = createNode(1L, "Car");
+        XMLNode child = createNode(2L, "Engine");
 
         verify(listener, times(2)).onNode(object, child);
         verifyNoMoreInteractions(listener);
@@ -276,5 +274,9 @@ public class XMLSlurperTest {
         slurpNode.findAll(listener);
 
         parser.parse(getResourcePath(resourcePath));
+    }
+
+    private XMLNode createNode(long id, String name) {
+        return nodeFactory.createNode(id, name, Collections.emptyMap());
     }
 }
