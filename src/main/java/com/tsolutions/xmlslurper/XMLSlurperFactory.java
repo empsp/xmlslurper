@@ -50,7 +50,7 @@ public final class XMLSlurperFactory {
         };
     }
 
-    public SlurpAlignmentFactory getSlurpAlignmentFactory() {
+    static SlurpAlignmentFactory getSlurpAlignmentFactory() {
         return new SlurpAlignmentFactory();
     }
 

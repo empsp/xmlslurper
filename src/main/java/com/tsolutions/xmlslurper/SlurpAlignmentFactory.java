@@ -61,8 +61,7 @@ final class SlurpAlignmentFactory {
     private class SimpleSlurpAlignment extends SlurpAlignment {
         private final List<String> namePath;
 
-        private boolean areMisaligned;
-        private int misalignmentDepthLevel;
+        private int misalignmentDepthLevel = Integer.MAX_VALUE;
 
         private SimpleSlurpAlignment(List<String> namePath) {
             this.namePath = namePath;
@@ -70,22 +69,16 @@ final class SlurpAlignmentFactory {
 
         @Override
         public boolean checkAlignment(XMLNode node, int depthLevel) {
-            if (depthLevel > namePath.size()) // check if actual hierarchy depth is greater than expected
+            if (depthLevel > misalignmentDepthLevel || depthLevel > namePath.size())
                 return false;
 
-            if (!areMisaligned) {
-                if (namePath.get(depthLevel - 1).equals(node.getName())) {
-                    // if partially aligned and names match, check if depths are the same, they are fully aligned if so
-                    if (depthLevel == namePath.size())
-                        return true;
-                } else {
-                    areMisaligned = true;
-                    misalignmentDepthLevel = depthLevel;
-                }
-            } else if (depthLevel <= misalignmentDepthLevel && namePath.get(depthLevel - 1).equals(node.getName())) {
-                // if were misaligned and names match but depth is less than misalignment depth, they again partially align
-                areMisaligned = false;
-            }
+            if (namePath.get(depthLevel - 1).equals(node.getName())) {
+                misalignmentDepthLevel = Integer.MAX_VALUE;
+
+                if (depthLevel == namePath.size()) // if partially aligned and names match, check if depths are the same, they are fully aligned if so
+                    return true;
+            } else
+                misalignmentDepthLevel = depthLevel;
 
             return false;
         }
@@ -99,7 +92,6 @@ final class SlurpAlignmentFactory {
     private class SiblingsSlurpAlignment extends SlurpAlignment {
         private final List<String> namePath;
 
-        private boolean areMisaligned;
         private int misalignmentDepthLevel;
 
         public SiblingsSlurpAlignment(List<String> namePath) {
@@ -108,23 +100,17 @@ final class SlurpAlignmentFactory {
 
         @Override
         public boolean checkAlignment(XMLNode node, int depthLevel) {
-            if (depthLevel > namePath.size()) // check if actual hierarchy depth is greater than expected
+            if (depthLevel > misalignmentDepthLevel || depthLevel > namePath.size())
                 return false;
 
-            if (!areMisaligned) {
-                String expectedNodeName = namePath.get(depthLevel - 1);
-                if (expectedNodeName.equals(node.getName()) || expectedNodeName.equals(SIBLINGSCHECK_MARKER)) {
-                    // if partially aligned and names match or siblings marker detected, check if depths are the same, they are fully aligned if so
-                    if (depthLevel == namePath.size())
-                        return true;
-                } else {
-                    areMisaligned = true;
-                    misalignmentDepthLevel = depthLevel;
-                }
-            } else if (depthLevel <= misalignmentDepthLevel && namePath.get(depthLevel - 1).equals(node.getName())) {
-                // if were misaligned and names match but depth is less than misalignment depth, they again partially align
-                areMisaligned = false;
-            }
+            String expectedNodeName = namePath.get(depthLevel - 1);
+            if (expectedNodeName.equals(node.getName()) || expectedNodeName.equals(SIBLINGSCHECK_MARKER)) {
+                misalignmentDepthLevel = Integer.MAX_VALUE;
+
+                if (depthLevel == namePath.size()) // if partially aligned and names match, check if depths are the same, they are fully aligned if so
+                    return true;
+            } else
+                misalignmentDepthLevel = depthLevel;
 
             return false;
         }
