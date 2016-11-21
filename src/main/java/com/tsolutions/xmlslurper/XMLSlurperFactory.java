@@ -4,6 +4,8 @@ import com.tsolutions.xmlslurper.listener.SlurpListener;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,15 +29,25 @@ public final class XMLSlurperFactory {
     }
 
     public XMLSlurper createXMLSlurper() {
-        return new SAXSlurper(SAXParserFactory.newInstance(), getNodeFactory(), getSlurpAlignmentFactory());
+        List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
+        SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
+
+        return new SAXSlurper(
+                SAXParserFactory.newInstance(), getNodeFactory(), getSlurpFactory(slurpAlignmentListenerTuples, slurpAlignmentFactory), slurpAlignmentListenerTuples);
     }
 
     public XMLSlurper createXMLSlurper(ParserType parserType) {
+        List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
+        SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
+        SlurpFactory slurpFactory = getSlurpFactory(slurpAlignmentListenerTuples, slurpAlignmentFactory);
+
+        NodeFactory nodeFactory = getNodeFactory();
+
         switch(parserType) {
             case STAX_PARSER:
-                return new StAXSlurper(XMLInputFactory.newInstance(), getNodeFactory(), getSlurpAlignmentFactory());
+                return new StAXSlurper(XMLInputFactory.newInstance(), nodeFactory, slurpFactory, slurpAlignmentListenerTuples);
             case SAX_PARSER:
-                return new SAXSlurper(SAXParserFactory.newInstance(), getNodeFactory(), getSlurpAlignmentFactory());
+                return new SAXSlurper(SAXParserFactory.newInstance(), nodeFactory, slurpFactory, slurpAlignmentListenerTuples);
         }
 
         throw new IllegalArgumentException();
@@ -52,6 +64,11 @@ public final class XMLSlurperFactory {
 
     static SlurpAlignmentFactory getSlurpAlignmentFactory() {
         return new SlurpAlignmentFactory();
+    }
+
+    private static SlurpFactory getSlurpFactory(
+            List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples, SlurpAlignmentFactory slurpAlignmentFactory) {
+        return new SlurpFactory(slurpAlignmentFactory, slurpAlignmentListenerTuples);
     }
 
     static class SlurpAlignmentListenerTuple {

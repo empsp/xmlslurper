@@ -2,7 +2,6 @@ package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
 import com.tsolutions.xmlslurper.XMLSlurperFactory.SlurpAlignmentListenerTuple;
-import com.tsolutions.xmlslurper.listener.SlurpListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
 import javax.xml.stream.XMLInputFactory;
@@ -23,23 +22,25 @@ public class StAXSlurper implements XMLSlurper {
 
     private final XMLInputFactory xmlInputFactory;
     private final NodeFactory nodeFactory;
-    private final SlurpAlignmentFactory slurpAlignmentFactory;
+    private final SlurpFactory slurpFactory;
 
     private FileInputStream fis;
     private XMLStreamReader parser;
 
     private Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
-    private List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
+    private List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples;
 
-    StAXSlurper(XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpAlignmentFactory slurpAlignmentFactory) {
+    StAXSlurper(
+            XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples) {
         this.xmlInputFactory = xmlInputFactory;
         this.nodeFactory = nodeFactory;
-        this.slurpAlignmentFactory = slurpAlignmentFactory;
+        this.slurpFactory = slurpFactory;
+        this.slurpAlignmentListenerTuples = slurpAlignmentListenerTuples;
     }
 
     @Override
     public SlurpNode getNodes() {
-        return new SlurpNodeImpl(slurpAlignmentListenerTuples, slurpAlignmentFactory, slurpAlignmentFactory.createEmpty());
+        return slurpFactory.createSlurpNode();
     }
 
     @Override
