@@ -27,7 +27,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private FileInputStream fis;
     private SAXParser parser;
 
-    private Deque<XMLNode> descendants = new LinkedList<XMLNode>();
+    private Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
     private List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
 
     SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpAlignmentFactory slurpAlignmentFactory) {
@@ -55,11 +55,12 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         XMLNode parent = descendants.peekLast();
         XMLNode child = nodeFactory.createNode(idFeed++, qName.intern(), parseAttributes(attributes));
-        descendants.addLast(child);
 
         for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
-            if(tuple.getSlurpAlignment().checkAlignment(child, descendants.size()))
+            if(tuple.getSlurpAlignment().checkAlignment(descendants, child))
                 tuple.getSlurpListener().onNode(parent, child);
+
+        descendants.addLast(child);
     }
 
     @Override
@@ -72,13 +73,11 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        // important to get depthLevel of descendants before any operation
-        int depthLevel = descendants.size();
         XMLNode child = descendants.removeLast();
         XMLNode parent = descendants.peekLast();
 
         for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
-            if(tuple.getSlurpAlignment().checkAlignment(child, depthLevel))
+            if(tuple.getSlurpAlignment().checkAlignment(descendants, child))
                 tuple.getSlurpListener().onNode(parent, child);
     }
 

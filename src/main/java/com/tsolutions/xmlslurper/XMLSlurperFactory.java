@@ -44,8 +44,8 @@ public final class XMLSlurperFactory {
     static NodeFactory getNodeFactory() {
         return new NodeFactory() {
             @Override
-            XMLNode createNode(long id, String name, Map<String, String> attributeByName) {
-                return new XMLNodeImpl(id, name, attributeByName);
+            XMLNode createNode(long id, String localName, Map<String, String> attributeByName) {
+                return new XMLNodeImpl(id, localName, attributeByName);
             }
         };
     }

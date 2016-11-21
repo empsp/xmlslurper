@@ -1,54 +1,61 @@
 package com.tsolutions.xmlslurper;
 
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by mturski on 11/13/2016.
  */
 final class SlurpAlignmentFactory {
-    private static final String SIBLINGCHECK_MARKER = "*";
-    private static final String DEPTHCHECK_MARKER = "**";
+    private static final String SIBLING_MARKER = "*";
+    private static final String DEPTH_MARKER = "**";
 
     SlurpAlignment createEmpty() {
         return new DefaultSlurpAlignment();
     }
 
-    SlurpAlignment copyAlignmentAndAddNode(SlurpAlignment slurpAlignment, String nodeName) {
-        List<String> namePath = new ArrayList<String>(slurpAlignment.getPath());
-        namePath.add(nodeName);
+    SlurpAlignment copyAlignmentAndAddNode(SlurpAlignment slurpAlignment, String nodeLocalName) {
+        List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
+        localNamePath.add(nodeLocalName);
 
-        return getSlurpAlignment(namePath);
+        return getSlurpAlignment(localNamePath);
     }
 
     SlurpAlignment copyAlignmentAndAddAttribute(SlurpAlignment slurpAlignment, String attrName) {
-        List<String> namePath = new ArrayList<String>(slurpAlignment.getPath());
+        List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new SlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), attrName);
+        return new SlurpAttributeAlignmentWrapper(getSlurpAlignment(localNamePath), attrName);
     }
 
     SlurpAlignment copyAlignmentAndAddAttributeValue(SlurpAlignment slurpAlignment, String attrValue) {
-        List<String> namePath = new ArrayList<String>(slurpAlignment.getPath());
+        List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new ValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName, attrValue);
+        return new ValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(localNamePath), ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName, attrValue);
     }
 
     SlurpAlignment copyAlignmentAndAddAttributeExcludedValue(SlurpAlignment slurpAlignment, String attrValue) {
-        List<String> namePath = new ArrayList<String>(slurpAlignment.getPath());
+        List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new ExcludedValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(namePath), ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName, attrValue);
+        return new ExcludedValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(localNamePath), ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName, attrValue);
     }
 
-    private SlurpAlignment getSlurpAlignment(List<String> namePath) {
-        if (namePath.contains(SIBLINGCHECK_MARKER))
-            return new SiblingsSlurpAlignment(namePath);
+    private SlurpAlignment getSlurpAlignment(List<String> localNamePath) {
+        if (localNamePath.contains(DEPTH_MARKER))
+            return new DepthSlurpAlignment(localNamePath);
         else
-            return new SimpleSlurpAlignment(namePath);
+            return new SimpleSlurpAlignment(localNamePath);
     }
 
     private class DefaultSlurpAlignment extends SlurpAlignment {
         @Override
-        public boolean checkAlignment(XMLNode node, int depthLevel) {
+        public boolean checkAlignment(int depth, XMLNode lastNode) {
+            return true;
+        }
+
+        @Override
+        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
             return true;
         }
 
@@ -59,65 +66,96 @@ final class SlurpAlignmentFactory {
     }
 
     private class SimpleSlurpAlignment extends SlurpAlignment {
-        private final List<String> namePath;
+        private final List<String> localNamePath;
 
-        private int misalignmentDepthLevel = Integer.MAX_VALUE;
+        private int misalignmentDepth = Integer.MAX_VALUE;
 
-        private SimpleSlurpAlignment(List<String> namePath) {
-            this.namePath = namePath;
+        private SimpleSlurpAlignment(List<String> localNamePath) {
+            this.localNamePath = localNamePath;
         }
 
         @Override
-        public boolean checkAlignment(XMLNode node, int depthLevel) {
-            if (depthLevel > misalignmentDepthLevel || depthLevel > namePath.size())
+        public boolean checkAlignment(int depth, XMLNode lastNode) {
+            if (depth > misalignmentDepth || depth > localNamePath.size())
                 return false;
 
-            if (namePath.get(depthLevel - 1).equals(node.getName())) {
-                misalignmentDepthLevel = Integer.MAX_VALUE;
+            String name = localNamePath.get(depth - 1);
+            if (name.equals(lastNode.getLocalName()) || name.equals(SIBLING_MARKER)) {
+                misalignmentDepth = Integer.MAX_VALUE;
 
-                if (depthLevel == namePath.size()) // if partially aligned and names match, check if depths are the same, they are fully aligned if so
+                if (depth == localNamePath.size()) // paths are aligned only when all path names match and sizes are equal
                     return true;
             } else
-                misalignmentDepthLevel = depthLevel;
+                misalignmentDepth = depth;
 
             return false;
         }
 
         @Override
+        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
+            return checkAlignment(descendants.size() + 1, lastNode); // +1 for lastNode which is a detached part of descendants
+        }
+
+        @Override
         public List<String> getPath() {
-            return namePath;
+            return localNamePath;
         }
     }
 
-    private class SiblingsSlurpAlignment extends SlurpAlignment {
-        private final List<String> namePath;
+    private class DepthSlurpAlignment extends SlurpAlignment {
+        private final List<String> localNamePath;
 
-        private int misalignmentDepthLevel = Integer.MAX_VALUE;
-
-        public SiblingsSlurpAlignment(List<String> namePath) {
-            this.namePath = namePath;
+        public DepthSlurpAlignment(List<String> localNamePath) {
+            this.localNamePath = localNamePath;
         }
 
         @Override
-        public boolean checkAlignment(XMLNode node, int depthLevel) {
-            if (depthLevel > misalignmentDepthLevel || depthLevel > namePath.size())
-                return false;
+        public boolean checkAlignment(int depth, XMLNode lastNode) {
+            throw new UnsupportedOperationException(); // TODO unsupported yet
+        }
 
-            String expectedNodeName = namePath.get(depthLevel - 1);
-            if (expectedNodeName.equals(SIBLINGCHECK_MARKER) || expectedNodeName.equals(node.getName())) {
-                misalignmentDepthLevel = Integer.MAX_VALUE;
+        @Override
+        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
+            Iterator<String> nameIt = localNamePath.iterator();
+            String name = nameIt.next();
+            boolean isPrevNameDepthMarker = false;
+            boolean isSiblingAfterDepthMarker = false;
 
-                if (depthLevel == namePath.size()) // if partially aligned and names match, check if depths are the same, they are fully aligned if so
-                    return true;
-            } else
-                misalignmentDepthLevel = depthLevel;
+            for (XMLNode descendant : descendants) {
+                if (name.equals(DEPTH_MARKER)) {
+                    if (!nameIt.hasNext())
+                        return true;
 
-            return false;
+                    isPrevNameDepthMarker = true;
+                    name = nameIt.next();
+                }
+
+                if (name.equals(SIBLING_MARKER)) {
+                    if (!nameIt.hasNext())
+                        return false;
+
+                    if (isPrevNameDepthMarker)
+                        isSiblingAfterDepthMarker = true;
+
+                    isPrevNameDepthMarker = false;
+                    name = nameIt.next();
+                } else if (name.equals(descendant.getLocalName())) {
+                    if (!nameIt.hasNext())
+                        return false;
+
+                    isSiblingAfterDepthMarker = false;
+                    isPrevNameDepthMarker = false;
+                    name = nameIt.next();
+                } else if (!isPrevNameDepthMarker && !isSiblingAfterDepthMarker)
+                    return false;
+            }
+
+            return !nameIt.hasNext() && (name.equals(lastNode.getLocalName()) || name.equals(SIBLING_MARKER) || name.equals(DEPTH_MARKER));
         }
 
         @Override
         public List<String> getPath() {
-            return namePath;
+            return localNamePath;
         }
     }
 
@@ -131,8 +169,13 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(XMLNode node, int depthLevel) {
-            return slurpAlignment.checkAlignment(node, depthLevel) && node.hasAttribute(attrName);
+        boolean checkAlignment(int depth, XMLNode lastNode) {
+            return slurpAlignment.checkAlignment(depth, lastNode) && lastNode.hasAttribute(attrName);
+        }
+
+        @Override
+        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
+            return slurpAlignment.checkAlignment(descendants, lastNode) && lastNode.hasAttribute(attrName);
         }
 
         @Override
@@ -153,8 +196,13 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(XMLNode node, int depthLevel) {
-            return slurpAlignment.checkAlignment(node, depthLevel) && attrValue.equals(node.getAttribute(attrName));
+        boolean checkAlignment(int depth, XMLNode lastNode) {
+            return slurpAlignment.checkAlignment(depth, lastNode) && attrValue.equals(lastNode.getAttribute(attrName));
+        }
+
+        @Override
+        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
+            return slurpAlignment.checkAlignment(descendants, lastNode) && attrValue.equals(lastNode.getAttribute(attrName));
         }
 
         @Override
@@ -175,8 +223,13 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(XMLNode node, int depthLevel) {
-            return slurpAlignment.checkAlignment(node, depthLevel) && !attrValue.equals(node.getAttribute(attrName));
+        boolean checkAlignment(int depth, XMLNode lastNode) {
+            return slurpAlignment.checkAlignment(depth, lastNode) && !attrValue.equals(lastNode.getAttribute(attrName));
+        }
+
+        @Override
+        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
+            return slurpAlignment.checkAlignment(descendants, lastNode) && !attrValue.equals(lastNode.getAttribute(attrName));
         }
 
         @Override

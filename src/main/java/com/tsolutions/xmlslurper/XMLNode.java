@@ -11,10 +11,10 @@ import java.util.Map;
 public interface XMLNode {
     long getId();
 
-    void setName(@NotNull String name);
+    void setLocalName(@NotNull String name);
 
     @NotNull
-    String getName();
+    String getLocalName();
 
     void setText(@Nullable String text);
 

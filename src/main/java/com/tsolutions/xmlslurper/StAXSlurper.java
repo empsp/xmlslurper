@@ -28,7 +28,7 @@ public class StAXSlurper implements XMLSlurper {
     private FileInputStream fis;
     private XMLStreamReader parser;
 
-    private Deque<XMLNode> descendants = new LinkedList<XMLNode>();
+    private Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
     private List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
 
     StAXSlurper(XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpAlignmentFactory slurpAlignmentFactory) {
@@ -71,11 +71,12 @@ public class StAXSlurper implements XMLSlurper {
     private void onStartElement() {
         XMLNode parent = descendants.peekLast();
         XMLNode child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes());
-        descendants.addLast(child);
 
         for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
-            if(tuple.getSlurpAlignment().checkAlignment(child, descendants.size()))
+            if(tuple.getSlurpAlignment().checkAlignment(descendants, child))
                 tuple.getSlurpListener().onNode(parent, child);
+
+        descendants.addLast(child);
     }
 
     private Map<String, String> parseAttributes() {
@@ -95,13 +96,11 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     private void onEndElement() {
-        // important to get depthLevel of descendants before any operation
-        int depthLevel = descendants.size();
         XMLNode child = descendants.removeLast();
         XMLNode parent = descendants.peekLast();
 
         for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
-            if(tuple.getSlurpAlignment().checkAlignment(child, depthLevel))
+            if(tuple.getSlurpAlignment().checkAlignment(descendants, child))
                 tuple.getSlurpListener().onNode(parent, child);
     }
 

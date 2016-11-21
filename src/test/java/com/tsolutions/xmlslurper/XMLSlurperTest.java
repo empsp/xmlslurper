@@ -90,7 +90,7 @@ public class XMLSlurperTest {
         expectedAttributes.put("attr2", "E=1");
 
         XMLNode actualObject = actualNodes.get(1);
-        assertThat(actualObject.getName(), is("Object"));
+        assertThat(actualObject.getLocalName(), is("Object"));
         assertThat(actualObject.getText(), is("attrValue"));
         assertThat(actualObject.getAttributes(), is(expectedAttributes));
     }

@@ -14,13 +14,13 @@ import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 public final class XMLNodeImpl implements XMLNode {
     private final long id;
 
-    private String name;
+    private String localName;
     private String text;
     private Map<String, String> attributeByName;
 
-    XMLNodeImpl(long id, String name, Map<String, String> attributeByName) {
+    XMLNodeImpl(long id, String localName, Map<String, String> attributeByName) {
         this.id = id;
-        this.name = requireNonNull(name);
+        this.localName = requireNonNull(localName);
         this.attributeByName = requireNonNull(attributeByName);
     }
 
@@ -30,13 +30,13 @@ public final class XMLNodeImpl implements XMLNode {
     }
 
     @Override
-    public void setName(@NotNull String name) {
-        this.name = requireNonNull(name);
+    public void setLocalName(@NotNull String name) {
+        this.localName = requireNonNull(name);
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getLocalName() {
+        return localName;
     }
 
     @Override
@@ -102,7 +102,7 @@ public final class XMLNodeImpl implements XMLNode {
     public String toString() {
         return "XMLNodeImpl{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", localName='" + localName + '\'' +
                 ", text='" + text + '\'' +
                 ", attributeByName=" + attributeByName +
                 '}';
