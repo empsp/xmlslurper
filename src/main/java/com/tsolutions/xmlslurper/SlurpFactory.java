@@ -1,8 +1,9 @@
 package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 import com.tsolutions.xmlslurper.XMLSlurperFactory.SlurpAlignmentListenerTuple;
-import com.tsolutions.xmlslurper.listener.SlurpListener;
+import com.tsolutions.xmlslurper.listener.NodeListener;
 import com.tsolutions.xmlslurper.path.Slurp;
 import com.tsolutions.xmlslurper.path.SlurpAttribute;
 import com.tsolutions.xmlslurper.path.SlurpNode;
@@ -72,10 +73,13 @@ final class SlurpFactory {
         }
 
         @Override
-        public void findAll(@NotNull SlurpListener slurpListener) {
-            requireNonNull(slurpListener);
+        public void findAll(@Nullable NodeListener nodeListener) {
+            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, nodeListener, nodeListener));
+        }
 
-            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, slurpListener));
+        @Override
+        public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
+            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, startNodeListener, endNodeListener));
         }
     }
 
@@ -101,10 +105,13 @@ final class SlurpFactory {
         }
 
         @Override
-        public void findAll(@NotNull SlurpListener slurpListener) {
-            requireNonNull(slurpListener);
+        public void findAll(@Nullable NodeListener nodeListener) {
+            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, nodeListener));
+        }
 
-            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, slurpListener));
+        @Override
+        public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
+            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, startNodeListener, endNodeListener));
         }
     }
 }

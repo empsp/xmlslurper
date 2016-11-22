@@ -2,6 +2,7 @@ package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
 import com.tsolutions.xmlslurper.XMLSlurperFactory.SlurpAlignmentListenerTuple;
+import com.tsolutions.xmlslurper.listener.NodeListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -58,9 +59,14 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         XMLNode parent = descendants.peekLast();
         XMLNode child = nodeFactory.createNode(idFeed++, qName.intern(), parseAttributes(attributes));
 
-        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
-            if(tuple.getSlurpAlignment().checkAlignment(descendants, child))
-                tuple.getSlurpListener().onNode(parent, child);
+        NodeListener startNodeListener;
+        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples) {
+            startNodeListener = tuple.getStartNodeListener();
+
+            if(startNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child))
+                startNodeListener.onNode(parent, child);
+        }
+
 
         descendants.addLast(child);
     }
@@ -78,9 +84,13 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         XMLNode child = descendants.removeLast();
         XMLNode parent = descendants.peekLast();
 
-        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
-            if(tuple.getSlurpAlignment().checkAlignment(descendants, child))
-                tuple.getSlurpListener().onNode(parent, child);
+        NodeListener endNodeListener;
+        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples) {
+            endNodeListener = tuple.getEndNodeListener();
+
+            if(endNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child))
+                endNodeListener.onNode(parent, child);
+        }
     }
 
     private Map<String, String> parseAttributes(Attributes attributes) {

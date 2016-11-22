@@ -1,12 +1,8 @@
 package com.tsolutions.xmlslurper.listener;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
-import com.tsolutions.xmlslurper.XMLNode;
-
 /**
- * Created by mturski on 11/11/2016.
+ * Created by mturski on 11/22/2016.
  */
-public interface SlurpListener {
-    void onNode(@Nullable XMLNode parent, @NotNull XMLNode node);
+@Deprecated
+public interface SlurpListener extends NodeListener {
 }

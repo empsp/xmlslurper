@@ -1,6 +1,6 @@
 package com.tsolutions.xmlslurper;
 
-import com.tsolutions.xmlslurper.listener.SlurpListener;
+import com.tsolutions.xmlslurper.listener.NodeListener;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
@@ -73,19 +73,29 @@ public final class XMLSlurperFactory {
 
     static class SlurpAlignmentListenerTuple {
         private final SlurpAlignment slurpAlignment;
-        private final SlurpListener slurpListener;
+        private final NodeListener startNodeListener;
+        private NodeListener endNodeListener;
 
-        SlurpAlignmentListenerTuple(SlurpAlignment slurpAlignment, SlurpListener slurpListener) {
+        SlurpAlignmentListenerTuple(SlurpAlignment slurpAlignment, NodeListener startNodeListener, NodeListener endNodeListener) {
             this.slurpAlignment = slurpAlignment;
-            this.slurpListener = slurpListener;
+            this.startNodeListener = startNodeListener;
+            this.endNodeListener = endNodeListener;
+        }
+
+        SlurpAlignmentListenerTuple(SlurpAlignment slurpAlignment, NodeListener nodeListener) {
+            this(slurpAlignment, nodeListener, nodeListener);
         }
 
         SlurpAlignment getSlurpAlignment() {
             return slurpAlignment;
         }
 
-        SlurpListener getSlurpListener() {
-            return slurpListener;
+        NodeListener getStartNodeListener() {
+            return startNodeListener;
+        }
+
+        NodeListener getEndNodeListener() {
+            return endNodeListener;
         }
     }
 }

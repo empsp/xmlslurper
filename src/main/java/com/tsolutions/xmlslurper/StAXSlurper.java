@@ -75,7 +75,7 @@ public class StAXSlurper implements XMLSlurper {
 
         for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
             if(tuple.getSlurpAlignment().checkAlignment(descendants, child))
-                tuple.getSlurpListener().onNode(parent, child);
+                tuple.getStartNodeListener().onNode(parent, child);
 
         descendants.addLast(child);
     }
@@ -102,7 +102,7 @@ public class StAXSlurper implements XMLSlurper {
 
         for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples)
             if(tuple.getSlurpAlignment().checkAlignment(descendants, child))
-                tuple.getSlurpListener().onNode(parent, child);
+                tuple.getEndNodeListener().onNode(parent, child);
     }
 
     private void close() throws XMLStreamException, IOException {
