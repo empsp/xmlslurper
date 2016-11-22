@@ -12,13 +12,16 @@ final class SlurpAlignmentFactory {
     private static final String SIBLING_MARKER = "*";
     private static final String DEPTH_MARKER = "**";
 
+    SlurpAlignmentFactory() {
+    }
+
     SlurpAlignment createEmpty() {
         return new DefaultSlurpAlignment();
     }
 
-    SlurpAlignment copyAlignmentAndAddNode(SlurpAlignment slurpAlignment, String nodeLocalName) {
+    SlurpAlignment copyAlignmentAndAddNode(SlurpAlignment slurpAlignment, String localName) {
         List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
-        localNamePath.add(nodeLocalName);
+        localNamePath.add(localName);
 
         return getSlurpAlignment(localNamePath);
     }
