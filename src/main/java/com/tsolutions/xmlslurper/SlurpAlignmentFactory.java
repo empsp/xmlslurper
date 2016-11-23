@@ -1,9 +1,6 @@
 package com.tsolutions.xmlslurper;
 
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by mturski on 11/13/2016.
@@ -114,8 +111,9 @@ final class SlurpAlignmentFactory {
 
         @Override
         public boolean checkAlignment(int depth, XMLNode lastNode) {
-            throw new UnsupportedOperationException(); // TODO unsupported yet
+            throw new UnsupportedOperationException();
         }
+
 
         @Override
         boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
@@ -152,6 +150,9 @@ final class SlurpAlignmentFactory {
                 } else if (!isPrevNameDepthMarker && !isSiblingAfterDepthMarker)
                     return false;
             }
+
+            while (name.equals(DEPTH_MARKER) && nameIt.hasNext())
+                name = nameIt.next();
 
             return !nameIt.hasNext() && (name.equals(lastNode.getLocalName()) || name.equals(SIBLING_MARKER) || name.equals(DEPTH_MARKER));
         }

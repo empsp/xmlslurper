@@ -136,6 +136,59 @@ public class DepthSlurpAlignmentTest {
         createAndAssertNotAlign("Descendant");
     }
 
+    @Test
+    public void givenChildrenOfRootDescendantsCheckAlignmentReturnsTrueForAllNodesUnderRoot() {
+        slurpAlignment = getAlignment("Child", "**", "*");
+
+        createAndAssertNotAlign("Root");
+        addAsLast();
+        createAndAssertNotAlign("Child");
+        removeLast();
+        createAndAssertNotAlign("Child");
+        addAsLast();
+        createAndAssertAlign("Descendant");
+        createAndAssertAlign("Kin");
+        addAsLast();
+        createAndAssertNotAlign("Offspring");
+    }
+
+    @Test
+    public void givenChildrenOfDescendantsCheckAlignmentReturnsTrueForRootNodes() {
+        slurpAlignment = getAlignment("**", "*");
+
+        createAndAssertAlign("Root");
+        addAsLast();
+        createAndAssertNotAlign("Child");
+        removeLast();
+        createAndAssertAlign("OtherRoot");
+        addAsLast();
+        createAndAssertNotAlign("Kin");
+        addAsLast();
+        createAndAssertNotAlign("Descendant");
+        removeLast();
+        removeLast();
+        createAndAssertAlign("Child");
+    }
+
+    @Test
+    public void givenChildrenOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForRootAndChildren() {
+        slurpAlignment = getAlignment("**", "**", "*");
+
+        createAndAssertAlign("Root");
+        addAsLast();
+        createAndAssertAlign("Child");
+        removeLast();
+        createAndAssertAlign("OtherRoot");
+        addAsLast();
+        createAndAssertAlign("Kin");
+        addAsLast();
+        createAndAssertNotAlign("Descendant");
+        removeLast();
+        createAndAssertAlign("Offspring");
+        removeLast();
+        createAndAssertAlign("Child");
+    }
+
     @After
     public void teardown() {
         slurpAlignment = null;
