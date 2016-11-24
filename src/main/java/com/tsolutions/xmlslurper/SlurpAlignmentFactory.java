@@ -1,6 +1,8 @@
 package com.tsolutions.xmlslurper;
 
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Created by mturski on 11/13/2016.
@@ -26,24 +28,54 @@ final class SlurpAlignmentFactory {
     SlurpAlignment copyAlignmentAndAddAttribute(SlurpAlignment slurpAlignment, String attrName) {
         List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new SlurpAttributeAlignmentWrapper(getSlurpAlignment(localNamePath), attrName);
+        return new SlurpAttributeAlignmentWrapper(
+                getSlurpAlignment(localNamePath),
+                attrName);
     }
 
     SlurpAlignment copyAlignmentAndAddAttributeValue(SlurpAlignment slurpAlignment, String attrValue) {
         List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new ValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(localNamePath), ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName, attrValue);
+        return new ValueSlurpAttributeAlignmentWrapper(
+                getSlurpAlignment(localNamePath),
+                ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName,
+                attrValue);
     }
 
     SlurpAlignment copyAlignmentAndAddAttributeExcludedValue(SlurpAlignment slurpAlignment, String attrValue) {
         List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new ExcludedValueSlurpAttributeAlignmentWrapper(getSlurpAlignment(localNamePath), ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName, attrValue);
+        return new ExcludedValueSlurpAttributeAlignmentWrapper(
+                getSlurpAlignment(localNamePath),
+                ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName,
+                new String[] {attrValue});
+    }
+
+    SlurpAlignment copyAlignmentAndAddAttributeExcludedValues(SlurpAlignment slurpAlignment, String[] attrValues) {
+        List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
+        String[] copiedAttrValues = Arrays.copyOf(attrValues, attrValues.length);
+
+        return new ExcludedValueSlurpAttributeAlignmentWrapper(
+                getSlurpAlignment(localNamePath),
+                ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName,
+                copiedAttrValues);
+    }
+
+    SlurpAlignment copyAlignmentAndAddAttributeRegexValue(SlurpAlignment slurpAlignment, String regex) {
+        List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
+        Pattern valuePattern = Pattern.compile(regex);
+
+        return new RegexValueSlurpAttributeAlignmentWrapper(
+                getSlurpAlignment(localNamePath),
+                ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName,
+                valuePattern);
     }
 
     private SlurpAlignment getSlurpAlignment(List<String> localNamePath) {
         if (localNamePath.contains(DEPTH_MARKER))
             return new DepthSlurpAlignment(localNamePath);
+        else if (localNamePath.isEmpty())
+            return new DefaultSlurpAlignment();
         else
             return new SimpleSlurpAlignment(localNamePath);
     }
@@ -113,7 +145,6 @@ final class SlurpAlignmentFactory {
         public boolean checkAlignment(int depth, XMLNode lastNode) {
             throw new UnsupportedOperationException();
         }
-
 
         @Override
         boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
@@ -218,22 +249,80 @@ final class SlurpAlignmentFactory {
     private class ExcludedValueSlurpAttributeAlignmentWrapper extends SlurpAlignment {
         private final SlurpAlignment slurpAlignment;
         private final String attrName;
-        private final String attrValue;
+        private final String[] attrValues;
 
-        public ExcludedValueSlurpAttributeAlignmentWrapper(SlurpAlignment slurpAlignment, String attrName, String attrValue) {
+        public ExcludedValueSlurpAttributeAlignmentWrapper(SlurpAlignment slurpAlignment, String attrName, String[] attrValues) {
             this.slurpAlignment = slurpAlignment;
             this.attrName = attrName;
-            this.attrValue = attrValue;
+            this.attrValues = attrValues;
         }
 
         @Override
         boolean checkAlignment(int depth, XMLNode lastNode) {
-            return slurpAlignment.checkAlignment(depth, lastNode) && !attrValue.equals(lastNode.getAttribute(attrName));
+            if (slurpAlignment.checkAlignment(depth, lastNode)) {
+                String actualAttrValue = lastNode.getAttribute(attrName);
+
+                return actualAttrValue != null && isAttributeValueOutsideExcludedRange(actualAttrValue);
+            }
+
+            return false;
+        }
+
+        private boolean isAttributeValueOutsideExcludedRange(String actualAttrValue) {
+            for (String attrValue : attrValues)
+                if (attrValue.equals(actualAttrValue))
+                    return false;
+
+            return true;
         }
 
         @Override
         boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            return slurpAlignment.checkAlignment(descendants, lastNode) && !attrValue.equals(lastNode.getAttribute(attrName));
+            if (slurpAlignment.checkAlignment(descendants, lastNode)) {
+                String actualAttrValue = lastNode.getAttribute(attrName);
+
+                return actualAttrValue != null && isAttributeValueOutsideExcludedRange(actualAttrValue);
+            }
+
+            return false;
+        }
+
+        @Override
+        List<String> getPath() {
+            return slurpAlignment.getPath();
+        }
+    }
+
+    private class RegexValueSlurpAttributeAlignmentWrapper extends SlurpAlignment {
+        private final SlurpAlignment slurpAlignment;
+        private final String attrName;
+        private final Pattern valuePattern;
+
+        public RegexValueSlurpAttributeAlignmentWrapper(SlurpAlignment slurpAlignment, String attrName, Pattern valuePattern) {
+            this.slurpAlignment = slurpAlignment;
+            this.attrName = attrName;
+            this.valuePattern = valuePattern;
+        }
+        @Override
+        boolean checkAlignment(int depth, XMLNode lastNode) {
+            if (slurpAlignment.checkAlignment(depth, lastNode)) {
+                String actualAttrValue = lastNode.getAttribute(attrName);
+
+                return actualAttrValue != null && valuePattern.matcher(lastNode.getAttribute(attrName)).find();
+            }
+
+            return false;
+        }
+
+        @Override
+        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
+            if (slurpAlignment.checkAlignment(descendants, lastNode)) {
+                String actualAttrValue = lastNode.getAttribute(attrName);
+
+                return actualAttrValue != null && valuePattern.matcher(actualAttrValue).find();
+            }
+
+            return false;
         }
 
         @Override

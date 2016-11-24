@@ -8,6 +8,7 @@ import com.tsolutions.xmlslurper.path.Slurp;
 import com.tsolutions.xmlslurper.path.SlurpAttribute;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
@@ -17,7 +18,7 @@ import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
  */
 final class SlurpFactory {
     enum SlurpAlignmentType {
-        IS, ISNOT;
+        IS, ISNOT, REGEX;
     }
 
     private SlurpAlignmentFactory slurpAlignmentFactory;
@@ -40,15 +41,21 @@ final class SlurpFactory {
         return new SlurpAttributeImpl(slurpAlignmentFactory.copyAlignmentAndAddAttribute(slurpAlignment, attrName));
     }
 
-    SlurpAttribute createSlurpAttribute(SlurpAlignment slurpAlignment, String attrValue, SlurpAlignmentType slurpAlignmentType) {
+    SlurpAttribute createSlurpAttribute(SlurpAlignmentType slurpAlignmentType, SlurpAlignment slurpAlignment, String attrValue) {
         switch(slurpAlignmentType) {
             case IS:
                 return new SlurpAttributeImpl(slurpAlignmentFactory.copyAlignmentAndAddAttributeValue(slurpAlignment, attrValue));
             case ISNOT:
                 return new SlurpAttributeImpl(slurpAlignmentFactory.copyAlignmentAndAddAttributeExcludedValue(slurpAlignment, attrValue));
+            case REGEX:
+                return new SlurpAttributeImpl(slurpAlignmentFactory.copyAlignmentAndAddAttributeRegexValue(slurpAlignment, attrValue));
         }
 
         throw new IllegalArgumentException();
+    }
+
+    SlurpAttribute createSlurpAttribute(SlurpAlignment slurpAlignment, String[] attrValues) {
+        return new SlurpAttributeImpl(slurpAlignmentFactory.copyAlignmentAndAddAttributeExcludedValues(slurpAlignment, attrValues));
     }
 
     private class SlurpNodeImpl implements SlurpNode {
@@ -94,14 +101,28 @@ final class SlurpFactory {
         public Slurp is(@NotNull String value) {
             requireNonNull(value);
 
-            return createSlurpAttribute(slurpAlignment, value, SlurpAlignmentType.IS);
+            return createSlurpAttribute(SlurpAlignmentType.IS, slurpAlignment, value);
+        }
+
+        @Override
+        public Slurp regex(@NotNull String regex) {
+            requireNonNull(regex);
+
+            return createSlurpAttribute(SlurpAlignmentType.REGEX, slurpAlignment, regex);
         }
 
         @Override
         public Slurp isNot(@NotNull String value) {
             requireNonNull(value);
 
-            return createSlurpAttribute(slurpAlignment, value, SlurpAlignmentType.ISNOT);
+            return createSlurpAttribute(SlurpAlignmentType.ISNOT, slurpAlignment, value);
+        }
+
+        @Override
+        public Slurp isNot(@NotNull String... values) {
+            requireNonNull(values);
+
+            return createSlurpAttribute(slurpAlignment, values);
         }
 
         @Override

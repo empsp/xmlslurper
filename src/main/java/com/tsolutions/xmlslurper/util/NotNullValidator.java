@@ -13,11 +13,22 @@ public final class NotNullValidator {
         return obj;
     }
 
+    public static final <T> T[] requireNonNull(T[] objs) {
+        if (objs == null)
+            throw new NullPointerException();
+
+        for (T obj : objs)
+            if (obj == null)
+                throw new NullPointerException();
+
+        return objs;
+    }
+
     public static final <K, V> Map<K, V> requireNonNull(Map<K, V> map) {
         if (map == null)
             throw new NullPointerException();
 
-        for(Map.Entry<K, V> entry : map.entrySet()) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
             if (entry.getKey() == null)
                 throw new NullPointerException();
 

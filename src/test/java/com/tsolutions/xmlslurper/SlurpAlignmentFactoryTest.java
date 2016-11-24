@@ -60,6 +60,7 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Child", 2);
     }
 
+    @Ignore
     @Test
     public void givenRootDescendantsCheckAlignmentReturnTrueForAllNodesUnderRoot() {
         slurpAlignment = getAlignment("Root", "**");
@@ -74,6 +75,7 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Child", 2);
     }
 
+    @Ignore
     @Test
     public void givenDescendantsOfChildOfAnyRootCheckAlignmentReturnsTrueForAllNodesUnderChildUnderAnyRoot() {
         slurpAlignment = getAlignment("*", "Child", "**");
@@ -91,6 +93,7 @@ public class SlurpAlignmentFactoryTest {
         assertAlign("Offspring", 4);
     }
 
+    @Ignore
     @Test
     public void givenDescendantsHavingChildCheckAlignmentReturnsTrueForFirstChildInDescendantTree() {
         slurpAlignment = getAlignment("**", "Child");
@@ -104,6 +107,7 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Child", 4);
     }
 
+    @Ignore
     @Test
     public void givenChildrenOfDescendantsHavingChildCheckAlignmentReturnsTrueForImmediateChildrenOfFirstChildInDescendantTree() {
         slurpAlignment = getAlignment("**", "Child", "*");
@@ -120,6 +124,7 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Descendant", 5);
     }
 
+    @Ignore
     @Test
     public void givenDescendantsHavingNotImmediateChildCheckAlignmentReturnsTrueForSecondChildToAnyNodeInDescendantTree() {
         slurpAlignment = getAlignment("**", "*", "Child");
@@ -136,6 +141,7 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Descendant", 5);
     }
 
+    @Ignore
     @Test
     public void givenChildrenOfRootDescendantsCheckAlignmentReturnsTrueForAllNodesUnderRoot() {
         slurpAlignment = getAlignment("Child", "**", "*");
@@ -148,6 +154,7 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Offspring", 3);
     }
 
+    @Ignore
     @Test
     public void givenChildrenOfDescendantsCheckAlignmentReturnsTrueForRootNodes() {
         slurpAlignment = getAlignment("**", "*");
@@ -160,6 +167,7 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Descendant", 3);
     }
 
+    @Ignore
     @Test
     public void givenChildrenOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForRootAndChildren() {
         slurpAlignment = getAlignment("**", "**", "*");

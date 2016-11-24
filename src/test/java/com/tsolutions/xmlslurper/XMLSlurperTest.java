@@ -6,6 +6,7 @@ import com.tsolutions.xmlslurper.listener.NodeListener;
 import com.tsolutions.xmlslurper.path.Slurp;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -49,7 +50,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeWithRootNodeSetFindAllReturnsRootNode() throws Exception {
+    public void givenRootSlurpNodeFindAllReturnsRoot() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -62,7 +63,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeWithChildNodeSetFindAllReturnsTheChild() throws Exception {
+    public void givenChildSlurpNodeFindAllReturnsChildOfRoot() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -79,7 +80,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenXmlFileSlurpNodeFindAllReturnsCompleteData() throws Exception {
+    public void givenChildSlurpNodeFindAllReturnsCompleteDataForChildOfRoot() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -103,7 +104,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSpecificDepthOfNodeFindAllReturnsNodesFromThatSpecificDepth() throws Exception {
+    public void givenChildOfChildSlurpNodeFindAllReturnsNodesFromThatSpecificDepth() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -120,7 +121,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeSetForChildNodeButOmittedRootNodeFindAllReturnsNothing() throws Exception {
+    public void givenDifferentRootSlurpNodeFindAllReturnsNothing() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -208,7 +209,27 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpAttributeSetFindAllReturnsNodesWithRelevantAttributeSet() throws Exception {
+    public void givenSlurpAttributeOnInitialSlurpNodeFindAllReturnsAllNodesWithThatAttribute() throws Exception {
+        // given
+        listener = mock(NodeListener.class);
+
+        // when
+        parse("borderTestCase.xml", getNodes().attr("attr1"));
+
+        // then
+        XMLNode root = createNode(0L, "ObjectTree");
+        XMLNode object = createNode(1L, "Object");
+        XMLNode otherObject = createNode(2L, "OtherObject");
+
+        InOrder inOrder = inOrder(listener);
+        inOrder.verify(listener).onNode(root, object);
+        inOrder.verify(listener, times(2)).onNode(object, otherObject);
+        inOrder.verify(listener).onNode(root, object);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void givenSlurpAttributeForChildFindAllReturnsChildNodesWithThatAttribute() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -224,7 +245,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpAttributeSetForNonExistentAttributeFindAllReturnsNothing() throws Exception {
+    public void givenSlurpAttributeForNonExistentAttributeFindAllReturnsNothing() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -236,7 +257,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeSetForSiblingsOfRootNodeFindAllReturnsAllSiblingsForThatDepthLevel() throws Exception {
+    public void givenSiblingsSlurpNodeFindAllReturnsAllImmediateChildrenOfRoot() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -255,7 +276,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpNodeSetForSiblingsOfChildNodeButOmittedRootNodeFindAllReturnsNothing() throws Exception {
+    public void givenSiblingSlurpNodeWithoutRootFindAllReturnsNothing() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -267,7 +288,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpAttributeWithNodeSetForSiblingsOfRootNodeFindAllReturnsRelevantNodes() throws Exception {
+    public void givenSlurpAttributeForSiblingsFindAllReturnsImmediateChildrenOfRootWithThatAttribute() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -283,7 +304,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpAttributeWithValueSetAndNodeSetForSiblingsOfRootNodeFindAllReturnsRelevantNodes() throws Exception {
+    public void givenSlurpAttributeValueFindAllReturnsImmediateChildrenOfRootWithThatAttributeWithThatValue() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -299,7 +320,7 @@ public class XMLSlurperTest {
     }
 
     @Test
-    public void givenSlurpAttributeWithExcludedValueSetAndNodeSetForChildNodeOfSiblingsOfRootNodeFindAllReturnsRelevantNodes() throws Exception {
+    public void givenSlurpAttributeWithExcludedValueFindAllReturnsAllOfThatLevelExceptOneHavingThatAttributeWithThatValue() throws Exception {
         // given
         listener = mock(NodeListener.class);
 
@@ -309,6 +330,34 @@ public class XMLSlurperTest {
         // then
         XMLNode object = createNode(1L, "Car");
         XMLNode child = createNode(2L, "Engine");
+
+        verify(listener, times(2)).onNode(object, child);
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void givenSlurpAttributeWithArrayOfAllPossibleValuesToBeExcludedFindAllReturnsNothing() throws Exception {
+        // given
+        listener = mock(NodeListener.class);
+
+        // when
+        parse("siblingsTestCase.xml", getNodes("Transport", "*", "Engine").attr("type").isNot("Hybrid Electric-Gasoline", "Turbofan"));
+
+        // then
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void givenSlurpAttributeWithRegexFindAllReturnsNodeWithAttributeWithValueMatching() throws Exception {
+        // given
+        listener = mock(NodeListener.class);
+
+        // when
+        parse("borderTestCase.xml", getNodes().attr("attr2").regex("[^,]?OTHER[\\w_]*[\\s=]+\\d{2}4"));
+
+        // then
+        XMLNode object = createNode(3L, "OtherObject");
+        XMLNode child = createNode(4L, "OtherObject");
 
         verify(listener, times(2)).onNode(object, child);
         verifyNoMoreInteractions(listener);

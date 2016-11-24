@@ -10,5 +10,11 @@ public interface SlurpAttribute extends Slurp {
     Slurp is(@NotNull String value);
 
     @NotNull
+    Slurp regex(@NotNull String regex);
+
+    @NotNull
     Slurp isNot(@NotNull String value);
+
+    @NotNull
+    Slurp isNot(@NotNull String... values);
 }
