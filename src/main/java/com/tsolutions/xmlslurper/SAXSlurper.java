@@ -59,9 +59,8 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         XMLNode parent = descendants.peekLast();
         XMLNode child = nodeFactory.createNode(idFeed++, qName.intern(), parseAttributes(attributes));
 
-        NodeListener startNodeListener;
         for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples) {
-            startNodeListener = tuple.getStartNodeListener();
+            NodeListener startNodeListener = tuple.getStartNodeListener();
 
             if(startNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child))
                 startNodeListener.onNode(parent, child);
@@ -84,9 +83,8 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         XMLNode child = descendants.removeLast();
         XMLNode parent = descendants.peekLast();
 
-        NodeListener endNodeListener;
         for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples) {
-            endNodeListener = tuple.getEndNodeListener();
+            NodeListener endNodeListener = tuple.getEndNodeListener();
 
             if(endNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child))
                 endNodeListener.onNode(parent, child);
