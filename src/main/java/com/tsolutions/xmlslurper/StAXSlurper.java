@@ -1,8 +1,6 @@
 package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
-import com.tsolutions.xmlslurper.XMLSlurperFactory.SlurpAlignmentListenerTuple;
-import com.tsolutions.xmlslurper.listener.NodeListener;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
 import javax.xml.stream.XMLInputFactory;
@@ -11,7 +9,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 
@@ -28,15 +27,14 @@ public class StAXSlurper implements XMLSlurper {
     private FileInputStream fis;
     private XMLStreamReader parser;
 
-    private Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
-    private List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples;
+    private final NodeNotifier nodeNotifier;
 
     StAXSlurper(
-            XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples) {
+            XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier) {
         this.xmlInputFactory = xmlInputFactory;
         this.nodeFactory = nodeFactory;
         this.slurpFactory = slurpFactory;
-        this.slurpAlignmentListenerTuples = slurpAlignmentListenerTuples;
+        this.nodeNotifier = nodeNotifier;
     }
 
     @Override
@@ -71,17 +69,9 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     private void onStartElement() {
-        XMLNode parent = descendants.peekLast();
         XMLNode child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes());
 
-        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples) {
-            NodeListener startNodeListener = tuple.getStartNodeListener();
-
-            if(startNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child))
-                startNodeListener.onNode(parent, child);
-        }
-
-        descendants.addLast(child);
+        nodeNotifier.onStartNode(child);
     }
 
     private Map<String, String> parseAttributes() {
@@ -95,28 +85,19 @@ public class StAXSlurper implements XMLSlurper {
 
     private void onCharacters() {
         String text = parser.getText();
-        XMLNode previous = descendants.peekLast();
+        XMLNode previous = nodeNotifier.peekLastDescendant();
 
         previous.setText(text);
     }
 
     private void onEndElement() {
-        XMLNode child = descendants.removeLast();
-        XMLNode parent = descendants.peekLast();
-
-        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples) {
-            NodeListener endNodeListener = tuple.getEndNodeListener();
-
-            if(endNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child))
-                endNodeListener.onNode(parent, child);
-        }
+        nodeNotifier.onEndNode();
     }
 
     private void close() throws XMLStreamException, IOException {
         idFeed = 0L;
 
-        descendants.clear();
-        slurpAlignmentListenerTuples.clear();
+        nodeNotifier.reset();
 
         if (fis != null)
             fis.close();

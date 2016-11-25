@@ -2,7 +2,6 @@ package com.tsolutions.xmlslurper;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * Created by mturski on 11/13/2016.
@@ -45,7 +44,7 @@ final class SlurpAlignmentFactory {
     SlurpAlignment copyAlignmentAndAddAttributeExcludedValue(SlurpAlignment slurpAlignment, String attrValue) {
         List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new ExcludedValueSlurpAttributeAlignmentWrapper(
+        return new ExcludedValuesSlurpAttributeAlignmentWrapper(
                 getSlurpAlignment(localNamePath),
                 ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName,
                 new String[] {attrValue});
@@ -55,7 +54,7 @@ final class SlurpAlignmentFactory {
         List<String> localNamePath = new ArrayList<String>(slurpAlignment.getPath());
         String[] copiedAttrValues = Arrays.copyOf(attrValues, attrValues.length);
 
-        return new ExcludedValueSlurpAttributeAlignmentWrapper(
+        return new ExcludedValuesSlurpAttributeAlignmentWrapper(
                 getSlurpAlignment(localNamePath),
                 ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrName,
                 copiedAttrValues);
@@ -246,12 +245,12 @@ final class SlurpAlignmentFactory {
         }
     }
 
-    private class ExcludedValueSlurpAttributeAlignmentWrapper extends SlurpAlignment {
+    private class ExcludedValuesSlurpAttributeAlignmentWrapper extends SlurpAlignment {
         private final SlurpAlignment slurpAlignment;
         private final String attrName;
         private final String[] attrValues;
 
-        public ExcludedValueSlurpAttributeAlignmentWrapper(SlurpAlignment slurpAlignment, String attrName, String[] attrValues) {
+        public ExcludedValuesSlurpAttributeAlignmentWrapper(SlurpAlignment slurpAlignment, String attrName, String[] attrValues) {
             this.slurpAlignment = slurpAlignment;
             this.attrName = attrName;
             this.attrValues = attrValues;

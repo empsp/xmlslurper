@@ -1,17 +1,22 @@
 package com.tsolutions.xmlslurper;
 
-import com.tsolutions.xmlslurper.listener.NodeListener;
-
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
+
+import com.sun.istack.NotNull;
+import com.tsolutions.xmlslurper.NodeNotifier.SlurpAlignmentListenerTuple;
+import com.tsolutions.xmlslurper.path.SlurpNode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
+
 /**
  * Created by mturski on 11/8/2016.
  */
-public final class XMLSlurperFactory {
+public class XMLSlurperFactory {
     public enum ParserType {
         STAX_PARSER, SAX_PARSER
     }
@@ -30,14 +35,19 @@ public final class XMLSlurperFactory {
 
     public XMLSlurper createXMLSlurper() {
         List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
+        NodeNotifier nodeNotifier = new NodeNotifier(slurpAlignmentListenerTuples);
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
+        SlurpFactory slurpFactory = getSlurpFactory(slurpAlignmentListenerTuples, slurpAlignmentFactory);
 
-        return new SAXSlurper(
-                SAXParserFactory.newInstance(), getNodeFactory(), getSlurpFactory(slurpAlignmentListenerTuples, slurpAlignmentFactory), slurpAlignmentListenerTuples);
+        SAXSlurper saxSlurper = new SAXSlurper(SAXParserFactory.newInstance(), getNodeFactory(), slurpFactory, nodeNotifier);
+        StAXSlurper staxSlurper = new StAXSlurper(XMLInputFactory.newInstance(), getNodeFactory(), slurpFactory, nodeNotifier);
+
+        return new LazyEngineSlurper(slurpFactory, nodeNotifier, staxSlurper, saxSlurper);
     }
 
     public XMLSlurper createXMLSlurper(ParserType parserType) {
         List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
+        NodeNotifier nodeNotifier = new NodeNotifier(slurpAlignmentListenerTuples);
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
         SlurpFactory slurpFactory = getSlurpFactory(slurpAlignmentListenerTuples, slurpAlignmentFactory);
 
@@ -45,9 +55,9 @@ public final class XMLSlurperFactory {
 
         switch(parserType) {
             case STAX_PARSER:
-                return new StAXSlurper(XMLInputFactory.newInstance(), nodeFactory, slurpFactory, slurpAlignmentListenerTuples);
+                return new StAXSlurper(XMLInputFactory.newInstance(), nodeFactory, slurpFactory, nodeNotifier);
             case SAX_PARSER:
-                return new SAXSlurper(SAXParserFactory.newInstance(), nodeFactory, slurpFactory, slurpAlignmentListenerTuples);
+                return new SAXSlurper(SAXParserFactory.newInstance(), nodeFactory, slurpFactory, nodeNotifier);
         }
 
         throw new IllegalArgumentException();
@@ -71,31 +81,37 @@ public final class XMLSlurperFactory {
         return new SlurpFactory(slurpAlignmentFactory, slurpAlignmentListenerTuples);
     }
 
-    static class SlurpAlignmentListenerTuple {
-        private final SlurpAlignment slurpAlignment;
-        private final NodeListener startNodeListener;
-        private NodeListener endNodeListener;
+    public class LazyEngineSlurper implements XMLSlurper {
+        private final SlurpFactory slurpFactory;
+        private final NodeNotifier nodeNotifier;
 
-        SlurpAlignmentListenerTuple(SlurpAlignment slurpAlignment, NodeListener startNodeListener, NodeListener endNodeListener) {
-            this.slurpAlignment = slurpAlignment;
-            this.startNodeListener = startNodeListener;
-            this.endNodeListener = endNodeListener;
+        private final StAXSlurper staxSlurper;
+        private final SAXSlurper saxSlurper;
+
+        public LazyEngineSlurper(SlurpFactory slurpFactory, NodeNotifier nodeNotifier, StAXSlurper staxSlurper, SAXSlurper saxSlurper) {
+            this.slurpFactory = slurpFactory;
+            this.nodeNotifier = nodeNotifier;
+            this.staxSlurper = staxSlurper;
+            this.saxSlurper = saxSlurper;
         }
 
-        SlurpAlignmentListenerTuple(SlurpAlignment slurpAlignment, NodeListener nodeListener) {
-            this(slurpAlignment, nodeListener, nodeListener);
+        @Override
+        public SlurpNode getNodes() {
+            return slurpFactory.createSlurpNode();
         }
 
-        SlurpAlignment getSlurpAlignment() {
-            return slurpAlignment;
+        @Override
+        public void parse(@NotNull String filepath) throws Exception {
+            requireNonNull(filepath);
+
+            useSlurperBasedOnNodeListenerTypes(filepath);
         }
 
-        NodeListener getStartNodeListener() {
-            return startNodeListener;
-        }
-
-        NodeListener getEndNodeListener() {
-            return endNodeListener;
+        private void useSlurperBasedOnNodeListenerTypes(@NotNull String filepath) throws Exception {
+            if (nodeNotifier.areSingleFindListenersAvailableOnly())
+                staxSlurper.parse(filepath);
+            else
+                saxSlurper.parse(filepath);
         }
     }
 }

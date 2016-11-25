@@ -2,13 +2,12 @@ package com.tsolutions.xmlslurper;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import com.tsolutions.xmlslurper.XMLSlurperFactory.SlurpAlignmentListenerTuple;
+import com.tsolutions.xmlslurper.NodeNotifier.SlurpAlignmentListenerTuple;
 import com.tsolutions.xmlslurper.listener.NodeListener;
 import com.tsolutions.xmlslurper.path.Slurp;
 import com.tsolutions.xmlslurper.path.SlurpAttribute;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
@@ -80,6 +79,16 @@ final class SlurpFactory {
         }
 
         @Override
+        public void find(@Nullable NodeListener nodeListener) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void find(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public void findAll(@Nullable NodeListener nodeListener) {
             slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, nodeListener, nodeListener));
         }
@@ -123,6 +132,16 @@ final class SlurpFactory {
             requireNonNull(values);
 
             return createSlurpAttribute(slurpAlignment, values);
+        }
+
+        @Override
+        public void find(@Nullable NodeListener nodeListener) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void find(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
