@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 /**
  * Created by mturski on 11/10/2016.
  */
-public class XMLSlurperTest {
+public class XMLSlurperIT {
     private static final NodeFactory nodeFactory = XMLSlurperFactory.getNodeFactory();
 
     private XMLSlurper parser = XMLSlurperFactory.getInstance().createXMLSlurper();

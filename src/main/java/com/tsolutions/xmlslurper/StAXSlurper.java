@@ -23,11 +23,12 @@ public class StAXSlurper implements XMLSlurper {
     private final XMLInputFactory xmlInputFactory;
     private final NodeFactory nodeFactory;
     private final SlurpFactory slurpFactory;
+    private final NodeNotifier nodeNotifier;
 
     private FileInputStream fis;
     private XMLStreamReader parser;
 
-    private final NodeNotifier nodeNotifier;
+    private boolean findNodeListenersOnlyMode;
 
     StAXSlurper(
             XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier) {
@@ -46,6 +47,8 @@ public class StAXSlurper implements XMLSlurper {
     public void parse(@NotNull String filepath) throws Exception {
         requireNonNull(filepath);
 
+        findNodeListenersOnlyMode = nodeNotifier.areSingleFindListenersAvailableOnly();
+
         fis = new FileInputStream(filepath);
         parser = xmlInputFactory.createXMLStreamReader(fis);
 
@@ -63,6 +66,9 @@ public class StAXSlurper implements XMLSlurper {
                     onEndElement();
                     break;
             }
+
+            if (findNodeListenersOnlyMode && nodeNotifier.areSingleFindListenersNotEmpty())
+                break;
         }
 
         close();

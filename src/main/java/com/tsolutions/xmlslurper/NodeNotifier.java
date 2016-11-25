@@ -2,25 +2,34 @@ package com.tsolutions.xmlslurper;
 
 import com.tsolutions.xmlslurper.listener.NodeListener;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by mturski on 11/25/2016.
  */
 final class NodeNotifier {
-    private Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
-    private List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples;
+    private final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
+    private final List<SlurpAlignmentListenerTuple> findTuples;
+    private final List<SlurpAlignmentListenerTuple> findAllTuples;
 
-    NodeNotifier(List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples) {
-        this.slurpAlignmentListenerTuples = slurpAlignmentListenerTuples;
+    NodeNotifier(List<SlurpAlignmentListenerTuple> findTuples, List<SlurpAlignmentListenerTuple> findAllTuples) {
+        this.findAllTuples = findAllTuples;
+        this.findTuples = findTuples;
     }
 
     void onStartNode(XMLNode child) {
         XMLNode parent = descendants.peekLast();
 
-        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples) {
+        for (SlurpAlignmentListenerTuple tuple : findTuples) {
+            NodeListener startNodeListener = tuple.getStartNodeListener();
+
+            if(startNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child)) {
+                startNodeListener.onNode(parent, child);
+                tuple.removeStartNodeListener();
+            }
+        }
+
+        for (SlurpAlignmentListenerTuple tuple : findAllTuples) {
             NodeListener startNodeListener = tuple.getStartNodeListener();
 
             if(startNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child))
@@ -35,7 +44,18 @@ final class NodeNotifier {
         XMLNode child = descendants.removeLast();
         XMLNode parent = descendants.peekLast();
 
-        for (SlurpAlignmentListenerTuple tuple : slurpAlignmentListenerTuples) {
+        Iterator<SlurpAlignmentListenerTuple> findTuplesIt = findTuples.iterator();
+        while(findTuplesIt.hasNext()) {
+            SlurpAlignmentListenerTuple tuple = findTuplesIt.next();
+            NodeListener endNodeListener = tuple.getEndNodeListener();
+
+            if(endNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child)) {
+                endNodeListener.onNode(parent, child);
+                findTuplesIt.remove();
+            }
+        }
+
+        for (SlurpAlignmentListenerTuple tuple : findAllTuples) {
             NodeListener endNodeListener = tuple.getEndNodeListener();
 
             if(endNodeListener != null && tuple.getSlurpAlignment().checkAlignment(descendants, child))
@@ -49,11 +69,16 @@ final class NodeNotifier {
 
     void reset() {
         descendants.clear();
-        slurpAlignmentListenerTuples.clear();
+        findTuples.clear();
+        findAllTuples.clear();
     }
 
     boolean areSingleFindListenersAvailableOnly() {
-        return false;
+        return findAllTuples.isEmpty();
+    }
+
+    boolean areSingleFindListenersNotEmpty() {
+        return !findTuples.isEmpty();
     }
 
     static class SlurpAlignmentListenerTuple {

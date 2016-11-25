@@ -34,23 +34,27 @@ public class XMLSlurperFactory {
     }
 
     public XMLSlurper createXMLSlurper() {
-        List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
-        NodeNotifier nodeNotifier = new NodeNotifier(slurpAlignmentListenerTuples);
-        SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
-        SlurpFactory slurpFactory = getSlurpFactory(slurpAlignmentListenerTuples, slurpAlignmentFactory);
+        List<SlurpAlignmentListenerTuple> findTuples = new ArrayList<SlurpAlignmentListenerTuple>();
+        List<SlurpAlignmentListenerTuple> findAllTuples = new ArrayList<SlurpAlignmentListenerTuple>();
 
-        SAXSlurper saxSlurper = new SAXSlurper(SAXParserFactory.newInstance(), getNodeFactory(), slurpFactory, nodeNotifier);
-        StAXSlurper staxSlurper = new StAXSlurper(XMLInputFactory.newInstance(), getNodeFactory(), slurpFactory, nodeNotifier);
+        NodeNotifier nodeNotifier = new NodeNotifier(findTuples, findAllTuples);
+        SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
+        SlurpFactory slurpFactory = getSlurpFactory(findTuples, findAllTuples, slurpAlignmentFactory);
+        NodeFactory nodeFactory = getNodeFactory();
+
+        SAXSlurper saxSlurper = new SAXSlurper(SAXParserFactory.newInstance(), nodeFactory, slurpFactory, nodeNotifier);
+        StAXSlurper staxSlurper = new StAXSlurper(XMLInputFactory.newInstance(), nodeFactory, slurpFactory, nodeNotifier);
 
         return new LazyEngineSlurper(slurpFactory, nodeNotifier, staxSlurper, saxSlurper);
     }
 
     public XMLSlurper createXMLSlurper(ParserType parserType) {
-        List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples = new ArrayList<SlurpAlignmentListenerTuple>();
-        NodeNotifier nodeNotifier = new NodeNotifier(slurpAlignmentListenerTuples);
-        SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
-        SlurpFactory slurpFactory = getSlurpFactory(slurpAlignmentListenerTuples, slurpAlignmentFactory);
+        List<SlurpAlignmentListenerTuple> findTuples = new ArrayList<SlurpAlignmentListenerTuple>();
+        List<SlurpAlignmentListenerTuple> findAllTuples = new ArrayList<SlurpAlignmentListenerTuple>();
 
+        NodeNotifier nodeNotifier = new NodeNotifier(findTuples, findAllTuples);
+        SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
+        SlurpFactory slurpFactory = getSlurpFactory(findTuples, findAllTuples, slurpAlignmentFactory);
         NodeFactory nodeFactory = getNodeFactory();
 
         switch(parserType) {
@@ -77,8 +81,10 @@ public class XMLSlurperFactory {
     }
 
     private static SlurpFactory getSlurpFactory(
-            List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples, SlurpAlignmentFactory slurpAlignmentFactory) {
-        return new SlurpFactory(slurpAlignmentFactory, slurpAlignmentListenerTuples);
+            List<SlurpAlignmentListenerTuple> findTuples,
+            List<SlurpAlignmentListenerTuple> findAllTuples,
+            SlurpAlignmentFactory slurpAlignmentFactory) {
+        return new SlurpFactory(findTuples, findAllTuples, slurpAlignmentFactory);
     }
 
     public class LazyEngineSlurper implements XMLSlurper {

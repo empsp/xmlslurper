@@ -20,12 +20,14 @@ final class SlurpFactory {
         IS, ISNOT, REGEX;
     }
 
+    private final List<SlurpAlignmentListenerTuple> findTuples;
+    private List<SlurpAlignmentListenerTuple> findAllTuples;
     private SlurpAlignmentFactory slurpAlignmentFactory;
-    private List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples;
 
-    SlurpFactory(SlurpAlignmentFactory slurpAlignmentFactory, List<SlurpAlignmentListenerTuple> slurpAlignmentListenerTuples) {
+    SlurpFactory(List<SlurpAlignmentListenerTuple> findTuples, List<SlurpAlignmentListenerTuple> findAllTuples, SlurpAlignmentFactory slurpAlignmentFactory) {
+        this.findTuples = findTuples;
+        this.findAllTuples = findAllTuples;
         this.slurpAlignmentFactory = slurpAlignmentFactory;
-        this.slurpAlignmentListenerTuples = slurpAlignmentListenerTuples;
     }
 
     SlurpNode createSlurpNode() {
@@ -80,22 +82,22 @@ final class SlurpFactory {
 
         @Override
         public void find(@Nullable NodeListener nodeListener) {
-            throw new UnsupportedOperationException();
+            findTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, nodeListener, nodeListener));
         }
 
         @Override
         public void find(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            throw new UnsupportedOperationException();
+            findTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, startNodeListener, endNodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener nodeListener) {
-            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, nodeListener, nodeListener));
+            findAllTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, nodeListener, nodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, startNodeListener, endNodeListener));
+            findAllTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, startNodeListener, endNodeListener));
         }
     }
 
@@ -136,22 +138,22 @@ final class SlurpFactory {
 
         @Override
         public void find(@Nullable NodeListener nodeListener) {
-            throw new UnsupportedOperationException();
+            findTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, nodeListener, nodeListener));
         }
 
         @Override
         public void find(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            throw new UnsupportedOperationException();
+            findTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, startNodeListener, endNodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener nodeListener) {
-            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, nodeListener));
+            findAllTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, nodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            slurpAlignmentListenerTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, startNodeListener, endNodeListener));
+            findAllTuples.add(new SlurpAlignmentListenerTuple(slurpAlignment, startNodeListener, endNodeListener));
         }
     }
 }
