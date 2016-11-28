@@ -58,9 +58,9 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        XMLNode child = nodeFactory.createNode(idFeed++, qName.intern(), parseAttributes(attributes));
+        XMLNode node = nodeFactory.createNode(idFeed++, qName.intern(), parseAttributes(attributes));
 
-        nodeNotifier.onStartNode(child);
+        nodeNotifier.onStartNode(node);
     }
 
     @Override

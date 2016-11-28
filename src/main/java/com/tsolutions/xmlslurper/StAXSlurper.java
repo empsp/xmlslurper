@@ -75,9 +75,9 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     private void onStartElement() {
-        XMLNode child = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes());
+        XMLNode node = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes());
 
-        nodeNotifier.onStartNode(child);
+        nodeNotifier.onStartNode(node);
     }
 
     private Map<String, String> parseAttributes() {
