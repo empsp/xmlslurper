@@ -4,7 +4,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 
 import com.sun.istack.NotNull;
-import com.tsolutions.xmlslurper.NodeNotifier.SlurpAlignmentListenerTuple;
+import com.tsolutions.xmlslurper.NodeNotifier.NodeNotifierData;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
 import java.util.ArrayList;
@@ -34,12 +34,12 @@ public class XMLSlurperFactory {
     }
 
     public XMLSlurper createXMLSlurper() {
-        List<SlurpAlignmentListenerTuple> findTuples = new ArrayList<SlurpAlignmentListenerTuple>();
-        List<SlurpAlignmentListenerTuple> findAllTuples = new ArrayList<SlurpAlignmentListenerTuple>();
+        List<NodeNotifierData> findData = new ArrayList<NodeNotifierData>();
+        List<NodeNotifierData> findAllData = new ArrayList<NodeNotifierData>();
 
-        NodeNotifier nodeNotifier = new NodeNotifier(findTuples, findAllTuples);
+        NodeNotifier nodeNotifier = getNodeNotifier(findData, findAllData);
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
-        SlurpFactory slurpFactory = getSlurpFactory(findTuples, findAllTuples, slurpAlignmentFactory);
+        SlurpFactory slurpFactory = getSlurpFactory(findData, findAllData, slurpAlignmentFactory);
         NodeFactory nodeFactory = getNodeFactory();
 
         SAXSlurper saxSlurper = new SAXSlurper(SAXParserFactory.newInstance(), nodeFactory, slurpFactory, nodeNotifier);
@@ -49,12 +49,12 @@ public class XMLSlurperFactory {
     }
 
     public XMLSlurper createXMLSlurper(ParserType parserType) {
-        List<SlurpAlignmentListenerTuple> findTuples = new ArrayList<SlurpAlignmentListenerTuple>();
-        List<SlurpAlignmentListenerTuple> findAllTuples = new ArrayList<SlurpAlignmentListenerTuple>();
+        List<NodeNotifierData> findData = new ArrayList<NodeNotifierData>();
+        List<NodeNotifierData> findAllData = new ArrayList<NodeNotifierData>();
 
-        NodeNotifier nodeNotifier = new NodeNotifier(findTuples, findAllTuples);
+        NodeNotifier nodeNotifier = getNodeNotifier(findData, findAllData);
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
-        SlurpFactory slurpFactory = getSlurpFactory(findTuples, findAllTuples, slurpAlignmentFactory);
+        SlurpFactory slurpFactory = getSlurpFactory(findData, findAllData, slurpAlignmentFactory);
         NodeFactory nodeFactory = getNodeFactory();
 
         switch(parserType) {
@@ -76,15 +76,20 @@ public class XMLSlurperFactory {
         };
     }
 
+    static NodeNotifier getNodeNotifier(List<NodeNotifierData> findData,
+                                        List<NodeNotifierData> findAllData) {
+        return new NodeNotifier(findData, findAllData);
+    }
+
     static SlurpAlignmentFactory getSlurpAlignmentFactory() {
         return new SlurpAlignmentFactory();
     }
 
-    private static SlurpFactory getSlurpFactory(
-            List<SlurpAlignmentListenerTuple> findTuples,
-            List<SlurpAlignmentListenerTuple> findAllTuples,
+    static SlurpFactory getSlurpFactory(
+            List<NodeNotifierData> findData,
+            List<NodeNotifierData> findAllData,
             SlurpAlignmentFactory slurpAlignmentFactory) {
-        return new SlurpFactory(findTuples, findAllTuples, slurpAlignmentFactory);
+        return new SlurpFactory(findData, findAllData, slurpAlignmentFactory);
     }
 
     public class LazyEngineSlurper implements XMLSlurper {

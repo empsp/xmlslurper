@@ -67,7 +67,7 @@ public class StAXSlurper implements XMLSlurper {
                     break;
             }
 
-            if (findNodeListenersOnlyMode && nodeNotifier.areSingleFindListenersNotEmpty())
+            if (findNodeListenersOnlyMode && nodeNotifier.areSingleFindListenersEmpty())
                 break;
         }
 
