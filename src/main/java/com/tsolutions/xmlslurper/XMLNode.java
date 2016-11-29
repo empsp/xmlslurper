@@ -11,25 +11,38 @@ import java.util.Map;
 public interface XMLNode {
     long getId();
 
-    void setLocalName(@NotNull String name);
+    @Nullable
+    String getNamespace();
+
+    void setNamespace(@Nullable String namespace);
+
+    @Nullable
+    String getPrefix();
+
+    void setPrefix(@Nullable String prefix);
 
     @NotNull
     String getLocalName();
 
-    void setText(@Nullable String text);
+    void setLocalName(@NotNull String name);
+
+    @NotNull
+    String getQName();
 
     @Nullable
     String getText();
 
-    void setAttributes(@NotNull Map<String, String> attributeByName);
+    void setText(@Nullable String text);
 
     @NotNull
     Map<String, String> getAttributes();
 
-    void setAttribute(@NotNull String name, @NotNull String value);
+    void setAttributes(@NotNull Map<String, String> attributeByName);
+
+    boolean hasAttribute(@NotNull String name);
 
     @Nullable
     String getAttribute(@Nullable String name);
 
-    boolean hasAttribute(@NotNull String name);
+    void setAttribute(@NotNull String name, @NotNull String value);
 }

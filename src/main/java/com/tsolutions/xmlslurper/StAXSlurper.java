@@ -3,6 +3,7 @@ package com.tsolutions.xmlslurper;
 import com.sun.istack.NotNull;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.tsolutions.xmlslurper.NodeFactory.QNAME_SEPARATOR;
 import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 
 /**
@@ -24,6 +26,7 @@ public class StAXSlurper implements XMLSlurper {
     private final NodeFactory nodeFactory;
     private final SlurpFactory slurpFactory;
     private final NodeNotifier nodeNotifier;
+    private final NamespaceSensitiveElementParser elementProcessor;
 
     private FileInputStream fis;
     private XMLStreamReader parser;
@@ -31,11 +34,16 @@ public class StAXSlurper implements XMLSlurper {
     private boolean findNodeListenersOnlyMode;
 
     StAXSlurper(
-            XMLInputFactory xmlInputFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier) {
+            XMLInputFactory xmlInputFactory,
+            NodeFactory nodeFactory,
+            SlurpFactory slurpFactory,
+            NodeNotifier nodeNotifier,
+            NamespaceSensitiveElementParser elementProcessor) {
         this.xmlInputFactory = xmlInputFactory;
         this.nodeFactory = nodeFactory;
         this.slurpFactory = slurpFactory;
         this.nodeNotifier = nodeNotifier;
+        this.elementProcessor = elementProcessor;
     }
 
     @Override
@@ -57,7 +65,7 @@ public class StAXSlurper implements XMLSlurper {
 
             switch (parser.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
-                    onStartElement();
+                    onStartElement(parser);
                     break;
                 case XMLStreamConstants.CHARACTERS:
                     onCharacters();
@@ -74,19 +82,8 @@ public class StAXSlurper implements XMLSlurper {
         close();
     }
 
-    private void onStartElement() {
-        XMLNode node = nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes());
-
-        nodeNotifier.onStartNode(node);
-    }
-
-    private Map<String, String> parseAttributes() {
-        Map<String, String> attributeByName = new HashMap<String, String>();
-
-        for (int index = 0; index < parser.getAttributeCount(); index++)
-            attributeByName.put(parser.getAttributeLocalName(index).intern(), parser.getAttributeValue(index));
-
-        return attributeByName;
+    private void onStartElement(XMLStreamReader parser) {
+        nodeNotifier.onStartNode(elementProcessor.parseStartElement(parser));
     }
 
     private void onCharacters() {
@@ -110,5 +107,54 @@ public class StAXSlurper implements XMLSlurper {
 
         if (parser != null)
             parser.close();
+    }
+
+    static class StAXNamespaceAwareElementParser extends NamespaceSensitiveElementParser {
+        StAXNamespaceAwareElementParser(NodeFactory nodeFactory) {
+            super(nodeFactory);
+        }
+
+        @Override
+        XMLNode parseStartElement(XMLStreamReader parser) {
+            String prefix = parser.getPrefix();
+            return nodeFactory.createNode(
+                    idFeed++, parser.getNamespaceURI(), prefix.isEmpty() ? null : prefix.intern(), parser.getLocalName().intern(), parseAttributes(parser));
+        }
+
+        private Map<String, String> parseAttributes(XMLStreamReader parser) {
+            Map<String, String> attributeByName = new HashMap<String, String>();
+
+            for (int index = 0; index < parser.getAttributeCount(); index++) {
+                String prefix = parser.getAttributePrefix(index);
+                attributeByName.put(
+                        prefix.isEmpty() ? parser.getAttributeLocalName(index).intern() : prefix.concat(QNAME_SEPARATOR).concat(parser.getAttributeLocalName(index)).intern(),
+                        parser.getAttributeValue(index));
+            }
+
+            for(int index = 0; index < parser.getNamespaceCount(); index++)
+                attributeByName.put(XMLConstants.XMLNS_ATTRIBUTE + QNAME_SEPARATOR + parser.getNamespacePrefix(index), parser.getNamespaceURI(index));
+
+            return attributeByName;
+        }
+    }
+
+    static class StAXNamespaceBlindElementParser extends NamespaceSensitiveElementParser {
+        StAXNamespaceBlindElementParser(NodeFactory nodeFactory) {
+            super(nodeFactory);
+        }
+
+        @Override
+        XMLNode parseStartElement(XMLStreamReader parser) {
+            return nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes(parser));
+        }
+
+        private Map<String, String> parseAttributes(XMLStreamReader parser) {
+            Map<String, String> attributeByName = new HashMap<String, String>();
+
+            for (int index = 0; index < parser.getAttributeCount(); index++)
+                attributeByName.put(parser.getAttributeLocalName(index).intern(), parser.getAttributeValue(index));
+
+            return attributeByName;
+        }
     }
 }

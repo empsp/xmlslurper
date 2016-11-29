@@ -6,7 +6,6 @@ import com.tsolutions.xmlslurper.listener.NodeListener;
 import com.tsolutions.xmlslurper.path.Slurp;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -16,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tsolutions.xmlslurper.NodeFactory.QNAME_SEPARATOR;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -176,7 +176,6 @@ public class XMLSlurperIT {
         // when
         getNodes().node("**").node("Object").findAll(listener, null);
         parser.parse(getResourcePath("simpleTestCase.xml"));
-
 
         // then
         verify(listener).onNode(any(), any());
@@ -363,6 +362,37 @@ public class XMLSlurperIT {
         verifyNoMoreInteractions(listener);
     }
 
+    @Test
+    public void givenSlurpNodeNamespaceAwareFindAllReturnsNodeNamespaceComplaint() throws Exception {
+        // given
+        listener = mock(NodeListener.class);
+
+        // when
+        getNodes("**", "other:OtherObject").findAll(listener, null);
+        parser.parse(getResourcePath("namespaceTestCase.xml"));
+
+        // then
+        Map<String, String> otherObjectAttrs = new HashMap<String, String>();
+        otherObjectAttrs.put("xmlns:other", "http://other");
+        otherObjectAttrs.put("other:attr3", "123");
+        XMLNode otherObject = createNode(3L, "http://other", "other", "OtherObject", otherObjectAttrs);
+
+        ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
+        verify(listener).onNode(nodeCaptor.capture(), nodeCaptor.capture());
+        verifyNoMoreInteractions(listener);
+
+        List<XMLNode> actualNodes = nodeCaptor.getAllValues();
+        XMLNode actualOtherObject = actualNodes.get(1);
+
+        System.out.println(actualOtherObject);
+
+        assertThat(actualOtherObject.getNamespace(), is(otherObject.getNamespace()));
+        assertThat(actualOtherObject.getPrefix(), is(otherObject.getPrefix()));
+        assertThat(actualOtherObject.getLocalName(), is(otherObject.getLocalName()));
+        assertThat(actualOtherObject.getQName(), is(otherObject.getPrefix() + QNAME_SEPARATOR + otherObject.getLocalName()));
+        assertThat(actualOtherObject.getAttributes(), is(otherObject.getAttributes()));
+    }
+
     @After
     public void teardown() {
         listener = null;
@@ -391,7 +421,11 @@ public class XMLSlurperIT {
         parser.parse(getResourcePath(resourcePath));
     }
 
-    private XMLNode createNode(long id, String name) {
-        return nodeFactory.createNode(id, name, Collections.emptyMap());
+    private XMLNode createNode(long id, String localName) {
+        return nodeFactory.createNode(id, localName, Collections.emptyMap());
+    }
+
+    private XMLNode createNode(long id, String namespace, String prefix, String localName, Map<String, String> attributeByQName) {
+        return nodeFactory.createNode(id, namespace, prefix, localName, attributeByQName);
     }
 }

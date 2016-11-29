@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.tsolutions.xmlslurper.NodeFactory.QNAME_SEPARATOR;
 import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 
 /**
@@ -26,17 +27,18 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private final NodeFactory nodeFactory;
     private final SlurpFactory slurpFactory;
     private final NodeNotifier nodeNotifier;
+    private final NamespaceSensitiveElementParser elementProcessor;
 
     private FileInputStream fis;
     private SAXParser parser;
 
 
-    SAXSlurper(
-            SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier) {
+    SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier, NamespaceSensitiveElementParser elementProcessor) {
         this.saxParserFactory = saxParserFactory;
         this.nodeFactory = nodeFactory;
         this.slurpFactory = slurpFactory;
         this.nodeNotifier = nodeNotifier;
+        this.elementProcessor = elementProcessor;
     }
 
     @Override
@@ -58,9 +60,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        XMLNode node = nodeFactory.createNode(idFeed++, qName.intern(), parseAttributes(attributes));
-
-        nodeNotifier.onStartNode(node);
+        nodeNotifier.onStartNode(elementProcessor.parseStartElement(uri, localName, qName, attributes));
     }
 
     @Override
@@ -76,15 +76,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         nodeNotifier.onEndNode();
     }
 
-    private Map<String, String> parseAttributes(Attributes attributes) {
-        Map<String, String> attributeByName = new HashMap<String, String>();
-
-        for (int index = 0; index < attributes.getLength(); index++)
-            attributeByName.put(attributes.getQName(index).intern(), attributes.getValue(index));
-
-        return attributeByName;
-    }
-
     private void close() throws XMLStreamException, IOException {
         idFeed = 0L;
 
@@ -95,5 +86,51 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
         if (parser != null)
             parser = null;
+    }
+
+    static class SAXNamespaceAwareElementParser extends NamespaceSensitiveElementParser {
+        SAXNamespaceAwareElementParser(NodeFactory nodeFactory) {
+            super(nodeFactory);
+        }
+
+        @Override
+        XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes) {
+            int qNameSeparatorIndex = qName.indexOf(QNAME_SEPARATOR);
+            return nodeFactory.createNode(
+                    idFeed++,
+                    uri,
+                    qNameSeparatorIndex >= 0 ? qName.substring(0, qNameSeparatorIndex) : null,
+                    localName.intern(),
+                    parseAttributes(attributes));
+        }
+
+        private Map<String, String> parseAttributes(Attributes attributes) {
+            Map<String, String> attributeByName = new HashMap<String, String>();
+
+            for (int index = 0; index < attributes.getLength(); index++)
+                attributeByName.put(attributes.getQName(index).intern(), attributes.getValue(index));
+
+            return attributeByName;
+        }
+    }
+
+    static class SAXNamespaceBlindElementParser extends NamespaceSensitiveElementParser {
+        SAXNamespaceBlindElementParser(NodeFactory nodeFactory) {
+            super(nodeFactory);
+        }
+
+        @Override
+        XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes) {
+            return nodeFactory.createNode(idFeed++, localName.intern(), parseAttributes(attributes));
+        }
+
+        private Map<String, String> parseAttributes(Attributes attributes) {
+            Map<String, String> attributeByName = new HashMap<String, String>();
+
+            for (int index = 0; index < attributes.getLength(); index++)
+                attributeByName.put(attributes.getLocalName(index).intern(), attributes.getValue(index));
+
+            return attributeByName;
+        }
     }
 }

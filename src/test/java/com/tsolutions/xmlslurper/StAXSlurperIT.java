@@ -57,6 +57,9 @@ public class StAXSlurperIT {
         given(parser.next()).willReturn(START_ELEMENT, START_ELEMENT, END_ELEMENT, END_ELEMENT);
         given(parser.getEventType()).willReturn(START_ELEMENT, START_ELEMENT, END_ELEMENT, END_ELEMENT);
         given(parser.getAttributeCount()).willReturn(0);
+        given(parser.getNamespaceCount()).willReturn(0);
+        given(parser.getNamespaceURI()).willReturn(null);
+        given(parser.getPrefix()).willReturn("");
         given(parser.getLocalName()).willReturn("ObjectTree", "Object", "Object", "ObjectTree");
 
         // when
@@ -72,8 +75,11 @@ public class StAXSlurperIT {
         verify(parser).hasNext();
         verify(parser).next();
         verify(parser).getEventType();
+        verify(parser).getNamespaceURI();
+        verify(parser).getPrefix();
         verify(parser).getLocalName();
         verify(parser).getAttributeCount();
+        verify(parser).getNamespaceCount();
         verify(parser).close();
         verifyNoMoreInteractions(parser);
     }
@@ -88,6 +94,9 @@ public class StAXSlurperIT {
         given(parser.next()).willReturn(START_ELEMENT, START_ELEMENT, END_ELEMENT, END_ELEMENT);
         given(parser.getEventType()).willReturn(START_ELEMENT, START_ELEMENT, END_ELEMENT, END_ELEMENT);
         given(parser.getAttributeCount()).willReturn(0);
+        given(parser.getNamespaceCount()).willReturn(0);
+        given(parser.getNamespaceURI()).willReturn(null);
+        given(parser.getPrefix()).willReturn("");
         given(parser.getLocalName()).willReturn("ObjectTree", "Object", "Object", "ObjectTree");
 
         // when
@@ -104,8 +113,11 @@ public class StAXSlurperIT {
         verify(parser, times(3)).hasNext();
         verify(parser, times(3)).next();
         verify(parser, times(3)).getEventType();
+        verify(parser, times(2)).getNamespaceURI();
+        verify(parser, times(2)).getPrefix();
         verify(parser, times(2)).getLocalName();
         verify(parser, times(2)).getAttributeCount();
+        verify(parser, times(2)).getNamespaceCount();
         verify(parser).close();
         verifyNoMoreInteractions(parser);
     }
@@ -127,11 +139,13 @@ public class StAXSlurperIT {
         XMLInputFactory xmlInputFactory = mock(XMLInputFactory.class);
         given(xmlInputFactory.createXMLStreamReader(any(FileInputStream.class))).willReturn(parser);
 
+        NodeFactory nodeFactory = getNodeFactory();
         slurper = new StAXSlurper(
                 xmlInputFactory,
-                getNodeFactory(),
+                nodeFactory,
                 getSlurpFactory(findData, findAllData, getSlurpAlignmentFactory()),
-                getNodeNotifier(findData, findAllData));
+                getNodeNotifier(findData, findAllData),
+                getStAXNamespaceSensitiveElementParser(false, nodeFactory));
 
         return parser;
     }

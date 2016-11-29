@@ -14,14 +14,25 @@ import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
 public final class XMLNodeImpl implements XMLNode {
     private final long id;
 
+    private String namespace;
+    private String prefix;
     private String localName;
-    private String text;
-    private Map<String, String> attributeByName;
 
-    XMLNodeImpl(long id, String localName, Map<String, String> attributeByName) {
+    private String text;
+
+    private Map<String, String> attributeByQName;
+
+    XMLNodeImpl(long id, String localName, Map<String, String> attributeByQName) {
         this.id = id;
         this.localName = requireNonNull(localName);
-        this.attributeByName = requireNonNull(attributeByName);
+        this.attributeByQName = requireNonNull(attributeByQName);
+    }
+
+    XMLNodeImpl(long id, String namespace, String prefix, String localName, Map<String, String> attributeByQName) {
+        this(id, localName, attributeByQName);
+
+        this.namespace = namespace;
+        this.prefix = prefix;
     }
 
     @Override
@@ -30,8 +41,23 @@ public final class XMLNodeImpl implements XMLNode {
     }
 
     @Override
-    public void setLocalName(@NotNull String name) {
-        this.localName = requireNonNull(name);
+    public String getNamespace() {
+        return namespace;
+    }
+
+    @Override
+    public void setNamespace(@Nullable String namespace) {
+        this.namespace = namespace;
+    }
+
+    @Override
+    public String getPrefix() {
+        return prefix;
+    }
+
+    @Override
+    public void setPrefix(@Nullable String prefix) {
+        this.prefix = prefix;
     }
 
     @Override
@@ -40,8 +66,13 @@ public final class XMLNodeImpl implements XMLNode {
     }
 
     @Override
-    public void setText(@Nullable String text) {
-        this.text = text;
+    public void setLocalName(@NotNull String name) {
+        this.localName = requireNonNull(name);
+    }
+
+    @Override
+    public String getQName() {
+        return prefix != null ? prefix + NodeFactory.QNAME_SEPARATOR + localName : localName;
     }
 
     @Override
@@ -50,37 +81,42 @@ public final class XMLNodeImpl implements XMLNode {
     }
 
     @Override
-    public void setAttributes(@NotNull Map<String, String> attributeByName) {
-        this.attributeByName = new HashMap<String, String>();
-
-        for(Map.Entry<String, String> entry : attributeByName.entrySet()) {
-            String attrName = requireNonNull(entry.getKey());
-            String attrValue = requireNonNull(entry.getValue());
-
-            this.attributeByName.put(attrName, attrValue);
-        }
+    public void setText(@Nullable String text) {
+        this.text = text;
     }
 
     @Override
     public Map<String, String> getAttributes() {
-        return attributeByName;
+        return attributeByQName;
     }
 
     @Override
-    public void setAttribute(@NotNull String name, @NotNull String value) {
-        this.attributeByName.put(requireNonNull(name), requireNonNull(value));
+    public void setAttributes(@NotNull Map<String, String> attributeByQName) {
+        this.attributeByQName = new HashMap<String, String>();
+
+        for(Map.Entry<String, String> entry : attributeByQName.entrySet()) {
+            String attrName = requireNonNull(entry.getKey());
+            String attrValue = requireNonNull(entry.getValue());
+
+            this.attributeByQName.put(attrName, attrValue);
+        }
     }
 
     @Override
-    public String getAttribute(@Nullable String name) {
-        return attributeByName.get(name);
+    public boolean hasAttribute(@NotNull String qName) {
+        requireNonNull(qName);
+
+        return attributeByQName.containsKey(qName);
     }
 
     @Override
-    public boolean hasAttribute(@NotNull String name) {
-        requireNonNull(name);
+    public void setAttribute(@NotNull String qName, @NotNull String value) {
+        this.attributeByQName.put(requireNonNull(qName), requireNonNull(value));
+    }
 
-        return attributeByName.containsKey(name);
+    @Override
+    public String getAttribute(@Nullable String qName) {
+        return attributeByQName.get(qName);
     }
 
     @Override
@@ -102,9 +138,11 @@ public final class XMLNodeImpl implements XMLNode {
     public String toString() {
         return "XMLNodeImpl{" +
                 "id=" + id +
+                ", namespace='" + namespace + '\'' +
+                ", prefix='" + prefix + '\'' +
                 ", localName='" + localName + '\'' +
                 ", text='" + text + '\'' +
-                ", attributeByName=" + attributeByName +
+                ", attributeByQName=" + attributeByQName +
                 '}';
     }
 }

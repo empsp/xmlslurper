@@ -7,8 +7,8 @@ import com.sun.istack.NotNull;
  */
 public interface SlurpNode extends Slurp {
     @NotNull
-    SlurpNode node(@NotNull String name);
+    SlurpNode node(@NotNull String qName);
 
     @NotNull
-    SlurpAttribute attr(@NotNull String name);
+    SlurpAttribute attr(@NotNull String qName);
 }

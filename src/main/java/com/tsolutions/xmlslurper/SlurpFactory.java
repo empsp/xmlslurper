@@ -67,17 +67,17 @@ final class SlurpFactory {
         }
 
         @Override
-        public SlurpNode node(@NotNull String name) {
-            requireNonNull(name);
+        public SlurpNode node(@NotNull String qName) {
+            requireNonNull(qName);
 
-            return createSlurpNode(slurpAlignment, name);
+            return createSlurpNode(slurpAlignment, qName);
         }
 
         @Override
-        public SlurpAttribute attr(@NotNull String name) {
-            requireNonNull(name);
+        public SlurpAttribute attr(@NotNull String qName) {
+            requireNonNull(qName);
 
-            return createSlurpAttribute(slurpAlignment, name);
+            return createSlurpAttribute(slurpAlignment, qName);
         }
 
         @Override
