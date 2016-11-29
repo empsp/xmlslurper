@@ -6,10 +6,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +31,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private final NodeNotifier nodeNotifier;
     private final NamespaceSensitiveElementParser elementParser;
 
-    private FileInputStream fis;
+    private FileInputStream inputStream;
     private SAXParser parser;
 
     SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier, NamespaceSensitiveElementParser elementParser) {
@@ -46,15 +48,29 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     @Override
-    public void parse(@NotNull String filepath) throws Exception {
+    public void parse(@NotNull String filepath) throws IOException, ParserConfigurationException, SAXException, XMLStreamException {
         requireNonNull(filepath);
 
-        fis = new FileInputStream(filepath);
-        parser = saxParserFactory.newSAXParser();
+        inputStream = new FileInputStream(filepath);
+        try {
+            parser = saxParserFactory.newSAXParser();
+        } catch (ParserConfigurationException e) {
+            close();
+            throw e;
+        } catch (SAXException e) {
+            close();
+            throw e;
+        }
 
-        parser.parse(fis, this);
-
-        close();
+        try {
+            parser.parse(inputStream, this);
+        } catch (SAXException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            close();
+        }
     }
 
     @Override
@@ -80,8 +96,10 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
         nodeNotifier.reset();
 
-        if (fis != null)
-            fis.close();
+        if (inputStream != null) {
+            inputStream.close();
+            inputStream = null;
+        }
 
         if (parser != null)
             parser = null;

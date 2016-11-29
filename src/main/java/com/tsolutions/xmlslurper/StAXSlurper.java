@@ -28,7 +28,7 @@ public class StAXSlurper implements XMLSlurper {
     private final NodeNotifier nodeNotifier;
     private final NamespaceSensitiveElementParser elementParser;
 
-    private FileInputStream fis;
+    private FileInputStream inputStream;
     private XMLStreamReader parser;
 
     private boolean findNodeListenersOnlyMode;
@@ -52,14 +52,23 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     @Override
-    public void parse(@NotNull String filepath) throws Exception {
+    public void parse(@NotNull String filepath) throws IOException, XMLStreamException {
         requireNonNull(filepath);
 
         findNodeListenersOnlyMode = nodeNotifier.areSingleFindListenersAvailableOnly();
 
-        fis = new FileInputStream(filepath);
-        parser = xmlInputFactory.createXMLStreamReader(fis);
+        inputStream = new FileInputStream(filepath);
+        try {
+            parser = xmlInputFactory.createXMLStreamReader(inputStream);
+            doParse(parser);
+        } catch (XMLStreamException e) {
+            throw e;
+        } finally {
+            close();
+        }
+    }
 
+    private void doParse(XMLStreamReader parser) throws XMLStreamException {
         while (parser.hasNext()) {
             parser.next();
 
@@ -78,8 +87,6 @@ public class StAXSlurper implements XMLSlurper {
             if (findNodeListenersOnlyMode && nodeNotifier.areSingleFindListenersEmpty())
                 break;
         }
-
-        close();
     }
 
     private void onStartElement(XMLStreamReader parser) {
@@ -102,8 +109,10 @@ public class StAXSlurper implements XMLSlurper {
 
         nodeNotifier.reset();
 
-        if (fis != null)
-            fis.close();
+        if (inputStream != null) {
+            inputStream.close();
+            inputStream = null;
+        }
 
         if (parser != null)
             parser.close();
