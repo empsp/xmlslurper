@@ -26,7 +26,7 @@ public class StAXSlurper implements XMLSlurper {
     private final NodeFactory nodeFactory;
     private final SlurpFactory slurpFactory;
     private final NodeNotifier nodeNotifier;
-    private final NamespaceSensitiveElementParser elementProcessor;
+    private final NamespaceSensitiveElementParser elementParser;
 
     private FileInputStream fis;
     private XMLStreamReader parser;
@@ -38,12 +38,12 @@ public class StAXSlurper implements XMLSlurper {
             NodeFactory nodeFactory,
             SlurpFactory slurpFactory,
             NodeNotifier nodeNotifier,
-            NamespaceSensitiveElementParser elementProcessor) {
+            NamespaceSensitiveElementParser elementParser) {
         this.xmlInputFactory = xmlInputFactory;
         this.nodeFactory = nodeFactory;
         this.slurpFactory = slurpFactory;
         this.nodeNotifier = nodeNotifier;
-        this.elementProcessor = elementProcessor;
+        this.elementParser = elementParser;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     private void onStartElement(XMLStreamReader parser) {
-        nodeNotifier.onStartNode(elementProcessor.parseStartElement(parser));
+        nodeNotifier.onStartNode(elementParser.parseStartElement(parser));
     }
 
     private void onCharacters() {

@@ -27,18 +27,17 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private final NodeFactory nodeFactory;
     private final SlurpFactory slurpFactory;
     private final NodeNotifier nodeNotifier;
-    private final NamespaceSensitiveElementParser elementProcessor;
+    private final NamespaceSensitiveElementParser elementParser;
 
     private FileInputStream fis;
     private SAXParser parser;
 
-
-    SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier, NamespaceSensitiveElementParser elementProcessor) {
+    SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier, NamespaceSensitiveElementParser elementParser) {
         this.saxParserFactory = saxParserFactory;
         this.nodeFactory = nodeFactory;
         this.slurpFactory = slurpFactory;
         this.nodeNotifier = nodeNotifier;
-        this.elementProcessor = elementProcessor;
+        this.elementParser = elementParser;
     }
 
     @Override
@@ -60,7 +59,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        nodeNotifier.onStartNode(elementProcessor.parseStartElement(uri, localName, qName, attributes));
+        nodeNotifier.onStartNode(elementParser.parseStartElement(uri, localName, qName, attributes));
     }
 
     @Override
