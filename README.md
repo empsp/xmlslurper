@@ -11,9 +11,9 @@ In order to use the library in your maven project, just declare the dependency i
 
 ```maven
 <dependency>
-	<groupId>com.tsolutions</groupId>
+	<groupId>org.xs4j</groupId>
 	<artifactId>xmlslurper</artifactId>
-	<version>1.7.0</version>
+	<version>1.8.0</version>
 </dependency>
 ```
 
@@ -23,7 +23,7 @@ In order to use the library in your gradle project, just declare the dependency 
 
 ```gradle
 dependencies {
-    compile 'com.tsolutions:xmlslurper:1.7.0'
+    compile 'org.xs4j:xmlslurper:1.8.0'
 }
 ```
 
