@@ -83,9 +83,12 @@ public class StAXSlurper implements XMLSlurper {
                     nodeNotifier.onStartNode(elementParser.parseStartElement(parser));
                     break;
                 case XMLStreamConstants.CHARACTERS:
-                    XMLNode previous = nodeNotifier.peekLastDescendant();
+                    XMLNode lastNode = nodeNotifier.peekLastDescendant();
                     String text = parser.getText();
-                    previous.setText(text);
+                    if (text != null) {
+                        String lastText = lastNode.getText();
+                        lastNode.setText(lastText == null ? text : lastText + text);
+                    }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
                     nodeNotifier.onEndNode();
@@ -131,7 +134,7 @@ public class StAXSlurper implements XMLSlurper {
         XMLNode parseStartElement(XMLStreamReader parser) {
             String prefix = parser.getPrefix();
             return nodeFactory.createNode(
-                    idFeed++, parser.getNamespaceURI(), prefix.isEmpty() ? null : prefix.intern(), parser.getLocalName().intern(), parseAttributes(parser));
+                    idFeed++, parser.getNamespaceURI(), prefix.isEmpty() ? null : prefix, parser.getLocalName(), parseAttributes(parser));
         }
 
         private Map<String, String> parseAttributes(XMLStreamReader parser) {
@@ -140,13 +143,13 @@ public class StAXSlurper implements XMLSlurper {
             for (int index = 0; index < parser.getAttributeCount(); index++) {
                 String prefix = parser.getAttributePrefix(index);
                 attributeByName.put(
-                        prefix.isEmpty() ? parser.getAttributeLocalName(index).intern() : prefix.concat(QNAME_SEPARATOR).concat(parser.getAttributeLocalName(index)).intern(),
+                        prefix.isEmpty() ? parser.getAttributeLocalName(index) : prefix + QNAME_SEPARATOR + parser.getAttributeLocalName(index),
                         parser.getAttributeValue(index));
             }
 
             String xmlns = XMLConstants.XMLNS_ATTRIBUTE + QNAME_SEPARATOR;
             for(int index = 0; index < parser.getNamespaceCount(); index++)
-                attributeByName.put(xmlns.concat(parser.getNamespacePrefix(index)).intern(), parser.getNamespaceURI(index));
+                attributeByName.put(xmlns + parser.getNamespacePrefix(index), parser.getNamespaceURI(index));
 
             return attributeByName;
         }
@@ -159,14 +162,14 @@ public class StAXSlurper implements XMLSlurper {
 
         @Override
         XMLNode parseStartElement(XMLStreamReader parser) {
-            return nodeFactory.createNode(idFeed++, parser.getLocalName().intern(), parseAttributes(parser));
+            return nodeFactory.createNode(idFeed++, parser.getLocalName(), parseAttributes(parser));
         }
 
         private Map<String, String> parseAttributes(XMLStreamReader parser) {
             Map<String, String> attributeByName = new HashMap<String, String>();
 
             for (int index = 0; index < parser.getAttributeCount(); index++)
-                attributeByName.put(parser.getAttributeLocalName(index).intern(), parser.getAttributeValue(index));
+                attributeByName.put(parser.getAttributeLocalName(index), parser.getAttributeValue(index));
 
             return attributeByName;
         }

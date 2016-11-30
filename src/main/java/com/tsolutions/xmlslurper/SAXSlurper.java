@@ -73,10 +73,12 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
     @Override
     public void characters(char ch[], int start, int length) throws SAXException {
-        String text = new String(ch, start, length);
-
         XMLNode lastNode = nodeNotifier.peekLastDescendant();
-        lastNode.setText(text);
+        String text = new String(ch, start, length);
+        if (text != null) {
+            String lastText = lastNode.getText();
+            lastNode.setText(lastText == null ? text : lastText + text);
+        }
     }
 
     @Override
@@ -121,7 +123,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
                     idFeed++,
                     uri,
                     qNameSeparatorIndex >= 0 ? qName.substring(0, qNameSeparatorIndex) : null,
-                    localName.intern(),
+                    localName,
                     parseAttributes(attributes));
         }
 
@@ -129,7 +131,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
             Map<String, String> attributeByName = new HashMap<String, String>();
 
             for (int index = 0; index < attributes.getLength(); index++)
-                attributeByName.put(attributes.getQName(index).intern(), attributes.getValue(index));
+                attributeByName.put(attributes.getQName(index), attributes.getValue(index));
 
             return attributeByName;
         }
@@ -142,14 +144,14 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
         @Override
         XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes) {
-            return nodeFactory.createNode(idFeed++, localName.intern(), parseAttributes(attributes));
+            return nodeFactory.createNode(idFeed++, localName, parseAttributes(attributes));
         }
 
         private Map<String, String> parseAttributes(Attributes attributes) {
             Map<String, String> attributeByName = new HashMap<String, String>();
 
             for (int index = 0; index < attributes.getLength(); index++)
-                attributeByName.put(attributes.getLocalName(index).intern(), attributes.getValue(index));
+                attributeByName.put(attributes.getLocalName(index), attributes.getValue(index));
 
             return attributeByName;
         }
