@@ -45,7 +45,7 @@ The basic premise is to facilitate xml files parsing by combining DOM node objec
 		</Cast>
 	</Movie>
 	<fr:Franchise fr:title="The Fast and the Furious" xmlns:fr="http://franchise">
-		<Movie title="Fast &amp; Furious 6" director="Justin Lin">
+		<Movie title="Fast & Furious 6" director="Justin Lin">
 			<Cast>
 				<LeadActor>Vin Diesel</LeadActor>
 				<LeadActress>Michelle Rodriguez</LeadActress>
@@ -88,7 +88,7 @@ The basic premise is to facilitate xml files parsing by combining DOM node objec
 	
 	In the above case, all available tags are going to be parsed and exposed to the developer. XMLSlurper provides SlurpNode interface via getNodes() method. SlurpNode can be further filtered to provide a more fine grained information. Here findAll() method is called with start/end node listener anonymous class/lambda expression used. The following table presents a list of first few events triggered in order.
 	
-	Event Index | Data available
+	Event Index / Comments | Data available
 	--- | ---
 	1 | parent=null,<br />node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='null', attrByQName={}}
 	Comment | The first event is a start node event on a root node. In such a case, parent will have a null value.
