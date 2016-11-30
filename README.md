@@ -3,6 +3,10 @@ Java XMLSlurper
 
 An attempt to port parsing capabilities offered by Groovy XMLSlurper into Java world. The following is not planned to be accurate projection, instead the most useful functions will be implemented.
 
+## Purpose
+
+The basic premise is to facilitate xml files parsing by combining DOM node objects having easy to access data with low memory footprint SAX/StAX event based stream processing. In fact XMLSlurper utilizes SAX/StAX parsers to extract and compile data in sequential order. Listener interfaces were designed to be implemented also as Java 1.8 functional interfaces while the library itself can still be used with Java 1.6 projects. SAX/StAX array of events in XMLSlurper has been limited down to start and end node events only. The rest of the events are consumed by the XMLSlurper and the outcome is encapsulated within the XMLNode object available through the listener interface. Each and every event provides information about currently parsed node together with a node directly above called 'parent'. That structure allows the developer to obtain information regarding the depth of the node currently parsed, hence being able to gain knowledge about the ancestors and descentants of the node. XMLNode objects are compared via the transient id value which is unique only to a scope of a single xml file processing. The library attempts to sustain as low as possible memory consumption, hence the objects should not be used for storage, instead vital information should be extracted and the objects should be left for garbage collection.
+
 ## Download
 
 ### Maven (soon)
@@ -26,10 +30,6 @@ dependencies {
     compile 'org.xs4j:xmlslurper:1.8.0'
 }
 ```
-
-## Reasoning
-
-The basic premise is to facilitate xml files parsing by combining DOM node objects having easy to access data with low memory footprint SAX/StAX event based stream processing. In fact XMLSlurper utilizes SAX/StAX parsers to extract and compile data in sequential order. Listener interfaces were designed to be implemented also as Java 1.8 functional interfaces while the library itself can still be used with Java 1.6 projects. SAX/StAX array of events in XMLSlurper has been limited down to start and end node events only. The rest of the events are consumed by the XMLSlurper and the outcome is encapsulated within the XMLNode object available through the listener interface. Each and every event provides information about currently parsed node together with a node directly above called 'parent'. That structure allows the developer to obtain information regarding the depth of the node currently parsed, hence being able to gain knowledge about the ancestors and descentants of the node. XMLNode objects are compared via the transient id value which is unique only to a scope of a single xml file processing. The library attempts to sustain as low as possible memory consumption, hence the objects should not be used for storage, instead vital information should be extracted and the objects should be left for garbage collection.
 
 ## Usage
 
