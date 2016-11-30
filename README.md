@@ -83,11 +83,11 @@ The usage is similar to SAX/Groovy XMLSlurper. A factory org.xs4j.XMLSlurperFact
 1. Simple 'take all' approach
 	
 	```java
-	XmlSlurper xmlSlurper = XmlSlurperFactory.getInstance().getParser();
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 	xmlSlurper.getNodes().findAll((parent, node) -> {
 		// your code here
-		});
-	xmlSlurper.parse("samplefile.xml");
+	});
+	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
 	```
 	
 	In the above case, all available tags are going to be parsed and exposed to the developer. XMLSlurper provides SlurpNode interface via getNodes() method. SlurpNode can be further filtered to provide a more fine grained information. Here findAll() method is called with start/end node listener anonymous class/lambda expression used. The following table presents a list of first few events triggered in order.
