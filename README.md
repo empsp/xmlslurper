@@ -93,19 +93,19 @@ The basic premise is to facilitate xml files parsing by combining DOM node objec
 	1 | parent=null,<br />node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='null', attrByQName={}}
 	Comment | The first event is a start node event on a root node. In such a case, parent will have a null value.
 	2 | parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}},<br />node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={title=Titanic, director=James Cameron}}
-	Comment | MovieDb parent node's text has been updated with new line and spaces (here symbolized by tab '\t' character) that there are before the start of a Movie node.
+	Comment | 'MovieDb' parent node's text has been updated with new line and spaces (here symbolized by tab '\t' character) that there are before the start of a 'Movie' node.
 	3 | parent=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}},<br />node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='null', attrByQName={}}
-	Comment | Movie parent node's text has been updated with white characters as well.
+	Comment | 'Movie' parent node's text has been updated with white characters as well.
 	4 | parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}},<br />node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}
-	Comment | As a start node event, the text value of a LeadActor node is still null.
+	Comment | As a start node event, the text value of a 'LeadActor' node is still null.
 	5 | parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}},<br />node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}
-	Comment | Here, at end node event, the text value of the LeadActor node is finally available.
+	Comment | Here, at end node event, the text value of the 'LeadActor' node is finally available.
 	6 | parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}},<br />node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}
-	Comment | Another start node event, and the text value of a LeadActress node is still null, however the text value of the Cast parent node has been updated with additional white characters.
+	Comment | Another start node event, and the text value of a 'LeadActress' node is null, however the text value of the 'Cast' parent node has been updated with additional white characters.
 	7 | parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}},<br />node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}
 	8 | parent=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}},<br />node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t\n\t\t', attrByQName={}}
 	9 | parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}},<br />node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={title=Titanic, director=James Cameron}}
 	10 | parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}},<br />node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}
-	Comment | Franchise node is from a separate namespace. Namespace and prefix fields will reflect that change. Attributes hold additional attribute 'xmlns:fr' which is a metadata and it's available together with ordinary attributes. Attribute title has a prefix 'fr' which distinguishes it from the other nodes' title attributes.
+	Comment | 'Franchise' node is from a separate namespace. Namespace and prefix fields will reflect that fact. Attributes hold additional metadata attribute 'xmlns:fr' and it's available together with ordinary attributes. Attribute 'title' has a prefix 'fr' which distinguishes it from the other nodes' 'title' attributes.
 	.. | | 
 	46 | parent=null,<br />node=XMLNodeImpl{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}} |
