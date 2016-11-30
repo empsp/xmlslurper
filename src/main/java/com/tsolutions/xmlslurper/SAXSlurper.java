@@ -121,7 +121,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
             int qNameSeparatorIndex = qName.indexOf(QNAME_SEPARATOR);
             return nodeFactory.createNode(
                     idFeed++,
-                    uri,
+                    uri.isEmpty() ? null : uri,
                     qNameSeparatorIndex >= 0 ? qName.substring(0, qNameSeparatorIndex) : null,
                     localName,
                     parseAttributes(attributes));

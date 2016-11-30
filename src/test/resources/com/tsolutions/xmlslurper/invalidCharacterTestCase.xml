@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<MOTree>
-    <MO className="SOMENE" fdn="NE=1">
-        <attr name="someAttr">attrValue</attr>
-        <MO className="SOMEOTHEROBJ" fdn="NE=1,SOMEOTHEROBJ=2">
-			<attr name="bellCharacter">BellInHereAndHere</attr>
-        </MO>
-    </MO>
-</MOTree>
