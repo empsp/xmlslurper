@@ -8,10 +8,14 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipInputStream;
 
 import static com.tsolutions.xmlslurper.NodeFactory.QNAME_SEPARATOR;
 import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
@@ -28,7 +32,7 @@ public class StAXSlurper implements XMLSlurper {
     private final NodeNotifier nodeNotifier;
     private final NamespaceSensitiveElementParser elementParser;
 
-    private FileInputStream inputStream;
+    private InputStream inputStream;
     private XMLStreamReader parser;
 
     private boolean findNodeListenersOnlyMode;
@@ -57,7 +61,7 @@ public class StAXSlurper implements XMLSlurper {
 
         findNodeListenersOnlyMode = nodeNotifier.areSingleFindListenersAvailableOnly();
 
-        inputStream = new FileInputStream(filepath);
+        inputStream = getInputStreamBasedOnFileType(filepath);
         try {
             parser = xmlInputFactory.createXMLStreamReader(inputStream);
             doParse(parser);
@@ -74,13 +78,15 @@ public class StAXSlurper implements XMLSlurper {
 
             switch (parser.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
-                    onStartElement(parser);
+                    nodeNotifier.onStartNode(elementParser.parseStartElement(parser));
                     break;
                 case XMLStreamConstants.CHARACTERS:
-                    onCharacters();
+                    XMLNode previous = nodeNotifier.peekLastDescendant();
+                    String text = parser.getText();
+                    previous.setText(text);
                     break;
                 case XMLStreamConstants.END_ELEMENT:
-                    onEndElement();
+                    nodeNotifier.onEndNode();
                     break;
             }
 
@@ -89,19 +95,15 @@ public class StAXSlurper implements XMLSlurper {
         }
     }
 
-    private void onStartElement(XMLStreamReader parser) {
-        nodeNotifier.onStartNode(elementParser.parseStartElement(parser));
-    }
+    private static InputStream getInputStreamBasedOnFileType(String filepath) throws IOException {
+        InputStream inputStream = new FileInputStream(filepath);
 
-    private void onCharacters() {
-        String text = parser.getText();
-        XMLNode previous = nodeNotifier.peekLastDescendant();
+        if (filepath.endsWith(".gz"))
+            inputStream = new GZIPInputStream(inputStream);
+        else if (filepath.endsWith(".zip"))
+            inputStream = new ZipInputStream(inputStream);
 
-        previous.setText(text);
-    }
-
-    private void onEndElement() {
-        nodeNotifier.onEndNode();
+        return inputStream;
     }
 
     private void close() throws XMLStreamException, IOException {

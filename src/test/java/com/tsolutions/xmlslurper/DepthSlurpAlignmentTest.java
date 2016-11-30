@@ -48,6 +48,7 @@ public class DepthSlurpAlignmentTest {
     public void givenDescendantsHavingChildCheckAlignmentReturnsTrueForFirstChildInDescendantTree() {
         slurpAlignment = getAlignment("**", "Child");
 
+        createAndAssertAlign("Child");
         createAndAssertNotAlign("Root");
         addAsLast();
         createAndAssertAlign("Child");
@@ -187,6 +188,19 @@ public class DepthSlurpAlignmentTest {
         createAndAssertAlign("Offspring");
         removeLast();
         createAndAssertAlign("Child");
+    }
+
+    @Test
+    public void givenChildrenOfDescendantsOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForRootAndChildrenAndChildrenOfChildren() {
+        slurpAlignment = getAlignment("**", "**", "**", "*");
+
+        createAndAssertAlign("Root");
+        addAsLast();
+        createAndAssertAlign("Child");
+        addAsLast();
+        createAndAssertAlign("Kin");
+        addAsLast();
+        createAndAssertNotAlign("Offspring");
     }
 
     @After

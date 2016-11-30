@@ -10,11 +10,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipInputStream;
 
 import static com.tsolutions.xmlslurper.NodeFactory.QNAME_SEPARATOR;
 import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
@@ -31,7 +31,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private final NodeNotifier nodeNotifier;
     private final NamespaceSensitiveElementParser elementParser;
 
-    private FileInputStream inputStream;
+    private InputStream inputStream;
     private SAXParser parser;
 
     SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier, NamespaceSensitiveElementParser elementParser) {
@@ -51,7 +51,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     public void parse(@NotNull String filepath) throws IOException, ParserConfigurationException, SAXException, XMLStreamException {
         requireNonNull(filepath);
 
-        inputStream = new FileInputStream(filepath);
+        inputStream = getInputStreamBasedOnFileType(filepath);
         try {
             parser = saxParserFactory.newSAXParser();
         } catch (ParserConfigurationException e) {
@@ -89,6 +89,17 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         nodeNotifier.onEndNode();
+    }
+
+    private static InputStream getInputStreamBasedOnFileType(String filepath) throws IOException {
+        InputStream inputStream = new FileInputStream(filepath);
+
+        if (filepath.endsWith(".gz"))
+            inputStream = new GZIPInputStream(inputStream);
+        else if (filepath.endsWith(".zip"))
+            inputStream = new ZipInputStream(inputStream);
+
+        return inputStream;
     }
 
     private void close() throws XMLStreamException, IOException {
