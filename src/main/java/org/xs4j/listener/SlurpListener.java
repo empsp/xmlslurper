@@ -1,4 +1,4 @@
-package com.tsolutions.xmlslurper.listener;
+package org.xs4j.listener;
 
 /**
  * Created by mturski on 11/22/2016.

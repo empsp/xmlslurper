@@ -1,21 +1,22 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import com.tsolutions.xmlslurper.listener.NodeListener;
-import com.tsolutions.xmlslurper.path.Slurp;
-import com.tsolutions.xmlslurper.path.SlurpNode;
+import org.xs4j.listener.NodeListener;
+import org.xs4j.path.Slurp;
+import org.xs4j.path.SlurpNode;
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.tsolutions.xmlslurper.NodeFactory.QNAME_SEPARATOR;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -143,7 +144,7 @@ public class XMLSlurperIT {
         objectSlurpNode.findAll(objectListener);
         objectSlurpNode.node("OtherObject").findAll(otherObjectListener);
 
-        parser.parse(getResourcePath("borderTestCase.xml"));
+        parser.parse(getResource("borderTestCase.xml"));
 
         // then
         XMLNode root = createNode(0L, "ObjectTree");
@@ -175,7 +176,7 @@ public class XMLSlurperIT {
 
         // when
         getNodes().node("**").node("Object").findAll(listener, null);
-        parser.parse(getResourcePath("simpleTestCase.xml"));
+        parser.parse(getResource("simpleTestCase.xml"));
 
         // then
         verify(listener).onNode(any(), any());
@@ -200,7 +201,7 @@ public class XMLSlurperIT {
 
         // when
         getNodes().node("**").node("Object").findAll(null, listener);
-        parser.parse(getResourcePath("simpleTestCase.xml"));
+        parser.parse(getResource("simpleTestCase.xml"));
 
         // then
         verify(listener).onNode(any(), any());
@@ -369,7 +370,7 @@ public class XMLSlurperIT {
 
         // when
         getNodes("**", "other:OtherObject").findAll(listener, null);
-        parser.parse(getResourcePath("namespaceTestCase.xml"));
+        parser.parse(getResource("namespaceTestCase.xml"));
 
         // then
         Map<String, String> otherObjectAttrs = new HashMap<String, String>();
@@ -384,12 +385,10 @@ public class XMLSlurperIT {
         List<XMLNode> actualNodes = nodeCaptor.getAllValues();
         XMLNode actualOtherObject = actualNodes.get(1);
 
-        System.out.println(actualOtherObject);
-
         assertThat(actualOtherObject.getNamespace(), is(otherObject.getNamespace()));
         assertThat(actualOtherObject.getPrefix(), is(otherObject.getPrefix()));
         assertThat(actualOtherObject.getLocalName(), is(otherObject.getLocalName()));
-        assertThat(actualOtherObject.getQName(), is(otherObject.getPrefix() + QNAME_SEPARATOR + otherObject.getLocalName()));
+        assertThat(actualOtherObject.getQName(), CoreMatchers.is(otherObject.getPrefix() + NodeFactory.QNAME_SEPARATOR + otherObject.getLocalName()));
         assertThat(actualOtherObject.getAttributes(), is(otherObject.getAttributes()));
     }
 
@@ -398,8 +397,8 @@ public class XMLSlurperIT {
         listener = null;
     }
 
-    private String getResourcePath(String resourceName) {
-        return getClass().getResource(resourceName).getPath();
+    private InputStream getResource(String resourceName) {
+        return getClass().getResourceAsStream(resourceName);
     }
 
     private SlurpNode getNodes(String... nodePath) {
@@ -418,7 +417,7 @@ public class XMLSlurperIT {
     private void parse(String resourcePath, Slurp slurp) throws Exception {
         slurp.findAll(listener);
 
-        parser.parse(getResourcePath(resourcePath));
+        parser.parse(getResource(resourcePath));
     }
 
     private XMLNode createNode(long id, String localName) {

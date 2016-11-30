@@ -1,6 +1,6 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
-import com.tsolutions.xmlslurper.listener.NodeListener;
+import org.xs4j.listener.NodeListener;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,11 +8,12 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.tsolutions.xmlslurper.XMLSlurperFactory.*;
+import static org.xs4j.XMLSlurperFactory.*;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import static org.mockito.BDDMockito.given;
@@ -38,7 +39,7 @@ public class StAXSlurperIT {
 
         // when
         slurper.getNodes().find(listener);
-        slurper.parse(getResourcePath("simpleTestCase.xml"));
+        slurper.parse(getResource("simpleTestCase.xml"));
 
         // then
         XMLNode root = createNode(0L, "ObjectTree");
@@ -64,7 +65,7 @@ public class StAXSlurperIT {
 
         // when
         slurper.getNodes().find(listener, null);
-        slurper.parse(getResourcePath("simpleTestCase.xml"));
+        slurper.parse(getResource("simpleTestCase.xml"));
 
         // then
         XMLNode root = createNode(0L, "ObjectTree");
@@ -101,7 +102,7 @@ public class StAXSlurperIT {
 
         // when
         slurper.getNodes().node("ObjectTree").node("Object").find(null, listener);
-        slurper.parse(getResourcePath("simpleTestCase.xml"));
+        slurper.parse(getResource("simpleTestCase.xml"));
 
         // then
         XMLNode root = createNode(0L, "ObjectTree");
@@ -126,8 +127,8 @@ public class StAXSlurperIT {
         return nodeFactory.createNode(id, name, Collections.emptyMap());
     }
 
-    private String getResourcePath(String resourceName) {
-        return getClass().getResource(resourceName).getPath();
+    private InputStream getResource(String resourceName) {
+        return getClass().getResourceAsStream(resourceName);
     }
 
     private XMLStreamReader createSlurperWithMockedXMLInputFactory() throws XMLStreamException {

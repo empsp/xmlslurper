@@ -1,14 +1,13 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
 import com.sun.istack.NotNull;
-import com.tsolutions.xmlslurper.path.SlurpNode;
+import org.xs4j.path.SlurpNode;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +16,7 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import static com.tsolutions.xmlslurper.NodeFactory.QNAME_SEPARATOR;
-import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
+import static org.xs4j.util.NotNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/8/2016.
@@ -56,18 +54,24 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     @Override
+    @Deprecated
     public void parse(@NotNull String filepath) throws XMLStreamException, IOException {
         requireNonNull(filepath);
 
+        parse(getInputStreamBasedOnFileType(filepath));
+    }
+
+    @Override
+    public void parse(@NotNull InputStream inputStream) throws XMLStreamException, IOException {
+        requireNonNull(inputStream);
+
         findNodeListenersOnlyMode = nodeNotifier.areSingleFindListenersAvailableOnly();
 
+        this.inputStream = inputStream;
         try {
-            inputStream = getInputStreamBasedOnFileType(filepath);
             parser = xmlInputFactory.createXMLStreamReader(inputStream);
             doParse(parser);
         } catch (XMLStreamException e) {
-            throw e;
-        } catch (IOException e) {
             throw e;
         } finally {
             close();
@@ -103,10 +107,15 @@ public class StAXSlurper implements XMLSlurper {
     private static InputStream getInputStreamBasedOnFileType(String filepath) throws IOException {
         InputStream inputStream = new FileInputStream(filepath);
 
-        if (filepath.endsWith(".gz"))
-            inputStream = new GZIPInputStream(inputStream);
-        else if (filepath.endsWith(".zip"))
-            inputStream = new ZipInputStream(inputStream);
+        try {
+            if (filepath.endsWith(".gz"))
+                inputStream = new GZIPInputStream(inputStream);
+            else if (filepath.endsWith(".zip"))
+                inputStream = new ZipInputStream(inputStream);
+        } catch (IOException e) {
+            inputStream.close();
+            throw e;
+        }
 
         return inputStream;
     }
@@ -143,11 +152,11 @@ public class StAXSlurper implements XMLSlurper {
             for (int index = 0; index < parser.getAttributeCount(); index++) {
                 String prefix = parser.getAttributePrefix(index);
                 attributeByName.put(
-                        prefix.isEmpty() ? parser.getAttributeLocalName(index) : prefix + QNAME_SEPARATOR + parser.getAttributeLocalName(index),
+                        prefix.isEmpty() ? parser.getAttributeLocalName(index) : prefix + NodeFactory.QNAME_SEPARATOR + parser.getAttributeLocalName(index),
                         parser.getAttributeValue(index));
             }
 
-            String xmlns = XMLConstants.XMLNS_ATTRIBUTE + QNAME_SEPARATOR;
+            String xmlns = XMLConstants.XMLNS_ATTRIBUTE + NodeFactory.QNAME_SEPARATOR;
             for(int index = 0; index < parser.getNamespaceCount(); index++)
                 attributeByName.put(xmlns + parser.getNamespacePrefix(index), parser.getNamespaceURI(index));
 

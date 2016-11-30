@@ -1,4 +1,4 @@
-package com.tsolutions.xmlslurper.util;
+package org.xs4j.util;
 
 import java.util.Map;
 

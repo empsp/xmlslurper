@@ -1,6 +1,6 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
-import com.tsolutions.xmlslurper.listener.NodeListener;
+import org.xs4j.listener.NodeListener;
 
 import java.util.*;
 

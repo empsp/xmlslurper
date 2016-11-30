@@ -1,4 +1,4 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
 import java.util.Deque;
 import java.util.List;

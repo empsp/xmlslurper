@@ -1,4 +1,4 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
 import org.junit.After;
 import org.junit.Test;

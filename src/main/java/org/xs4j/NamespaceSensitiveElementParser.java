@@ -1,4 +1,4 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
 import org.xml.sax.Attributes;
 

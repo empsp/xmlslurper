@@ -1,8 +1,8 @@
-package com.tsolutions.xmlslurper.listener;
+package org.xs4j.listener;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import com.tsolutions.xmlslurper.XMLNode;
+import org.xs4j.XMLNode;
 
 /**
  * Created by mturski on 11/11/2016.

@@ -1,4 +1,4 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
@@ -6,7 +6,7 @@ import com.sun.istack.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
+import static org.xs4j.util.NotNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/9/2016.

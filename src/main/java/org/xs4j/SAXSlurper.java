@@ -1,23 +1,24 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
 import com.sun.istack.NotNull;
-import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import org.xs4j.path.SlurpNode;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import static com.tsolutions.xmlslurper.NodeFactory.QNAME_SEPARATOR;
-import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
+import static org.xs4j.util.NotNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/15/2016.
@@ -48,13 +49,21 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     @Override
+    @Deprecated
     public void parse(@NotNull String filepath) throws ParserConfigurationException, SAXException, IOException, XMLStreamException {
         requireNonNull(filepath);
 
+        parse(getInputStreamBasedOnFileType(filepath));
+    }
+
+    @Override
+    public void parse(@NotNull InputStream inputStream) throws ParserConfigurationException, SAXException, IOException, XMLStreamException {
+        requireNonNull(inputStream);
+
+        this.inputStream = inputStream;
         try {
-            inputStream = getInputStreamBasedOnFileType(filepath);
-            parser = saxParserFactory.newSAXParser();
-            parser.parse(inputStream, this);
+             parser = saxParserFactory.newSAXParser();
+             parser.parse(inputStream, this);
         } catch (ParserConfigurationException e) {
             throw e;
         } catch (SAXException e) {
@@ -89,10 +98,15 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private static InputStream getInputStreamBasedOnFileType(String filepath) throws IOException {
         InputStream inputStream = new FileInputStream(filepath);
 
-        if (filepath.endsWith(".gz"))
-            inputStream = new GZIPInputStream(inputStream);
-        else if (filepath.endsWith(".zip"))
-            inputStream = new ZipInputStream(inputStream);
+        try {
+            if (filepath.endsWith(".gz"))
+                inputStream = new GZIPInputStream(inputStream);
+            else if (filepath.endsWith(".zip"))
+                inputStream = new ZipInputStream(inputStream);
+        } catch (IOException e) {
+            inputStream.close();
+            throw e;
+        }
 
         return inputStream;
     }
@@ -118,7 +132,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
         @Override
         XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes) {
-            int qNameSeparatorIndex = qName.indexOf(QNAME_SEPARATOR);
+            int qNameSeparatorIndex = qName.indexOf(NodeFactory.QNAME_SEPARATOR);
             return nodeFactory.createNode(
                     idFeed++,
                     uri.isEmpty() ? null : uri,

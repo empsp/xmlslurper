@@ -1,16 +1,16 @@
-package com.tsolutions.xmlslurper;
+package org.xs4j;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import com.tsolutions.xmlslurper.NodeNotifier.NodeNotifierData;
-import com.tsolutions.xmlslurper.listener.NodeListener;
-import com.tsolutions.xmlslurper.path.Slurp;
-import com.tsolutions.xmlslurper.path.SlurpAttribute;
-import com.tsolutions.xmlslurper.path.SlurpNode;
+import org.xs4j.listener.NodeListener;
+import org.xs4j.path.Slurp;
+import org.xs4j.path.SlurpAttribute;
+import org.xs4j.path.SlurpNode;
+import org.xs4j.util.NotNullValidator;
 
 import java.util.List;
 
-import static com.tsolutions.xmlslurper.util.NotNullValidator.requireNonNull;
+import static org.xs4j.util.NotNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/21/2016.
@@ -20,11 +20,11 @@ final class SlurpFactory {
         IS, ISNOT, REGEX
     }
 
-    private final List<NodeNotifierData> findData;
-    private final List<NodeNotifierData> findAllData;
+    private final List<NodeNotifier.NodeNotifierData> findData;
+    private final List<NodeNotifier.NodeNotifierData> findAllData;
     private final SlurpAlignmentFactory slurpAlignmentFactory;
 
-    SlurpFactory(List<NodeNotifierData> findData, List<NodeNotifierData> findAllData, SlurpAlignmentFactory slurpAlignmentFactory) {
+    SlurpFactory(List<NodeNotifier.NodeNotifierData> findData, List<NodeNotifier.NodeNotifierData> findAllData, SlurpAlignmentFactory slurpAlignmentFactory) {
         this.findData = findData;
         this.findAllData = findAllData;
         this.slurpAlignmentFactory = slurpAlignmentFactory;
@@ -82,22 +82,22 @@ final class SlurpFactory {
 
         @Override
         public void find(@Nullable NodeListener nodeListener) {
-            findData.add(new NodeNotifierData(slurpAlignment, nodeListener, nodeListener));
+            findData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, nodeListener, nodeListener));
         }
 
         @Override
         public void find(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            findData.add(new NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
+            findData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener nodeListener) {
-            findAllData.add(new NodeNotifierData(slurpAlignment, nodeListener, nodeListener));
+            findAllData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, nodeListener, nodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            findAllData.add(new NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
+            findAllData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
         }
     }
 
@@ -138,22 +138,22 @@ final class SlurpFactory {
 
         @Override
         public void find(@Nullable NodeListener nodeListener) {
-            findData.add(new NodeNotifierData(slurpAlignment, nodeListener, nodeListener));
+            findData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, nodeListener, nodeListener));
         }
 
         @Override
         public void find(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            findData.add(new NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
+            findData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener nodeListener) {
-            findAllData.add(new NodeNotifierData(slurpAlignment, nodeListener));
+            findAllData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, nodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            findAllData.add(new NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
+            findAllData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
         }
     }
 }

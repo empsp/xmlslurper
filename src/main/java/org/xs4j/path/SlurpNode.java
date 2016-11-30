@@ -1,4 +1,4 @@
-package com.tsolutions.xmlslurper.path;
+package org.xs4j.path;
 
 import com.sun.istack.NotNull;
 
