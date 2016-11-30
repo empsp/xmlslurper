@@ -48,22 +48,15 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     @Override
-    public void parse(@NotNull String filepath) throws IOException, ParserConfigurationException, SAXException, XMLStreamException {
+    public void parse(@NotNull String filepath) throws ParserConfigurationException, SAXException, IOException, XMLStreamException {
         requireNonNull(filepath);
 
-        inputStream = getInputStreamBasedOnFileType(filepath);
         try {
+            inputStream = getInputStreamBasedOnFileType(filepath);
             parser = saxParserFactory.newSAXParser();
-        } catch (ParserConfigurationException e) {
-            close();
-            throw e;
-        } catch (SAXException e) {
-            close();
-            throw e;
-        }
-
-        try {
             parser.parse(inputStream, this);
+        } catch (ParserConfigurationException e) {
+            throw e;
         } catch (SAXException e) {
             throw e;
         } catch (IOException e) {

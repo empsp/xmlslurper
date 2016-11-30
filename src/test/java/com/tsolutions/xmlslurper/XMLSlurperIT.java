@@ -6,7 +6,6 @@ import com.tsolutions.xmlslurper.listener.NodeListener;
 import com.tsolutions.xmlslurper.path.Slurp;
 import com.tsolutions.xmlslurper.path.SlurpNode;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -28,7 +27,7 @@ import static org.mockito.Mockito.*;
 public class XMLSlurperIT {
     private static final NodeFactory nodeFactory = XMLSlurperFactory.getNodeFactory();
 
-    private XMLSlurper parser = XMLSlurperFactory.getInstance().createXMLSlurper();
+    private XMLSlurper parser = XMLSlurperFactory.getInstance().createXMLSlurper(XMLSlurperFactory.ParserType.STAX_PARSER);
     private NodeListener listener;
 
     @Test

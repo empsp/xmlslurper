@@ -56,16 +56,18 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     @Override
-    public void parse(@NotNull String filepath) throws IOException, XMLStreamException {
+    public void parse(@NotNull String filepath) throws XMLStreamException, IOException {
         requireNonNull(filepath);
 
         findNodeListenersOnlyMode = nodeNotifier.areSingleFindListenersAvailableOnly();
 
-        inputStream = getInputStreamBasedOnFileType(filepath);
         try {
+            inputStream = getInputStreamBasedOnFileType(filepath);
             parser = xmlInputFactory.createXMLStreamReader(inputStream);
             doParse(parser);
         } catch (XMLStreamException e) {
+            throw e;
+        } catch (IOException e) {
             throw e;
         } finally {
             close();
@@ -142,8 +144,9 @@ public class StAXSlurper implements XMLSlurper {
                         parser.getAttributeValue(index));
             }
 
+            String xmlns = XMLConstants.XMLNS_ATTRIBUTE + QNAME_SEPARATOR;
             for(int index = 0; index < parser.getNamespaceCount(); index++)
-                attributeByName.put(XMLConstants.XMLNS_ATTRIBUTE + QNAME_SEPARATOR + parser.getNamespacePrefix(index), parser.getNamespaceURI(index));
+                attributeByName.put(xmlns.concat(parser.getNamespacePrefix(index)).intern(), parser.getNamespaceURI(index));
 
             return attributeByName;
         }
