@@ -13,7 +13,7 @@ In order to use the library in your maven project, just declare the dependency i
 <dependency>
 	<groupId>com.tsolutions</groupId>
 	<artifactId>xmlslurper</artifactId>
-	<version>1.4.1</version>
+	<version>1.7.0</version>
 </dependency>
 ```
 
@@ -23,7 +23,7 @@ In order to use the library in your gradle project, just declare the dependency 
 
 ```gradle
 dependencies {
-    compile 'com.tsolutions:xmlslurper:1.4.1'
+    compile 'com.tsolutions:xmlslurper:1.7.0'
 }
 ```
 
@@ -91,21 +91,21 @@ The basic premise is to facilitate xml files parsing by combining DOM node objec
 	Event Index | Data available
 	--- | ---
 	1 | parent=null, node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='null', attrByQName={}}
-	The first event is a start node event on a root node. In such a case, parent will have a null value.
+	Comment | The first event is a start node event on a root node. In such a case, parent will have a null value.
 	2 | parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={title=Titanic, director=James Cameron}}
-	Parent MovieDb node text has been updated with new line and spaces (here symbolized by tab '\t' character) that there are before the start of a Movie node.
+	Comment | Parent MovieDb node text has been updated with new line and spaces (here symbolized by tab '\t' character) that there are before the start of a Movie node.
 	3 | parent=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}, node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='null', attrByQName={}}
-	Parent Movie node text has been updated with white characters as well.
+	Comment | Parent Movie node text has been updated with white characters as well.
 	4 | parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}
-	As a start node event, the text value of a LeadActor node is still null.
+	Comment | As a start node event, the text value of a LeadActor node is still null.
 	5 | parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}
-	Here, an end node event, the text value of the LeadActor node is finally available.
+	Comment | Here, an end node event, the text value of the LeadActor node is finally available.
 	6 | parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}
-	As a start node event, the text value of a LeadActress node is still null, however the text value of the Cast parent node has been updated with additional white characters.
+	Comment | As a start node event, the text value of a LeadActress node is still null, however the text value of the Cast parent node has been updated with additional white characters.
 	7 | parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}
 	8 | parent=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}, node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t\n\t\t', attrByQName={}}
 	9 | parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={title=Titanic, director=James Cameron}}
 	10 | parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}
-	Franchise node is from a separate namespace. Namespace and prefix fields will reflect that change. Attributes hold additional attribute 'xmlns:fr' which is a metadata, however it's available together with ordinary attributes. Attribute title has a prefix 'fr' which distinguishes it from the other title attributes.
-	Omitted
-	46 | parent=null, node=XMLNodeImpl{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}}
+	Comment | Franchise node is from a separate namespace. Namespace and prefix fields will reflect that change. Attributes hold additional attribute 'xmlns:fr' which is a metadata, however it's available together with ordinary attributes. Attribute title has a prefix 'fr' which distinguishes it from the other title attributes.
+	.. | | 
+	46 | parent=null, node=XMLNodeImpl{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}} |
