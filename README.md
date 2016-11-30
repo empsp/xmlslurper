@@ -3,9 +3,9 @@ Java XMLSlurper
 
 An attempt to port parsing capabilities offered by Groovy XMLSlurper into Java world. The following is not planned to be accurate projection, instead the most useful functions will be implemented.
 
-## Purpose
+## Overview
 
-The basic premise is to facilitate xml files parsing by combining DOM node objects having easy to access data with low memory footprint SAX/StAX event based stream processing. In fact XMLSlurper utilizes SAX/StAX parsers to extract and compile data in sequential order. Listener interfaces were designed to be implemented also as Java 1.8 functional interfaces while the library itself can still be used with Java 1.6 projects. SAX/StAX array of events in XMLSlurper has been limited down to start and end node events only. The rest of the events are consumed by the XMLSlurper and the outcome is encapsulated within the XMLNode object available through the listener interface. Each and every event provides information about currently parsed node together with a node directly above called 'parent'. That structure allows the developer to obtain information regarding the depth of the node currently parsed, hence being able to gain knowledge about the ancestors and descentants of the node. XMLNode objects are compared via the transient id value which is unique only to a scope of a single xml file processing. The library attempts to sustain as low as possible memory consumption, hence the objects should not be used for storage, instead vital information should be extracted and the objects should be left for garbage collection.
+The basic premise is to facilitate xml file parsing by combining XPath/GPath similar data search with event based stream processing. XMLSlurper utilizes SAX/StAX parsers to perform bulk of the operations. Therefore one must expect events to occur in sequential order. Data retrieved is wrapped into org.xs4j.XMLNode and exposed via org.xs4j.listener.NodeListener functional interface (can be used in Java 1.8 Lambda expressions). The library has been compiled against Java 1.6 and therefore can be used in legacy code, as well.
 
 ## Download
 
@@ -32,6 +32,10 @@ dependencies {
 ```
 
 ## Usage
+
+The usage is similar to SAX/Groovy XMLSlurper. A factory org.xs4j.XMLSlurperFactory provides org.xs4j.XMLSlurper implementation. The interface exposes two methods:
+- org.xs4j.path.SlurpNode getNodes() - one can attach multiple listeners to nodes/attributes/values of choice (or to the whole document tree)
+- void parse(InputStream inputStream) - triggers the document processing as in SAX/Groovy XMLSlurper
 
 ### Movie Database sample xml file
 
