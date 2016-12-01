@@ -250,20 +250,21 @@ Additionally the library ensures that:
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 	
 	Map<XMLNode, XMLNode> movieByCast = new HashMap<>();
-	
-	SlurpNode cast = xmlSlurper.getNodes().node("MovieDb").node("Movie").node("Cast");
-	cast.findAll((parent, node) -> movieByCast.put(node, parent), null);
-	cast.node("*").findAll(null, (parent, node) -> {
+	NodeListener castListener = (parent, node) -> {
 		XMLNode movie = movieByCast.get(parent);
 		XMLNode cast = node;
 		
 		// your code here
-	});
+	};
+	
+	SlurpNode cast = xmlSlurper.getNodes().node("MovieDb").node("Movie").node("Cast");
+	cast.findAll((parent, node) -> movieByCast.put(node, parent), null);
+	cast.node("*").findAll(null, castListener);
 	
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
 	```
 	
-	Even though `XMLNode` has limited equal/hashcode capabilities it's still eligible to be used in maps and sets for utility purposes. Since start node event of the `MovieDb.Movie.Cast` node is sufficient to collect supporting data, end node event listener has been provided as a `null` reference. Cast on the other hand requires text information to be parsed on children nodes, hence the use of end node listener and start node listener given as a `null` reference. The following table provides a list of all triggered events in order:
+	Even though `XMLNode` has id based equal/hashcode it's still perfectly eligible to be used in maps and sets for utility purposes. Since start node event of the `MovieDb.Movie.Cast` node is sufficient to collect supporting data, end node event listener has been provided as a `null` reference. Cast on the other hand requires text information to be parsed on children nodes, hence the use of end node listener and start node listener given as a `null` reference. The following table provides a list of all triggered events on 'castListener' in order:
 	
 	Event Id | Data available
 	--- | ---
