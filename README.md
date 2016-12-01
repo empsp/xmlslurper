@@ -291,6 +291,7 @@ Additionally the library ensures that:
 	```
 	
 	For franchises movies which are 1 level deeper in the tree that the rest of the movie nodes we need to broader the search scope with descendants (`**`) marking. Also benefiting from the fact that the parsing is sequential, we can utilise `Deque` to easily gain information regarding the movies current cast belongs to. As with the previous example, we're excluding end node events on cast nodes and start node events on children of the cast nodes. The following table provides a list of all triggered events on 'castListener' in order:
+	
 	Event Id | Data available
 	--- | ---
 	1 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
