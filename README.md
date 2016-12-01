@@ -39,12 +39,12 @@ The following is a list of XMLSlurper capabilities:
 2. Read all the elements that match the given path.
 3. Read all the elements that contain the given attribute.
 4. Read all the elements that have the given attribute with specific value/values different than/value matching given regex expression.
-5. Read all the elements that are siblings (`\*`) of a given elements.
-6. Read all the elements that are descendants (`\*\*`) of a given elements.
-7. Combine the siblings (`\*`) and descendants (`\*\*`) to gain even more fine-grained search results.
-8. All of the above except that n-th elements will be choosen that match the given path/attribute/value with respect to siblings (`\*`) and descendants (`\*\*`).
-9. Or, a single first/n-th element will be choosen that match the given path/attribute/value with respect to siblings (`\*`) and descendants (`\*\*`). After the element is provided, the parser will break further xml file processing.
-10. Collect all the elements that match the given path/attribute/value with respect to siblings (`\*`) and descendants (`\*\*`).
+5. Read all the elements that are siblings (`*`) of a given elements.
+6. Read all the elements that are descendants (`**`) of a given elements.
+7. Combine the siblings (`*`) and descendants (`**`) to gain even more fine-grained search results.
+8. All of the above except that n-th elements will be choosen that match the given path/attribute/value with respect to siblings (`*`) and descendants (`**`).
+9. Or, a single first/n-th element will be choosen that match the given path/attribute/value with respect to siblings (`*`) and descendants (`**`). After the element is provided, the parser will break further xml file processing.
+10. Collect all the elements that match the given path/attribute/value with respect to siblings (`*`) and descendants (`**`).
 
 All of the above will return searched nodes together with parent nodes of those nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file. The returned information will be split among two events, start node and end node events. End node events contain additional information regarding the node's text. The developer can decide if both events are of his interest, or only a start node or only an end node.
 
@@ -263,7 +263,7 @@ Additionally the library ensures that:
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
 	```
 	
-	Even though `XMLNode` has id based equal/hashcode it's still perfectly eligible to be used in maps and sets for utility purposes. Since start node event of the `MovieDb.Movie.Cast` node is sufficient to collect supporting data, end node event listener has been provided as a `null` reference. Cast on the other hand requires text information to be parsed on children (`\*`) nodes, hence the use of end node listener and start node listener given as a `null` reference. The following table provides a list of all triggered events on 'castListener' in order:
+	Even though `XMLNode` has id based equal/hashcode it's still perfectly eligible to be used in maps and sets for utility purposes. Since start node event of the `MovieDb.Movie.Cast` node is sufficient to collect supporting data, end node event listener has been provided as a `null` reference. Cast on the other hand requires text information to be parsed on children (`*`) nodes, hence the use of end node listener and start node listener given as a `null` reference. The following table provides a list of all triggered events on 'castListener' in order:
 	
 	Event Id | Data available
 	--- | ---
@@ -290,7 +290,7 @@ Additionally the library ensures that:
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
 	```
 	
-	For franchises movies which are 1 level deeper in the tree that the rest of the movie nodes we need to broader the search scope with descendants ('\*\*') marking. Also benefiting from the fact that the parsing is sequential, we can utilise `Deque` to easily gain information regarding the movies current cast belongs to. As with the previous example, we're excluding end node events on cast nodes and start node events on children of the cast nodes. The following table provides a list of all triggered events on 'castListener' in order:
+	For franchises movies which are 1 level deeper in the tree that the rest of the movie nodes we need to broader the search scope with descendants (`**`) marking. Also benefiting from the fact that the parsing is sequential, we can utilise `Deque` to easily gain information regarding the movies current cast belongs to. As with the previous example, we're excluding end node events on cast nodes and start node events on children of the cast nodes. The following table provides a list of all triggered events on 'castListener' in order:
 	Event Id | Data available
 	--- | ---
 	1 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
