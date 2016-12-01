@@ -40,11 +40,11 @@ The following is a list of XMLSlurper capabilities:
 3. Read all the elements that contain the given attribute.
 4. Read all the elements that have the given attribute with specific value/values different than/value matching given regex expression.
 5. Read all the elements that are siblings ('*') of a given elements.
-6. Read all teh elements that are descendants ('**') of a given elements.
+6. Read all the elements that are descendants ('**') of a given elements.
 7. Combine the siblings ('*') and descendants ('**') to gain even more fine-grained search results.
 8. Collect all the elements that match the given path/attribute/value with respect to siblings ('*') and descendants ('**').
 9. All of the above except n-th elements will be choosen that match the given path/attribute/value with respect to siblings ('*') and descendants ('**').
-10. Or, a single n-th element will be choosen that match the given path/attribute/value with respect to siblings ('*') and descendants ('**').
+10. Or, a single n-th element will be choosen that match the given path/attribute/value with respect to siblings ('*') and descendants ('**'). After the element is provided, the parser will break further xml file processing.
 
 All of the above will return searched nodes together with parent nodes of those nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file.
 
