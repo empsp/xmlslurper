@@ -8,13 +8,10 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipInputStream;
 
 import static org.xs4j.util.NotNullValidator.requireNonNull;
 
@@ -33,7 +30,7 @@ public class StAXSlurper implements XMLSlurper {
     private InputStream inputStream;
     private XMLStreamReader parser;
 
-    private boolean findNodeListenersOnlyMode;
+    private boolean isOnlyFindDataAvailable;
 
     StAXSlurper(
             XMLInputFactory xmlInputFactory,
@@ -54,18 +51,10 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     @Override
-    @Deprecated
-    public void parse(@NotNull String filepath) throws XMLStreamException, IOException {
-        requireNonNull(filepath);
-
-        parse(getInputStreamBasedOnFileType(filepath));
-    }
-
-    @Override
     public void parse(@NotNull InputStream inputStream) throws XMLStreamException, IOException {
         requireNonNull(inputStream);
 
-        findNodeListenersOnlyMode = nodeNotifier.areSingleFindListenersAvailableOnly();
+        isOnlyFindDataAvailable = nodeNotifier.isOnlyFindDataAvailable();
 
         this.inputStream = inputStream;
         try {
@@ -99,25 +88,11 @@ public class StAXSlurper implements XMLSlurper {
                     break;
             }
 
-            if (findNodeListenersOnlyMode && nodeNotifier.areSingleFindListenersEmpty())
+            if (isOnlyFindDataAvailable && nodeNotifier.isFindDataEmpty())
                 break;
         }
-    }
 
-    private static InputStream getInputStreamBasedOnFileType(String filepath) throws IOException {
-        InputStream inputStream = new FileInputStream(filepath);
-
-        try {
-            if (filepath.endsWith(".gz"))
-                inputStream = new GZIPInputStream(inputStream);
-            else if (filepath.endsWith(".zip"))
-                inputStream = new ZipInputStream(inputStream);
-        } catch (IOException e) {
-            inputStream.close();
-            throw e;
-        }
-
-        return inputStream;
+        nodeNotifier.collectDataOnExit();
     }
 
     private void close() throws XMLStreamException, IOException {

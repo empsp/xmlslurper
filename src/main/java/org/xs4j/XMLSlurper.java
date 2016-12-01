@@ -12,8 +12,5 @@ public interface XMLSlurper {
     @NotNull
     SlurpNode getNodes();
 
-    @Deprecated
-    void parse(@NotNull String filepath) throws Exception;
-
     void parse(@NotNull InputStream inputStream) throws Exception;
 }

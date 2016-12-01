@@ -2,11 +2,13 @@ package org.xs4j;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
+import org.xs4j.NodeNotifier.CollectData;
+import org.xs4j.NodeNotifier.FindData;
+import org.xs4j.listener.NodeCollector;
 import org.xs4j.listener.NodeListener;
 import org.xs4j.path.Slurp;
 import org.xs4j.path.SlurpAttribute;
 import org.xs4j.path.SlurpNode;
-import org.xs4j.util.NotNullValidator;
 
 import java.util.List;
 
@@ -20,13 +22,15 @@ final class SlurpFactory {
         IS, ISNOT, REGEX
     }
 
-    private final List<NodeNotifier.NodeNotifierData> findData;
-    private final List<NodeNotifier.NodeNotifierData> findAllData;
+    private final List<FindData> findData;
+    private final List<FindData> findAllData;
+    private final List<CollectData> collectData;
     private final SlurpAlignmentFactory slurpAlignmentFactory;
 
-    SlurpFactory(List<NodeNotifier.NodeNotifierData> findData, List<NodeNotifier.NodeNotifierData> findAllData, SlurpAlignmentFactory slurpAlignmentFactory) {
+    SlurpFactory(List<FindData> findData, List<FindData> findAllData, List<CollectData> collectData, SlurpAlignmentFactory slurpAlignmentFactory) {
         this.findData = findData;
         this.findAllData = findAllData;
+        this.collectData = collectData;
         this.slurpAlignmentFactory = slurpAlignmentFactory;
     }
 
@@ -74,6 +78,11 @@ final class SlurpFactory {
         }
 
         @Override
+        public SlurpNode node(@NotNull String qName, long nodeIndex) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public SlurpAttribute attr(@NotNull String qName) {
             requireNonNull(qName);
 
@@ -82,22 +91,29 @@ final class SlurpFactory {
 
         @Override
         public void find(@Nullable NodeListener nodeListener) {
-            findData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, nodeListener, nodeListener));
+            findData.add(new FindData(slurpAlignment, nodeListener, nodeListener));
         }
 
         @Override
         public void find(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            findData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
+            findData.add(new FindData(slurpAlignment, startNodeListener, endNodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener nodeListener) {
-            findAllData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, nodeListener, nodeListener));
+            findAllData.add(new FindData(slurpAlignment, nodeListener, nodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            findAllData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
+            findAllData.add(new FindData(slurpAlignment, startNodeListener, endNodeListener));
+        }
+
+        @Override
+        public void collect(@NotNull NodeCollector nodeCollector) {
+            requireNonNull(nodeCollector);
+
+            collectData.add(new CollectData(slurpAlignment, nodeCollector));
         }
     }
 
@@ -138,22 +154,29 @@ final class SlurpFactory {
 
         @Override
         public void find(@Nullable NodeListener nodeListener) {
-            findData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, nodeListener, nodeListener));
+            findData.add(new FindData(slurpAlignment, nodeListener, nodeListener));
         }
 
         @Override
         public void find(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            findData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
+            findData.add(new FindData(slurpAlignment, startNodeListener, endNodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener nodeListener) {
-            findAllData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, nodeListener));
+            findAllData.add(new FindData(slurpAlignment, nodeListener));
         }
 
         @Override
         public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
-            findAllData.add(new NodeNotifier.NodeNotifierData(slurpAlignment, startNodeListener, endNodeListener));
+            findAllData.add(new FindData(slurpAlignment, startNodeListener, endNodeListener));
+        }
+
+        @Override
+        public void collect(@NotNull NodeCollector nodeCollector) {
+            requireNonNull(nodeCollector);
+
+            collectData.add(new CollectData(slurpAlignment, nodeCollector));
         }
     }
 }

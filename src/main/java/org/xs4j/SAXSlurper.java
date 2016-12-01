@@ -10,13 +10,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipInputStream;
 
 import static org.xs4j.util.NotNullValidator.requireNonNull;
 
@@ -49,21 +46,14 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     @Override
-    @Deprecated
-    public void parse(@NotNull String filepath) throws ParserConfigurationException, SAXException, IOException, XMLStreamException {
-        requireNonNull(filepath);
-
-        parse(getInputStreamBasedOnFileType(filepath));
-    }
-
-    @Override
     public void parse(@NotNull InputStream inputStream) throws ParserConfigurationException, SAXException, IOException, XMLStreamException {
         requireNonNull(inputStream);
 
         this.inputStream = inputStream;
         try {
-             parser = saxParserFactory.newSAXParser();
-             parser.parse(inputStream, this);
+            parser = saxParserFactory.newSAXParser();
+            parser.parse(inputStream, this);
+            nodeNotifier.collectDataOnExit();
         } catch (ParserConfigurationException e) {
             throw e;
         } catch (SAXException e) {
@@ -93,22 +83,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         nodeNotifier.onEndNode();
-    }
-
-    private static InputStream getInputStreamBasedOnFileType(String filepath) throws IOException {
-        InputStream inputStream = new FileInputStream(filepath);
-
-        try {
-            if (filepath.endsWith(".gz"))
-                inputStream = new GZIPInputStream(inputStream);
-            else if (filepath.endsWith(".zip"))
-                inputStream = new ZipInputStream(inputStream);
-        } catch (IOException e) {
-            inputStream.close();
-            throw e;
-        }
-
-        return inputStream;
     }
 
     private void close() throws XMLStreamException, IOException {

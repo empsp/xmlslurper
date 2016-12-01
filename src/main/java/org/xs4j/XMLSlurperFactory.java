@@ -3,6 +3,8 @@ package org.xs4j;
 import com.sun.istack.NotNull;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
+import org.xs4j.NodeNotifier.CollectData;
+import org.xs4j.NodeNotifier.FindData;
 import org.xs4j.path.SlurpNode;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,10 +21,6 @@ import static org.xs4j.util.NotNullValidator.requireNonNull;
  * Created by mturski on 11/8/2016.
  */
 public class XMLSlurperFactory {
-    public enum ParserType {
-        STAX_PARSER, SAX_PARSER
-    }
-
     private static XMLSlurperFactory instance;
 
     public static XMLSlurperFactory getInstance() {
@@ -44,13 +42,14 @@ public class XMLSlurperFactory {
     }
 
     public XMLSlurper createXMLSlurper() {
-        List<NodeNotifier.NodeNotifierData> findData = new ArrayList<NodeNotifier.NodeNotifierData>();
-        List<NodeNotifier.NodeNotifierData> findAllData = new ArrayList<NodeNotifier.NodeNotifierData>();
+        List<FindData> findData = new ArrayList<FindData>();
+        List<FindData> findAllData = new ArrayList<FindData>();
+        List<CollectData> collectData = new ArrayList<CollectData>();
 
         NodeFactory nodeFactory = getNodeFactory();
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
-        SlurpFactory slurpFactory = getSlurpFactory(findData, findAllData, slurpAlignmentFactory);
-        NodeNotifier nodeNotifier = getNodeNotifier(findData, findAllData);
+        SlurpFactory slurpFactory = getSlurpFactory(findData, findAllData, collectData, slurpAlignmentFactory);
+        NodeNotifier nodeNotifier = getNodeNotifier(findData, findAllData, collectData);
 
         SAXSlurper saxSlurper = new SAXSlurper(
                 getSaxParserFactory(isNamespaceAwarenessDisabled),
@@ -69,37 +68,6 @@ public class XMLSlurperFactory {
         return new LazyEngineSlurper(slurpFactory, nodeNotifier, staxSlurper, saxSlurper);
     }
 
-    public XMLSlurper createXMLSlurper(ParserType parserType) {
-        requireNonNull(parserType);
-
-        List<NodeNotifier.NodeNotifierData> findData = new ArrayList<NodeNotifier.NodeNotifierData>();
-        List<NodeNotifier.NodeNotifierData> findAllData = new ArrayList<NodeNotifier.NodeNotifierData>();
-
-        NodeFactory nodeFactory = getNodeFactory();
-        SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
-        SlurpFactory slurpFactory = getSlurpFactory(findData, findAllData, slurpAlignmentFactory);
-        NodeNotifier nodeNotifier = getNodeNotifier(findData, findAllData);
-
-        switch(parserType) {
-            case STAX_PARSER:
-                return new StAXSlurper(
-                        getXMLInputFactory(),
-                        nodeFactory,
-                        slurpFactory,
-                        nodeNotifier,
-                        getStAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, nodeFactory));
-            case SAX_PARSER:
-                return new SAXSlurper(
-                        getSaxParserFactory(isNamespaceAwarenessDisabled),
-                        nodeFactory,
-                        slurpFactory,
-                        nodeNotifier,
-                        getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, nodeFactory));
-        }
-
-        throw new IllegalArgumentException();
-    }
-
     static NodeFactory getNodeFactory() {
         return new NodeFactory() {
             @Override
@@ -114,9 +82,10 @@ public class XMLSlurperFactory {
         };
     }
 
-    static NodeNotifier getNodeNotifier(List<NodeNotifier.NodeNotifierData> findData,
-                                        List<NodeNotifier.NodeNotifierData> findAllData) {
-        return new NodeNotifier(findData, findAllData);
+    static NodeNotifier getNodeNotifier(List<FindData> findData,
+                                        List<FindData> findAllData,
+                                        List<CollectData> collectData) {
+        return new NodeNotifier(findData, findAllData, collectData);
     }
 
     static SlurpAlignmentFactory getSlurpAlignmentFactory() {
@@ -124,10 +93,11 @@ public class XMLSlurperFactory {
     }
 
     static SlurpFactory getSlurpFactory(
-            List<NodeNotifier.NodeNotifierData> findData,
-            List<NodeNotifier.NodeNotifierData> findAllData,
+            List<FindData> findData,
+            List<FindData> findAllData,
+            List<CollectData> collectData,
             SlurpAlignmentFactory slurpAlignmentFactory) {
-        return new SlurpFactory(findData, findAllData, slurpAlignmentFactory);
+        return new SlurpFactory(findData, findAllData, collectData, slurpAlignmentFactory);
     }
 
     static SAXParserFactory getSaxParserFactory(boolean isNamespaceAwarenessDisabled) {
@@ -194,21 +164,10 @@ public class XMLSlurperFactory {
         }
 
         @Override
-        @Deprecated
-        public void parse(@NotNull String filepath) throws Exception {
-            requireNonNull(filepath);
-
-            if (nodeNotifier.areSingleFindListenersAvailableOnly())
-                staxSlurper.parse(filepath);
-            else
-                saxSlurper.parse(filepath);
-        }
-
-        @Override
         public void parse(@NotNull InputStream inputStream) throws Exception {
             requireNonNull(inputStream);
 
-            if (nodeNotifier.areSingleFindListenersAvailableOnly())
+            if (nodeNotifier.isOnlyFindDataAvailable())
                 staxSlurper.parse(inputStream);
             else
                 saxSlurper.parse(inputStream);
