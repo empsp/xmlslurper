@@ -46,7 +46,7 @@ The following is a list of XMLSlurper capabilities:
 9. Or, a single first/n-th element will be choosen that match the given path/attribute/value with respect to siblings ('\*') and descendants ('\**'). After the element is provided, the parser will break further xml file processing.
 10. Collect all the elements that match the given path/attribute/value with respect to siblings ('\*') and descendants ('\**').
 
-All of the above will return searched nodes together with parent nodes of those nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file.
+All of the above will return searched nodes together with parent nodes of those nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file. The returned information will be split among two events, start node and end node events. End node events contain additional information regarding the node's text. The developer can decide if both events are of his interest, or only a start node or only an end node.
 
 Additionally the library ensures that:
 
@@ -133,7 +133,7 @@ Additionally the library ensures that:
 	.. | | 
 	46 | `parent=null, node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}}` |
 
-2. Get all the 'Movie' nodes directly under 'MovieDb' root node
+2. Read all 'Movie' nodes directly under 'MovieDb' root node
 
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
@@ -152,7 +152,7 @@ Additionally the library ensures that:
 	3 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
 	4 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
 
-3. Get all the nodes that have their counterpart xml element containing 'title' attribute
+3. Read all nodes having 'title' attribute
 
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
@@ -188,13 +188,13 @@ Additionally the library ensures that:
 	
 	The following table provides a list of all triggered events in order:
 	
-	Event Index | Data available
+	Event Id | Data available
 	--- | ---
 	1 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}`
 	Comment | Here, 'Franchise' node is a result node having a parent node 'MovieDb'.
 	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}`
 
-4. Get all nodes that have 'title' attribute value containing word 'Furious' or equal to 'Forest Gump'
+4. Read all nodes having 'title' attribute value containing word 'Furious' or equal to 'Forest Gump'
 	
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
@@ -212,7 +212,7 @@ Additionally the library ensures that:
 	
 	The following table provides a list of all triggered events in order:
 	
-	Event Index | Data available
+	Event Id | Data available
 	--- | ---
 	1 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Justin Lin, title=Fast and Furious 6}}`
 	2 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Justin Lin, title=Fast and Furious 6}}`
@@ -220,3 +220,54 @@ Additionally the library ensures that:
 	4 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=James Wan, title=Furious 7}}`
 	5 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
 	6 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+
+5. Read cast from movies (excluding franchises)
+	
+	```java
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
+	xmlSlurper.getNodes().node("MovieDb").node("Movie").node("Cast").node("*").findAll((parent, node) -> {
+		// your code here
+	});
+	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
+	```
+	
+	The following table provides a list of all triggered events in order:
+	
+	Event Id | Data available
+	--- | ---
+	1 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}`
+	2 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
+	3 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}`
+	4 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
+	5 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}`
+	6 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}`
+	7 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}`
+	8 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
+	
+	However, we've lost the information regarding which movie given cast belongs to. Lets fix that:
+	
+	```java
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
+	
+	Map<XMLNode, XMLNode> movieByCast = new HashMap<>();
+	
+	SlurpNode cast = xmlSlurper.getNodes().node("MovieDb").node("Movie").node("Cast");
+	cast.findAll((parent, node) -> movieByCast.put(node, parent), null);
+	cast.node("*").findAll(null, (parent, node) -> {
+		XMLNode movie = movieByCast.get(parent);
+		XMLNode cast = node;
+		
+		// your code here
+	});
+	
+	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
+	```
+	
+	Even though `XMLNode` has limited equal/hashcode capabilities it's still eligible to be used in maps and sets for utility purposes. Since start node event of the `MovieDb.Movie.Cast` node is sufficient to collect supporting data, end node event listener has been provided as a `null` reference. Cast on the other hand requires text information to be parsed on children nodes, hence the use of end node listener and start node listener given as a `null` reference. The following table provides a list of all triggered events in order:
+	
+	Event Id | Data available
+	--- | ---
+	1 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, cast=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
+	2 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, cast=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
+	3 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, cast=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}`
+	4 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, cast=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
