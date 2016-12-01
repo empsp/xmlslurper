@@ -244,7 +244,7 @@ Additionally the library ensures that:
 	7 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}`
 	8 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
 	
-	However, we've lost the information regarding which movie given cast belongs to. Lets fix that:
+	However, we've lost the information regarding which movie given cast belongs to. Also, some of the events are meaningless because text information is not yet available. Lets fix that:
 	
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
