@@ -5,7 +5,7 @@ An attempt to port parsing capabilities offered by Groovy XMLSlurper into Java w
 
 ## Overview
 
-The basic premise is to facilitate xml file parsing by combining XPath/GPath similar data search with event based stream processing. XMLSlurper utilizes SAX parser to perform bulk of the operations. Event appearance will align with what SAX supports, data will be provided in similar ordered fashion. XMLSlurper wraps acquired information into a convienent XMLNode which is available through NodeListener functional interface (compatible with Java 1.8 Lambda expressions). The library has been compiled against Java 1.6, hence can be used in legacy code.
+The basic premise is to facilitate xml file parsing by combining XPath/GPath similar data search with event based stream processing. XMLSlurper utilizes SAX parser to perform bulk of the operations. Event appearance will align with what SAX supports, data will be provided sequentially ordered. XMLSlurper wraps acquired information into a convienent XMLNode which is available through NodeListener functional interface (compatible with Java 1.8 Lambda expressions). The library has been compiled against Java 1.6, hence can be used in legacy code.
 
 ## Download
 
