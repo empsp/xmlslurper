@@ -42,9 +42,9 @@ The following is a list of XMLSlurper capabilities:
 5. Read all the elements that are siblings ('\*') of a given elements.
 6. Read all the elements that are descendants ('\**') of a given elements.
 7. Combine the siblings ('\*') and descendants ('\**') to gain even more fine-grained search results.
-8. Collect all the elements that match the given path/attribute/value with respect to siblings ('\*') and descendants ('\**').
-9. All of the above except that n-th elements will be choosen that match the given path/attribute/value with respect to siblings ('\*') and descendants ('\**').
-10. Or, a single first/n-th element will be choosen that match the given path/attribute/value with respect to siblings ('\*') and descendants ('\**'). After the element is provided, the parser will break further xml file processing.
+8. All of the above except that n-th elements will be choosen that match the given path/attribute/value with respect to siblings ('\*') and descendants ('\**').
+9. Or, a single first/n-th element will be choosen that match the given path/attribute/value with respect to siblings ('\*') and descendants ('\**'). After the element is provided, the parser will break further xml file processing.
+10. Collect all the elements that match the given path/attribute/value with respect to siblings ('\*') and descendants ('\**').
 
 All of the above will return searched nodes together with parent nodes of those nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file.
 
@@ -131,4 +131,48 @@ Additionally the library ensures that:
 	10 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}`
 	Comment | 'Franchise' node is from a separate namespace. Namespace and prefix fields will reflect that fact. Attributes hold additional metadata attribute 'xmlns:fr' and it's available together with ordinary attributes. Attribute 'title' has a prefix 'fr' which distinguishes it from the other nodes' 'title' attributes.
 	.. | | 
-	46 | `parent=null, node=XMLNodeImpl{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}}` |
+	46 | `parent=null, node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}}` |
+
+2. Get all the 'Movie' nodes directly under 'MovieDb' root node
+
+	```java
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
+	xmlSlurper.getNodes().node("MovieDb").node("Movie").findAll((parent, node) -> {
+		// your code here
+	});
+	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
+	```
+	
+	The following table provides a list of all triggered events in order:
+	
+	Event Index | Data available
+	--- | ---
+	1 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}`
+	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}`
+	3 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+	4 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+
+3. Get all the nodes that have their counterpart xml element containing 'title' attribute
+
+	```java
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
+	xmlSlurper.getNodes().attr("title").findAll((parent, node) -> {
+		// your code here
+	});
+	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
+	```
+	
+	The following table provides a list of all triggered events in order:
+	
+	Event Index | Data available
+	--- | ---
+	0 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}`
+	1 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}`
+	2 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Justin Lin, title=Fast and Furious 6}}`
+	3 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Justin Lin, title=Fast and Furious 6}}`
+	4 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Wan, title=Furious 7}}`
+	5 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=James Wan, title=Furious 7}}`
+	6 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+	7 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+
+4. 
