@@ -5,7 +5,7 @@ An attempt to port parsing capabilities offered by Groovy XMLSlurper into Java w
 
 ## Overview
 
-The basic premise is to facilitate xml file parsing by combining XPath/GPath similar data search with event based stream processing. XMLSlurper utilizes SAX/StAX parsers to perform bulk of the operations, therefore one must expect events to occur in sequential order. Data retrieved is wrapped into org.xs4j.XMLNode and exposed via org.xs4j.listener.NodeListener functional interface (can be used in Java 1.8 Lambda expressions). The library has been compiled against Java 1.6, hence can be used in legacy code.
+The basic premise is to facilitate xml file parsing by combining XPath/GPath similar data search with event based stream processing. XMLSlurper utilizes SAX parser to perform bulk of the operations. Event appearance will align with what SAX supports, data will be provided in similar ordered fashion. XMLSlurper wraps acquired information into a convienent XMLNode which is available through NodeListener functional interface (compatible with Java 1.8 Lambda expressions). The library has been compiled against Java 1.6, hence can be used in legacy code.
 
 ## Download
 
@@ -17,7 +17,7 @@ In order to use the library in your maven project, just declare the dependency i
 <dependency>
 	<groupId>org.xs4j</groupId>
 	<artifactId>xmlslurper</artifactId>
-	<version>1.8.0</version>
+	<version>2.0.0</version>
 </dependency>
 ```
 
@@ -27,15 +27,34 @@ In order to use the library in your gradle project, just declare the dependency 
 
 ```gradle
 dependencies {
-    compile 'org.xs4j:xmlslurper:1.8.0'
+    compile 'org.xs4j:xmlslurper:2.0.0'
 }
 ```
 
 ## Usage
 
-The usage is similar to SAX/Groovy XMLSlurper. A factory org.xs4j.XMLSlurperFactory provides org.xs4j.XMLSlurper implementation. The interface exposes two methods:
-- org.xs4j.path.SlurpNode getNodes() - one can attach multiple listeners to nodes/attributes/values of choice (or to the whole document tree)
-- void parse(InputStream inputStream) - triggers the document processing as in SAX/Groovy XMLSlurper
+The following is a list of XMLSlurper capabilities:
+
+1. Read all the elements (with attributes and text) from the xml file.
+2. Read all the elements that match the given path.
+3. Read all the elements that contain the given attribute.
+4. Read all the elements that have the given attribute with specific value/values different than/value matching given regex expression.
+5. Read all the elements that are siblings ('*') of a given elements.
+6. Read all teh elements that are descendants ('**') of a given elements.
+7. Combine the siblings ('*') and descendants ('**') to gain even more fine-grained search results.
+8. Collect all the elements that match the given path/attribute/value with respect to siblings ('*') and descendants ('**').
+9. All of the above except n-th elements will be choosen that match the given path/attribute/value with respect to siblings ('*') and descendants ('**').
+10. Or, a single n-th element will be choosen that match the given path/attribute/value with respect to siblings ('*') and descendants ('**').
+
+All of the above will return searched nodes together with parent nodes of those nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file.
+
+Additionally the library ensures that:
+
+1. Namespace awareness can be turned on/off (feature turned on by default).
+1. @NotNull/@Nullable interfaces will be adhered to.
+2. XMLSlurper will release all of the resources after the execution (including the InputStream given).
+3. Single XMLSlurper instance can be reused many times, however the paths must be redefined.
+4. XMLNode objects are meaningfully equal only by the ids which will be unique only to the scope of a single xml file processing. Consecutive parsing of a different xml file will produce objects with different data but with matching ids. Therefore XMLNode objects are not fit and designed to be stored, instead the information should be extracted and the objects should be left for garbage collection.
 
 ### Movie Database sample xml file
 
