@@ -30,6 +30,13 @@ final class SlurpAlignmentFactory {
         return getSlurpAlignment(qNamePath);
     }
 
+    SlurpAlignment copyAlignmentAndAndNthNode(SlurpAlignment slurpAlignment, String qName, long nodeIndex) {
+        List<String> qNamePath = new ArrayList<String>(slurpAlignment.getPath());
+        qNamePath.add(qName);
+
+        return new SlurpAlignmentNthElementWrapper(getSlurpAlignment(qNamePath), nodeIndex);
+    }
+
     SlurpAlignment copyAlignmentAndAddAttribute(SlurpAlignment slurpAlignment, String attrQName) {
         List<String> qNamePath = new ArrayList<String>(slurpAlignment.getPath());
 
@@ -196,6 +203,31 @@ final class SlurpAlignmentFactory {
         @Override
         public List<String> getPath() {
             return namePath;
+        }
+    }
+
+    private class SlurpAlignmentNthElementWrapper extends SlurpAlignment {
+        private final SlurpAlignment slurpAlignment;
+        private final long nodeIndex;
+
+        public SlurpAlignmentNthElementWrapper(SlurpAlignment slurpAlignment, long nodeIndex) {
+            this.slurpAlignment = slurpAlignment;
+            this.nodeIndex = nodeIndex;
+        }
+
+        @Override
+        boolean checkAlignment(int depth, XMLNode lastNode) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        List<String> getPath() {
+            return slurpAlignment.getPath();
         }
     }
 

@@ -51,7 +51,7 @@ final class SlurpFactory {
 
         @Override
         public SlurpNode node(@NotNull String qName, long nodeIndex) {
-            throw new UnsupportedOperationException();
+            return new SlurpNodeImpl(slurpAlignmentFactory.copyAlignmentAndAndNthNode(slurpAlignment, qName, nodeIndex));
         }
 
         @Override
