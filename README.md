@@ -226,7 +226,7 @@ Additionally the library ensures that:
 	
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-	xmlSlurper.getNodes().node("MovieDb").node("Movie").node("Cast").node("*").findAll((parent, node) -> {
+	xmlSlurper.getNodes("MovieDb", "Movie", "Cast", "*").findAll((parent, node) -> {
 		// your code here
 	});
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
