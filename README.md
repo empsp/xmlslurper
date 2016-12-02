@@ -232,6 +232,8 @@ Additionally the library ensures that:
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
 	```
 	
+	For convenience `getNodes("MovieDb", "Movie", "Cast", "*")` used which is equal to construct `getNodes().node("MovieDb").node("Movie").node("Cast").node("*")`.
+	
 	The following table provides a list of all triggered events in order:
 	
 	Event Id | Data available
@@ -257,7 +259,7 @@ Additionally the library ensures that:
 		// your code here
 	};
 	
-	SlurpNode cast = xmlSlurper.getNodes().node("MovieDb").node("Movie").node("Cast");
+	SlurpNode cast = xmlSlurper.getNodes("MovieDb", "Movie", "Cast");
 	cast.findAll((movie, cast) -> movieByCast.put(cast, movie), null);
 	cast.node("*").findAll(null, castListener);
 	
@@ -288,7 +290,7 @@ Additionally the library ensures that:
 		// your code here
 	};
 	
-	SlurpNode cast = xmlSlurper.getNodes().node("**").node("Movie").node("Cast");
+	SlurpNode cast = xmlSlurper.getNodes("**", "Movie", "Cast");
 	cast.findAll((movie, cast) -> movies.addLast(movie), (movie, cast) -> movies.removeLast());
 	cast.node("*").findAll(null, castListener);
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
