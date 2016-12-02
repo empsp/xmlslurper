@@ -46,8 +46,8 @@ public class StAXSlurper implements XMLSlurper {
     }
 
     @Override
-    public SlurpNode getNodes() {
-        return slurpFactory.createSlurpNode();
+    public SlurpNode getNodes(String... nodes) {
+        return slurpFactory.createSlurpNode(nodes);
     }
 
     @Override

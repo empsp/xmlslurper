@@ -1,6 +1,7 @@
 package org.xs4j;
 
 import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -41,8 +42,8 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     @Override
-    public SlurpNode getNodes() {
-        return slurpFactory.createSlurpNode();
+    public SlurpNode getNodes(@Nullable String... nodes) {
+        return slurpFactory.createSlurpNode(nodes);
     }
 
     @Override

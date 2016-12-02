@@ -403,12 +403,7 @@ public class XMLSlurperIT {
     }
 
     private SlurpNode getNodes(String... nodePath) {
-        SlurpNode slurpNode = parser.getNodes();
-
-        for(String nodeName : nodePath)
-            slurpNode = slurpNode.node(nodeName);
-
-        return slurpNode;
+        return parser.getNodes(nodePath);
     }
 
     private void parse(String resourcePath, String... nodePath) throws Exception {

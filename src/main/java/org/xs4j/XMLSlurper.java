@@ -1,6 +1,7 @@
 package org.xs4j;
 
 import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 import org.xs4j.path.SlurpNode;
 
 import java.io.InputStream;
@@ -10,7 +11,7 @@ import java.io.InputStream;
  */
 public interface XMLSlurper {
     @NotNull
-    SlurpNode getNodes();
+    SlurpNode getNodes(@Nullable String... nodes);
 
     void parse(@NotNull InputStream inputStream) throws Exception;
 }

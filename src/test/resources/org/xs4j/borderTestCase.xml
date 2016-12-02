@@ -4,7 +4,7 @@
         <OtherObject attr1="OTHEROBJ"/>
     </Object>
     <OtherObject attr3="123">
-        a<OtherObject attr2="OTHER =123,OTHER_OBJECT= 124"/>
-        b<OtherObject attr2="OTHER = 123,OTHER_OBJECT = 125"/>
+        <OtherObject attr2="OTHER =123,OTHER_OBJECT= 124"/>
+        <OtherObject attr2="OTHER = 123,OTHER_OBJECT = 125"/>
     </OtherObject>
 </ObjectTree>

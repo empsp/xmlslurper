@@ -1,6 +1,7 @@
 package org.xs4j;
 
 import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xs4j.NodeNotifier.FindData;
@@ -155,8 +156,8 @@ public class XMLSlurperFactory {
         }
 
         @Override
-        public SlurpNode getNodes() {
-            return slurpFactory.createSlurpNode();
+        public SlurpNode getNodes(@Nullable String... nodes) {
+            return slurpFactory.createSlurpNode(nodes);
         }
 
         @Override

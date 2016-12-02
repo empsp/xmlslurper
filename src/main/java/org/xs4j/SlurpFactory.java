@@ -30,8 +30,13 @@ final class SlurpFactory {
         this.slurpAlignmentFactory = slurpAlignmentFactory;
     }
 
-    SlurpNode createSlurpNode() {
-        return new SlurpNodeImpl(slurpAlignmentFactory.createEmpty());
+    SlurpNode createSlurpNode(String[] nodes) {
+        if (nodes != null) {
+            requireNonNull(nodes);
+
+            return new SlurpNodeImpl(slurpAlignmentFactory.createAlignmentAndAddNodes(nodes));
+        } else
+            return new SlurpNodeImpl(slurpAlignmentFactory.createEmpty());
     }
 
     SlurpNode createSlurpNode(SlurpAlignment slurpAlignment, String localName) {

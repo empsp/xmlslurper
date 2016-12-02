@@ -17,6 +17,12 @@ final class SlurpAlignmentFactory {
         return new DefaultSlurpAlignment();
     }
 
+    SlurpAlignment createAlignmentAndAddNodes(String[] qNames) {
+        List<String> qNamePath = new ArrayList<String>(Arrays.asList(qNames));
+
+        return getSlurpAlignment(qNamePath);
+    }
+
     SlurpAlignment copyAlignmentAndAddNode(SlurpAlignment slurpAlignment, String qName) {
         List<String> qNamePath = new ArrayList<String>(slurpAlignment.getPath());
         qNamePath.add(qName);
