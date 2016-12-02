@@ -204,14 +204,12 @@ public class DepthSlurpAlignmentTest {
         createAndAssertNotAlign("Offspring");
     }
 
-    @Ignore
     @Test
     public void givenAll2ndNodesCheckAlignmentReturnsTrueForEverySecondNodeAtAnyDepth() {
         getAlignment();
         addNthNodeToAlignment("**", 2);
 
         createAndAssertNotAlign("Root");
-        createAndAssertAlign("OtherRoot");
         addLevel();
         createAndAssertNotAlign("Child");
         createAndAssertAlign("Kin");
@@ -221,14 +219,14 @@ public class DepthSlurpAlignmentTest {
         createAndAssertNotAlign("Offspring");
         createAndAssertAlign("Descendant");
         removeLevel();
-        createAndAssertNotAlign("Child");
-        createAndAssertAlign("Kin");
+        createAndAssertAlign("Child");
         createAndAssertNotAlign("Kin");
-        createAndAssertAlign("Kin");
+        createAndAssertNotAlign("Child");
+        createAndAssertNotAlign("Kin");
         removeLevel();
         createAndAssertNotAlign("Child");
         removeLevel();
-        createAndAssertNotAlign("Root");
+        createAndAssertAlign("OtherRoot");
     }
 
     @After

@@ -60,7 +60,6 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Child", 2);
     }
 
-    @Ignore
     @Test
     public void given2ndRootChildCheckAlignmentReturnsTrueFor2ndRootChild() {
         getAlignment("Root");
@@ -77,7 +76,6 @@ public class SlurpAlignmentFactoryTest {
         assertAlign("Child", 2);
     }
 
-    @Ignore
     @Test
     public void givenRoot2ndOfChildrenCheckAlignmentReturnsTrueForRoot2ndOfChildren() {
         getAlignment("Root");
@@ -101,18 +99,17 @@ public class SlurpAlignmentFactoryTest {
         addNthNodeToAlignment("**", 2);
 
         assertNotAlign("Root", 1);
-        assertAlign("OtherRoot", 1);
         assertNotAlign("Child", 2);
         assertAlign("Kin", 2);
         assertNotAlign("Descendant", 3);
         assertNotAlign("Offspring", 4);
         assertAlign("Descendant", 4);
-        assertNotAlign("Child", 3);
-        assertAlign("Kin", 3);
+        assertAlign("Child", 3);
         assertNotAlign("Kin", 3);
-        assertAlign("Kin", 3);
+        assertNotAlign("Child", 3);
+        assertNotAlign("Kin", 3);
         assertNotAlign("Child", 2);
-        assertNotAlign("Root", 1);
+        assertAlign("OtherRoot", 1);
     }
 
     @Ignore

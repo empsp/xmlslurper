@@ -210,6 +210,9 @@ final class SlurpAlignmentFactory {
         private final SlurpAlignment slurpAlignment;
         private final long nodeIndex;
 
+        private Deque<Long> indexByDepth = new ArrayDeque<Long>();
+        private int prevDepth;
+
         public SlurpAlignmentNthElementWrapper(SlurpAlignment slurpAlignment, long nodeIndex) {
             this.slurpAlignment = slurpAlignment;
             this.nodeIndex = nodeIndex;
@@ -217,12 +220,31 @@ final class SlurpAlignmentFactory {
 
         @Override
         boolean checkAlignment(int depth, XMLNode lastNode) {
-            throw new UnsupportedOperationException();
+            countOccurences(depth);
+
+            return slurpAlignment.checkAlignment(depth, lastNode) && indexByDepth.peekLast() == nodeIndex;
         }
 
         @Override
         boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            throw new UnsupportedOperationException();
+            countOccurences(descendants.size() + 1);
+
+            return slurpAlignment.checkAlignment(descendants, lastNode) && indexByDepth.peekLast() == nodeIndex;
+        }
+
+        private void countOccurences(int depth) {
+            if (depth > prevDepth)
+                indexByDepth.addLast(1L);
+            else if (depth == prevDepth)
+                indexByDepth.addLast(indexByDepth.removeLast() + 1);
+            else {
+                indexByDepth.removeLast();
+
+                if (indexByDepth.size() > 0)
+                    indexByDepth.addLast(indexByDepth.removeLast() + 1);
+            }
+
+            prevDepth = depth;
         }
 
         @Override
