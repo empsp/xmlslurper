@@ -45,7 +45,7 @@ The following is a list of XMLSlurper capabilities:
 8. All of the above except that n-th elements will be choosen that match the given path/attribute/value with respect to siblings (`*`) and descendants (`**`).
 9. Or, a single first/n-th element will be choosen that match the given path/attribute/value with respect to siblings (`*`) and descendants (`**`). After the element is provided, the parser will break further xml file processing.
 
-All of the above will return searched nodes together with parent nodes of those nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file. The returned information will be split among two events, start node and end node events. End node events contain additional information regarding nodes' text. The developer can decide if both events are of his interest, or only a start node or only an end node.
+All of the above will return searched nodes together with parent nodes of those nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file. The returned information will be split among two events, start node and end node events. End node events contain additional information regarding nodes' text. The developer can decide if both events are of his interest, or only the start node or only the end node.
 
 Additionally the library ensures that:
 
@@ -104,7 +104,17 @@ Any time it is required to retrieve all immediate children under a specific elem
 
 #### Descendants search - double wildcard \*\*
 
-It is also possible to retrieve all elements being descendants of a specific element with double wildcard (`**`) character. Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all first elements named 'Movie' found traversing path's depth beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath parent 'Movie' element would not be shown.
+It is also possible to retrieve all elements being descendants of a specific element with double wildcard (`**`) character.
+
+##### Subject to discussion
+
+(Current)
+Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all first elements named 'Movie' found traversing path's depth beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would not be shown.
+
+or
+
+(Proposition)
+Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all elements named 'Movie' found traversing path's depth beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would be shown, as well.
 
 ### Scenarios
 
