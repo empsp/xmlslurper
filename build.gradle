@@ -11,7 +11,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
-group = 'com.tsolutions'
+group = 'org.xs4j'
 archivesBaseName = 'xmlslurper'
 version = '2.0.0-RC1'
 
