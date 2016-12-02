@@ -144,7 +144,7 @@ public class SlurpAlignmentFactoryTest {
 
     @Ignore
     @Test
-    public void givenChildrenOfRootDescendantsCheckAlignmentReturnsTrueForAllNodesUnderRoot() {
+    public void givenChildrenOfRootDescendantsCheckAlignmentReturnsTrueForImmediateChildrenOfChildNode() {
         slurpAlignment = getAlignment("Child", "**", "*");
 
         assertNotAlign("Root", 1);
