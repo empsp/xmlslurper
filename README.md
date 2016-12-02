@@ -211,6 +211,21 @@ Additionally the library ensures that:
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
 	```
 	
+	Please note, `SlurpAttribute` extraction to a local variable is just for brevity, the same outcome can still be achieved by:
+	
+	```java
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
+	
+	NodeListener listener = (parent, node) -> {
+		// your code here
+	};
+	
+	xmlSlurper.getNodes().attr("title").regex(".*Furious.*").findAll(listener);
+	xmlSlurper.getNodes().attr("title").is("Forest Gump").findAll(listener);
+	
+	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
+	```
+	
 	The following table provides a list of all triggered events in order:
 	
 	Event Id | Data available
