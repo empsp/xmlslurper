@@ -2,9 +2,7 @@ package org.xs4j;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import org.xs4j.NodeNotifier.CollectData;
 import org.xs4j.NodeNotifier.FindData;
-import org.xs4j.listener.NodeCollector;
 import org.xs4j.listener.NodeListener;
 import org.xs4j.path.Slurp;
 import org.xs4j.path.SlurpAttribute;
@@ -24,13 +22,11 @@ final class SlurpFactory {
 
     private final List<FindData> findData;
     private final List<FindData> findAllData;
-    private final List<CollectData> collectData;
     private final SlurpAlignmentFactory slurpAlignmentFactory;
 
-    SlurpFactory(List<FindData> findData, List<FindData> findAllData, List<CollectData> collectData, SlurpAlignmentFactory slurpAlignmentFactory) {
+    SlurpFactory(List<FindData> findData, List<FindData> findAllData, SlurpAlignmentFactory slurpAlignmentFactory) {
         this.findData = findData;
         this.findAllData = findAllData;
-        this.collectData = collectData;
         this.slurpAlignmentFactory = slurpAlignmentFactory;
     }
 
@@ -108,13 +104,6 @@ final class SlurpFactory {
         public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
             findAllData.add(new FindData(slurpAlignment, startNodeListener, endNodeListener));
         }
-
-        @Override
-        public void collect(@NotNull NodeCollector nodeCollector) {
-            requireNonNull(nodeCollector);
-
-            collectData.add(new CollectData(slurpAlignment, nodeCollector));
-        }
     }
 
     private class SlurpAttributeImpl implements SlurpAttribute {
@@ -170,13 +159,6 @@ final class SlurpFactory {
         @Override
         public void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener) {
             findAllData.add(new FindData(slurpAlignment, startNodeListener, endNodeListener));
-        }
-
-        @Override
-        public void collect(@NotNull NodeCollector nodeCollector) {
-            requireNonNull(nodeCollector);
-
-            collectData.add(new CollectData(slurpAlignment, nodeCollector));
         }
     }
 }

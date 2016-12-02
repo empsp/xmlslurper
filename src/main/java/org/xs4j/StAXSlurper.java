@@ -91,8 +91,6 @@ public class StAXSlurper implements XMLSlurper {
             if (isOnlyFindDataAvailable && nodeNotifier.isFindDataEmpty())
                 break;
         }
-
-        nodeNotifier.collectDataOnExit();
     }
 
     private void close() throws XMLStreamException, IOException {

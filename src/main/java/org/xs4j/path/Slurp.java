@@ -1,8 +1,6 @@
 package org.xs4j.path;
 
-import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import org.xs4j.listener.NodeCollector;
 import org.xs4j.listener.NodeListener;
 
 /**
@@ -16,6 +14,4 @@ public interface Slurp {
     void findAll(@Nullable NodeListener nodeListener);
 
     void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener);
-
-    void collect(@NotNull NodeCollector nodeCollector);
 }

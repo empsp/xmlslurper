@@ -1,10 +1,11 @@
 package org.xs4j;
 
-import org.xs4j.listener.NodeCollector;
-import org.xs4j.listener.NodeCollector.XMLNodeTuple;
 import org.xs4j.listener.NodeListener;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by mturski on 11/25/2016.
@@ -13,12 +14,10 @@ final class NodeNotifier {
     private final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
     private final List<FindData> findData;
     private final List<FindData> findAllData;
-    private final List<CollectData> collectData;
 
-    NodeNotifier(List<FindData> findData, List<FindData> findAllData, List<CollectData> collectData) {
+    NodeNotifier(List<FindData> findData, List<FindData> findAllData) {
         this.findData = findData;
         this.findAllData = findAllData;
-        this.collectData = collectData;
     }
 
     void onStartNode(XMLNode node) {
@@ -66,7 +65,6 @@ final class NodeNotifier {
 
         notifyFindListenersOnEndNode(parent, node);
         notifyFindAllListenersOnEndNode(parent, node);
-        collectDataOnEndNode(parent, node);
     }
 
     private void notifyFindListenersOnEndNode(XMLNode parent, XMLNode node) {
@@ -97,17 +95,6 @@ final class NodeNotifier {
         }
     }
 
-    private void collectDataOnEndNode(XMLNode parent, XMLNode node) {
-        for (CollectData data : collectData)
-            if (data.slurpAlignment.checkAlignment(descendants, node))
-                data.outputData.addLast(new XMLNodeTupleImpl(parent, node));
-    }
-
-    void collectDataOnExit() {
-        for (CollectData data : collectData)
-            data.nodeCollector.onCollect(data.outputData);
-    }
-
     XMLNode peekLastDescendant() {
         return descendants.peekLast();
     }
@@ -116,11 +103,10 @@ final class NodeNotifier {
         descendants.clear();
         findData.clear();
         findAllData.clear();
-        collectData.clear();
     }
 
     boolean isOnlyFindDataAvailable() {
-        return findAllData.isEmpty() && collectData.isEmpty();
+        return findAllData.isEmpty();
     }
 
     boolean isFindDataEmpty() {
@@ -142,46 +128,6 @@ final class NodeNotifier {
 
         FindData(SlurpAlignment slurpAlignment, NodeListener nodeListener) {
             this(slurpAlignment, nodeListener, nodeListener);
-        }
-    }
-
-    static class CollectData {
-        private SlurpAlignment slurpAlignment;
-        private NodeCollector nodeCollector;
-
-        private Deque<XMLNodeTuple> outputData = new ArrayDeque<XMLNodeTuple>();
-
-        CollectData(SlurpAlignment slurpAlignment, NodeCollector nodeCollector) {
-            this.slurpAlignment = slurpAlignment;
-            this.nodeCollector = nodeCollector;
-        }
-    }
-
-    static class XMLNodeTupleImpl implements XMLNodeTuple {
-        private final XMLNode parent;
-        private final XMLNode node;
-
-        XMLNodeTupleImpl(XMLNode parent, XMLNode node) {
-            this.parent = parent;
-            this.node = node;
-        }
-
-        @Override
-        public XMLNode getParent() {
-            return parent;
-        }
-
-        @Override
-        public XMLNode getNode() {
-            return node;
-        }
-
-        @Override
-        public String toString() {
-            return "XMLNodeTupleImpl{" +
-                    "parent=" + parent +
-                    ", node=" + node +
-                    '}';
         }
     }
 }

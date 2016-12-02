@@ -3,7 +3,6 @@ package org.xs4j;
 import com.sun.istack.NotNull;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
-import org.xs4j.NodeNotifier.CollectData;
 import org.xs4j.NodeNotifier.FindData;
 import org.xs4j.path.SlurpNode;
 
@@ -44,12 +43,11 @@ public class XMLSlurperFactory {
     public XMLSlurper createXMLSlurper() {
         List<FindData> findData = new ArrayList<FindData>();
         List<FindData> findAllData = new ArrayList<FindData>();
-        List<CollectData> collectData = new ArrayList<CollectData>();
 
         NodeFactory nodeFactory = getNodeFactory();
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
-        SlurpFactory slurpFactory = getSlurpFactory(findData, findAllData, collectData, slurpAlignmentFactory);
-        NodeNotifier nodeNotifier = getNodeNotifier(findData, findAllData, collectData);
+        SlurpFactory slurpFactory = getSlurpFactory(findData, findAllData, slurpAlignmentFactory);
+        NodeNotifier nodeNotifier = getNodeNotifier(findData, findAllData);
 
         SAXSlurper saxSlurper = new SAXSlurper(
                 getSaxParserFactory(isNamespaceAwarenessDisabled),
@@ -83,9 +81,8 @@ public class XMLSlurperFactory {
     }
 
     static NodeNotifier getNodeNotifier(List<FindData> findData,
-                                        List<FindData> findAllData,
-                                        List<CollectData> collectData) {
-        return new NodeNotifier(findData, findAllData, collectData);
+                                        List<FindData> findAllData) {
+        return new NodeNotifier(findData, findAllData);
     }
 
     static SlurpAlignmentFactory getSlurpAlignmentFactory() {
@@ -95,9 +92,8 @@ public class XMLSlurperFactory {
     static SlurpFactory getSlurpFactory(
             List<FindData> findData,
             List<FindData> findAllData,
-            List<CollectData> collectData,
             SlurpAlignmentFactory slurpAlignmentFactory) {
-        return new SlurpFactory(findData, findAllData, collectData, slurpAlignmentFactory);
+        return new SlurpFactory(findData, findAllData, slurpAlignmentFactory);
     }
 
     static SAXParserFactory getSaxParserFactory(boolean isNamespaceAwarenessDisabled) {

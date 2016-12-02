@@ -1,10 +1,8 @@
 package org.xs4j;
 
-import org.xs4j.NodeNotifier.CollectData;
+import org.junit.Test;
 import org.xs4j.NodeNotifier.FindData;
 import org.xs4j.listener.NodeListener;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -15,11 +13,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.xs4j.XMLSlurperFactory.*;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.xs4j.XMLSlurperFactory.*;
 
 /**
  * Created by mturski on 11/28/2016.
@@ -131,7 +129,6 @@ public class StAXSlurperIT {
     private XMLStreamReader createSlurperWithMockedXMLInputFactory() throws XMLStreamException {
         List<FindData> findData = new ArrayList<FindData>();
         List<FindData> findAllData = new ArrayList<FindData>();
-        List<CollectData> collectData = new ArrayList<CollectData>();
 
         XMLStreamReader parser = mock(XMLStreamReader.class);
 
@@ -142,8 +139,8 @@ public class StAXSlurperIT {
         slurper = new StAXSlurper(
                 xmlInputFactory,
                 nodeFactory,
-                getSlurpFactory(findData, findAllData, collectData, getSlurpAlignmentFactory()),
-                getNodeNotifier(findData, findAllData, collectData),
+                getSlurpFactory(findData, findAllData, getSlurpAlignmentFactory()),
+                getNodeNotifier(findData, findAllData),
                 getStAXNamespaceSensitiveElementParser(false, nodeFactory));
 
         return parser;

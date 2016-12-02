@@ -2,14 +2,14 @@ package org.xs4j;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import org.xs4j.listener.NodeListener;
-import org.xs4j.path.Slurp;
-import org.xs4j.path.SlurpNode;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
+import org.xs4j.listener.NodeListener;
+import org.xs4j.path.Slurp;
+import org.xs4j.path.SlurpNode;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -30,6 +30,7 @@ public class XMLSlurperIT {
 
     private XMLSlurper parser = XMLSlurperFactory.getInstance().createXMLSlurper();
     private NodeListener listener;
+
 
     @Test
     public void givenInitialSlurpNodeFindAllReturnsAllNodesInOrder() throws Exception {

@@ -53,7 +53,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         try {
             parser = saxParserFactory.newSAXParser();
             parser.parse(inputStream, this);
-            nodeNotifier.collectDataOnExit();
         } catch (ParserConfigurationException e) {
             throw e;
         } catch (SAXException e) {
