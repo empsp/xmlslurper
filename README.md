@@ -66,17 +66,17 @@ Additionally the library ensures that:
 			<LeadActress>Kate Winslet</LeadActress>
 		</Cast>
 	</Movie>
-	<fr:Franchise fr:title="The Fast and the Furious" xmlns:fr="http://franchise">
-		<Movie title="Fast and Furious 6" director="Justin Lin">
+	<fr:Franchise fr:title="Fast and Furious" xmlns:fr="http://franchise">
+		<Movie title="The Fast and the Furious" director="Rob Cohen">
 			<Cast>
 				<LeadActor>Vin Diesel</LeadActor>
 				<LeadActress>Michelle Rodriguez</LeadActress>
 			</Cast>
 		</Movie>
-		<Movie title="Furious 7" director="James Wan">
+		<Movie title="2 Fast 2 Furious" director="John Singleton">
 			<Cast>
 				<LeadActor>Vin Diesel</LeadActor>
-				<LeadActress>Michelle Rodriguez</LeadActress>
+				<LeadActress>Eva Mendes</LeadActress>
 			</Cast>
 		</Movie>
 		<Studios>
@@ -109,12 +109,12 @@ It is also possible to retrieve all elements being descendants of a specific ele
 ##### Subject to discussion
 
 (Current)
-Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all first elements named 'Movie' found traversing path's depth beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would not be shown.
+Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all first elements named 'Movie' found traversing path beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would not be shown.
 
 or
 
 (Proposition)
-Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all elements named 'Movie' found traversing path's depth beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would be shown, as well.
+Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all elements named 'Movie' found traversing path beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would be shown, as well.
 
 ### Scenarios
 
@@ -149,7 +149,7 @@ Searching for descendants with specific node at the end eg. '\*\*.Movie' will re
 	7 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
 	8 | `parent=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}, node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t\n\t\t', attrByQName={}}`
 	9 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={title=Titanic, director=James Cameron}}`
-	10 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}`
+	10 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
 	Comment | 'Franchise' node is from a separate namespace. Namespace and prefix fields will reflect that fact. Attributes hold additional metadata attribute 'xmlns:fr' and it's available together with ordinary attributes. Attribute 'title' has a prefix 'fr' which distinguishes it from the other nodes' 'title' attributes.
 	.. | | 
 	46 | `parent=null, node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}}` |
@@ -189,13 +189,14 @@ Searching for descendants with specific node at the end eg. '\*\*.Movie' will re
 	--- | ---
 	1 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}`
 	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}`
-	3 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Justin Lin, title=Fast and Furious 6}}`
+	3 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}`
 	Comment | 'Franchise' node is only available here as a parent node. It has not been found as a node because it has a 'title' attribute within different namespace.
-	4 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Justin Lin, title=Fast and Furious 6}}`
-	5 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Wan, title=Furious 7}}`
-	6 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=James Wan, title=Furious 7}}`
+	4 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}`
+	5 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}`
+	6 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}`
 	7 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
 	8 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+
 	
 	However, searching for an attribute with prefix (qName) will have different results:
 	
@@ -211,9 +212,9 @@ Searching for descendants with specific node at the end eg. '\*\*.Movie' will re
 	
 	Event Id | Data available
 	--- | ---
-	1 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}`
+	1 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
 	Comment | Here, 'Franchise' node is a result node having a parent node 'MovieDb'.
-	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}`
+	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
 
 4. Read all nodes having 'title' attribute value containing word 'Furious' or equal to 'Forest Gump'
 	
@@ -250,12 +251,13 @@ Searching for descendants with specific node at the end eg. '\*\*.Movie' will re
 	
 	Event Id | Data available
 	--- | ---
-	1 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Justin Lin, title=Fast and Furious 6}}`
-	2 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Justin Lin, title=Fast and Furious 6}}`
-	3 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Wan, title=Furious 7}}`
-	4 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=The Fast and the Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=James Wan, title=Furious 7}}`
+	1 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}`
+	2 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}`
+	3 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}`
+	4 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}`
 	5 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
 	6 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+
 
 5. Read cast from movies (excluding franchises)
 	
@@ -339,9 +341,26 @@ Searching for descendants with specific node at the end eg. '\*\*.Movie' will re
 	--- | ---
 	1 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
 	2 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
-	3 | `movie=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=Justin Lin, title=Fast and Furious 6}}, person=XMLNode{id=8, namespace='null', prefix='null', localName='LeadActor', text='Vin Diesel', attrByQName={}}`
-	4 | `movie=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=Justin Lin, title=Fast and Furious 6}}, person=XMLNode{id=9, namespace='null', prefix='null', localName='LeadActress', text='Michelle Rodriguez', attrByQName={}}`
-	5 | `movie=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=James Wan, title=Furious 7}}, person=XMLNode{id=12, namespace='null', prefix='null', localName='LeadActor', text='Vin Diesel', attrByQName={}}`
-	6 | `movie=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=James Wan, title=Furious 7}}, person=XMLNode{id=13, namespace='null', prefix='null', localName='LeadActress', text='Michelle Rodriguez', attrByQName={}}`
+	3 | `movie=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, person=XMLNode{id=8, namespace='null', prefix='null', localName='LeadActor', text='Vin Diesel', attrByQName={}}`
+	4 | `movie=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, person=XMLNode{id=9, namespace='null', prefix='null', localName='LeadActress', text='Michelle Rodriguez', attrByQName={}}`
+	5 | `movie=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, person=XMLNode{id=12, namespace='null', prefix='null', localName='LeadActor', text='Vin Diesel', attrByQName={}}`
+	6 | `movie=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, person=XMLNode{id=13, namespace='null', prefix='null', localName='LeadActress', text='Eva Mendes', attrByQName={}}`
 	7 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}`
 	8 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
+
+7. Read second movie in the 'Fast and Furious' franchise and end parsing.
+	
+	```java
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
+	xmlSlurper.getNodes("**", "fr:Franchise").node("Movie", 2).find(null, (franchise, movie) -> {
+		// your code here
+	});
+	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
+	```
+	
+	The following table provides a list of all triggered events in order:
+	
+	Event Id | Data available
+	--- | ---
+	1 | `franchise=XMLNodeImpl{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attributeByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, movie=XMLNodeImpl{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attributeByQName={director=John Singleton, title=2 Fast 2 Furious}}`
+	
