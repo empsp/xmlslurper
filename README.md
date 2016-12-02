@@ -100,7 +100,7 @@ Additionally the library ensures that:
 
 #### Sibling search - wildcard \*
 
-Any time it is required to retrieve all immediate children under a specific element, a wildcard (`*`) character can be used as a node name. Similary as in XPath, wildcards can be stacked to get children of a children (of a children and so on..) of the specific element. Having the path '*.fr:Franchise.*' will return not only 'Movie' immediate children nodes but also 'Studios' node.
+Any time it is required to retrieve all immediate children under a specific element, a wildcard (`*`) character can be used as a node name. Similary as in XPath, wildcards can be stacked to get children of a children (of a children and so on..) of the specific element. Having the path 'MovieDb.fr:Franchise.\*' will return not only 'Movie' immediate children nodes but also 'Studios' node.
 
 #### Descendants search - double wildcard \*\*
 
