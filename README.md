@@ -232,7 +232,7 @@ Additionally the library ensures that:
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
 	```
 	
-	For convenience `getNodes("MovieDb", "Movie", "Cast", "*")` used which is equal to construct `getNodes().node("MovieDb").node("Movie").node("Cast").node("*")`.
+	For convenience method `getNodes("MovieDb", "Movie", "Cast", "*")` used which is equal to construct `getNodes().node("MovieDb").node("Movie").node("Cast").node("*")`.
 	
 	The following table provides a list of all triggered events in order:
 	
