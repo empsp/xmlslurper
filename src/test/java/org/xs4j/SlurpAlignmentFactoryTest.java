@@ -105,13 +105,14 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Child", 2);
         assertAlign("Kin", 2);
         assertNotAlign("Descendant", 3);
-        assertAlign("Offspring", 4);
-        assertNotAlign("Descendant", 4);
-        assertAlign("Child", 3);
+        assertNotAlign("Offspring", 4);
+        assertAlign("Descendant", 4);
+        assertNotAlign("Child", 3);
+        assertAlign("Kin", 3);
         assertNotAlign("Kin", 3);
         assertAlign("Kin", 3);
         assertNotAlign("Child", 2);
-        assertAlign("Root", 1);
+        assertNotAlign("Root", 1);
     }
 
     @Ignore

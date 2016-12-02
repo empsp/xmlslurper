@@ -218,16 +218,17 @@ public class DepthSlurpAlignmentTest {
         addLevel();
         createAndAssertNotAlign("Descendant");
         addLevel();
-        createAndAssertAlign("Offspring");
-        createAndAssertNotAlign("Descendant");
+        createAndAssertNotAlign("Offspring");
+        createAndAssertAlign("Descendant");
         removeLevel();
-        createAndAssertAlign("Child");
+        createAndAssertNotAlign("Child");
+        createAndAssertAlign("Kin");
         createAndAssertNotAlign("Kin");
         createAndAssertAlign("Kin");
         removeLevel();
         createAndAssertNotAlign("Child");
         removeLevel();
-        createAndAssertAlign("Root");
+        createAndAssertNotAlign("Root");
     }
 
     @After
