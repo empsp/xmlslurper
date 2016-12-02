@@ -96,6 +96,16 @@ Additionally the library ensures that:
 </MovieDb>
 ```
 
+### Sibling and Descendant search
+
+#### Sibling search - wildcard \*
+
+Any time it is required to retrieve all immediate children under a specific element, a wildcard (`*`) character can be used as a node name. Similary as in XPath, wildcards can be stacked to get children of a children (of a children and so on..) of the specific element. Having the path '*.fr:Franchise.*' will return not only 'Movie' immediate children nodes but also 'Studios' node.
+
+#### Descendants search - double wildcard \*\*
+
+It is also possible to retrieve all elements being descendants of a specific element with double wildcard (`**`) character. Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all first elements named 'Movie' found traversing path's depth beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath parent 'Movie' element would not be shown.
+
 ### Scenarios
 
 1. Simple 'take all' approach
@@ -311,7 +321,7 @@ Additionally the library ensures that:
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
 	```
 	
-	For franchises movies, which are one level deeper in the tree that the rest of the movie nodes, we need to broader the search scope with descendants (`**`) marking. Also benefiting from the fact that the parsing is sequential, we can utilise `Deque` to easily gain information regarding the movies current cast belongs to. As with the previous example, we're excluding start node events on children nodes of the cast nodes, however this time, we're ensuring no overflowing occurs on the `Deque` in case of processing of very large xml files.
+	For franchises movies, which are one level deeper in the tree that the rest of the movie nodes, we need to broader the search scope with descendants (`**`). Also benefiting from the fact that the parsing is sequential, we can utilise `Deque` to easily gain information regarding the movies current cast belongs to. As with the previous example, we're excluding start node events on children nodes of the cast nodes, however this time, we're ensuring no overflowing occurs on the `Deque` in case of processing of very large xml files.
 	
 	The following table provides a list of all triggered events on 'castListener' in order:
 	
