@@ -119,7 +119,7 @@ public class StAXSlurperIT {
     }
 
     private XMLNode createNode(long id, String name) {
-        return nodeFactory.createNode(id, name, Collections.emptyMap());
+        return nodeFactory.createNode(id, name, Collections.<String, String> emptyMap());
     }
 
     private InputStream getResource(String resourceName) {

@@ -30,7 +30,7 @@ final class SlurpAlignmentFactory {
         return getSlurpAlignment(qNamePath);
     }
 
-    SlurpAlignment copyAlignmentAndAndNthNode(SlurpAlignment slurpAlignment, String qName, long nodeIndex) {
+    SlurpAlignment copyAlignmentAndAddNthNode(SlurpAlignment slurpAlignment, String qName, long nodeIndex) {
         List<String> qNamePath = new ArrayList<String>(slurpAlignment.getPath());
         qNamePath.add(qName);
 

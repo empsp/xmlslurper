@@ -51,7 +51,7 @@ final class SlurpFactory {
 
         @Override
         public SlurpNode node(@NotNull String qName, long nodeIndex) {
-            return new SlurpNodeImpl(slurpAlignmentFactory.copyAlignmentAndAndNthNode(slurpAlignment, qName, nodeIndex));
+            return new SlurpNodeImpl(slurpAlignmentFactory.copyAlignmentAndAddNthNode(slurpAlignment, qName, nodeIndex));
         }
 
         @Override

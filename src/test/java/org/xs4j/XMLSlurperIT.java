@@ -162,7 +162,7 @@ public class XMLSlurperIT {
     @Test
     public void givenStartNodeListenerFindAllReturnsStartNodeEventsWithPartialDataRead() throws Exception {
         // given
-        Map<String, String> expectedAttributes = new HashMap<String, String>();
+        final Map<String, String> expectedAttributes = new HashMap<String, String>();
         expectedAttributes.put("attr1", "SOMEOBJ");
         expectedAttributes.put("attr2", "E=1");
 
@@ -180,14 +180,14 @@ public class XMLSlurperIT {
         parser.parse(getResource("simpleTestCase.xml"));
 
         // then
-        verify(listener).onNode(any(), any());
+        verify(listener).onNode(any(XMLNode.class), any(XMLNode.class));
         verifyNoMoreInteractions(listener);
     }
 
     @Test
     public void givenEndNodeListenerFindAllReturnsEndNodeEventsWithAllDataRead() throws Exception {
         // given
-        Map<String, String> expectedAttributes = new HashMap<String, String>();
+        final Map<String, String> expectedAttributes = new HashMap<String, String>();
         expectedAttributes.put("attr1", "SOMEOBJ");
         expectedAttributes.put("attr2", "E=1");
 
@@ -205,7 +205,7 @@ public class XMLSlurperIT {
         parser.parse(getResource("simpleTestCase.xml"));
 
         // then
-        verify(listener).onNode(any(), any());
+        verify(listener).onNode(any(XMLNode.class), any(XMLNode.class));
         verifyNoMoreInteractions(listener);
     }
 
@@ -417,7 +417,7 @@ public class XMLSlurperIT {
     }
 
     private XMLNode createNode(long id, String localName) {
-        return nodeFactory.createNode(id, localName, Collections.emptyMap());
+        return nodeFactory.createNode(id, localName, Collections.<String, String> emptyMap());
     }
 
     private XMLNode createNode(long id, String namespace, String prefix, String localName, Map<String, String> attributeByQName) {
