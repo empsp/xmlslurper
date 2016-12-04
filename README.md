@@ -37,7 +37,7 @@ dependencies {
 
 - Element is a xml element that either begins with a start-tag and ends with a matching end-tag or consists only of an empty-element tag.
 - Node is a Java data structure reflecting a particular xml element
-- Path represents a node(-s) together with additional information about the location of the node within the document tree eg. 'Foo.Bar.Baz' provides 'Baz' node that is a child of 'Bar' node that is a child of 'Foo' root document node.
+- Path is a location of the node within the document tree eg. 'Foo.Bar.Baz' provides 'Baz' node that is a child of 'Bar' node that is a child of 'Foo' root document node.
 
 ### Capabilities
 
