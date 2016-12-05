@@ -65,7 +65,7 @@ Additionally the library ensures that:
 
 ##### Sibling search - wildcard \*
 
-Any time it is required to retrieve children of the given element, a wildcard (`*`) character can be used as a node name. Similary as in XPath, wildcards can be stacked to get grandchildren (and so on..) of the given element.
+Any time it is required to retrieve all children of the given element, a wildcard (`*`) character can be used as a node name. Similary as in XPath, wildcards can be stacked to get all grandchildren (and so on..) of the given element.
 
 ##### Descendants search - double wildcard \*\*
 
