@@ -34,7 +34,7 @@ final class SlurpAlignmentFactory {
         List<String> qNamePath = new ArrayList<String>(slurpAlignment.getPath());
         qNamePath.add(qName);
 
-        return new SlurpAlignmentNthElementWrapper(getSlurpAlignment(qNamePath), nodeIndex);
+        return new SlurpNthElementAlignmentWrapper(getSlurpAlignment(qNamePath), nodeIndex);
     }
 
     SlurpAlignment copyAlignmentAndAddAttribute(SlurpAlignment slurpAlignment, String attrQName) {
@@ -206,14 +206,14 @@ final class SlurpAlignmentFactory {
         }
     }
 
-    private class SlurpAlignmentNthElementWrapper extends SlurpAlignment {
+    private class SlurpNthElementAlignmentWrapper extends SlurpAlignment {
         private final SlurpAlignment slurpAlignment;
         private final long nodeIndex;
 
         private Deque<Long> indexByDepth = new ArrayDeque<Long>();
         private int prevDepth;
 
-        public SlurpAlignmentNthElementWrapper(SlurpAlignment slurpAlignment, long nodeIndex) {
+        public SlurpNthElementAlignmentWrapper(SlurpAlignment slurpAlignment, long nodeIndex) {
             this.slurpAlignment = slurpAlignment;
             this.nodeIndex = nodeIndex;
         }

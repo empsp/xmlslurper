@@ -21,187 +21,129 @@ public class DepthSlurpAlignmentTest {
     private static final NodeFactory nodeFactory = XMLSlurperFactory.getNodeFactory();
 
     private SlurpAlignment slurpAlignment;
-    private Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
-    private XMLNode node;
 
     @Test
     public void givenRootDescendantsCheckAlignmentReturnTrueForAllNodesUnderRoot() {
         getAlignment("Root", "**");
 
-        createAndAssertNotAlign("Root");
-        addLevel();
-        createAndAssertAlign("Child");
-        addLevel();
-        createAndAssertAlign("Child");
-        removeLevel();
-        createAndAssertAlign("Sibling");
-        addLevel();
-        createAndAssertAlign("Kin");
-        removeLevel();
-        createAndAssertAlign("Child");
-        removeLevel();
-        createAndAssertNotAlign("OtherRoot");
-        addLevel();
-        createAndAssertNotAlign("Child");
+        assertNotAlign("Root");
+        assertAlign("Root", "Child");
+        assertAlign("Root", "Child", "Child");
+        assertAlign("Root", "Sibling");
+        assertAlign("Root", "Sibling", "Kin");
+        assertAlign("Root", "Child");
+        assertNotAlign("OtherRoot");
+        assertNotAlign("OtherRoot", "Child");
     }
 
     @Test
     public void givenDescendantsHavingChildCheckAlignmentReturnsTrueForFirstChildInDescendantTree() {
         getAlignment("**", "Child");
 
-        createAndAssertAlign("Child");
-        createAndAssertNotAlign("Root");
-        addLevel();
-        createAndAssertAlign("Child");
-        createAndAssertNotAlign("Sibling");
-        addLevel();
-        createAndAssertAlign("Child");
-        removeLevel();
-        createAndAssertAlign("Child");
-        addLevel();
-        createAndAssertNotAlign("Kin");
-        addLevel();
-        createAndAssertNotAlign("Child");
+        assertAlign("Child");
+        assertNotAlign("Root");
+        assertAlign("Root", "Child");
+        assertNotAlign("Root", "Sibling");
+        assertAlign("Root", "Sibling", "Child");
+        assertAlign("Root", "Child");
+        assertNotAlign("Root", "Child", "Kin");
+        assertNotAlign("Root", "Child", "Kin", "Child");
     }
 
     @Test
     public void givenDescendantsOfChildOfAnyRootCheckAlignmentReturnsTrueForAllNodesUnderChildUnderAnyRoot() {
         getAlignment("*", "Child", "**");
 
-        createAndAssertNotAlign("Root");
-        addLevel();
-        createAndAssertNotAlign("Child");
-        addLevel();
-        createAndAssertAlign("Descendant");
-        removeLevel();
-        createAndAssertNotAlign("Sibling");
-        addLevel();
-        createAndAssertNotAlign("Kin");
-        removeLevel();
-        createAndAssertNotAlign("Child");
-        removeLevel();
-        createAndAssertNotAlign("OtherRoot");
-        addLevel();
-        createAndAssertNotAlign("Child");
-        addLevel();
-        createAndAssertAlign("Descendant");
-        createAndAssertAlign("Kin");
-        addLevel();
-        createAndAssertAlign("Offspring");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertAlign("Root", "Child", "Descendant");
+        assertNotAlign("Root", "Sibling");
+        assertNotAlign("Root", "Sibling", "Kin");
+        assertNotAlign("Root", "Child");
+        assertNotAlign("OtherRoot");
+        assertNotAlign("OtherRoot", "Child");
+        assertAlign("OtherRoot", "Child", "Descendant");
+        assertAlign("OtherRoot", "Child", "Kin");
+        assertAlign("OtherRoot", "Child", "Kin", "Offspring");
     }
 
     @Test
     public void givenChildrenOfDescendantsHavingChildCheckAlignmentReturnsTrueForImmediateChildrenOfFirstChildInDescendantTree() {
         getAlignment("**", "Child", "*");
 
-        createAndAssertNotAlign("Child");
-        addLevel();
-        createAndAssertAlign("Kin");
-        addLevel();
-        createAndAssertNotAlign("Descendant");
-        removeLevel();
-        createAndAssertAlign("Offspring");
-        removeLevel();
-        createAndAssertNotAlign("Root");
-        addLevel();
-        createAndAssertNotAlign("Sibling");
-        addLevel();
-        createAndAssertNotAlign("Child");
-        addLevel();
-        createAndAssertAlign("Kin");
-        createAndAssertAlign("Offspring");
-        addLevel();
-        createAndAssertNotAlign("Descendant");
+        assertNotAlign("Child");
+        assertAlign("Child", "Kin");
+        assertNotAlign("Child", "Kin", "Descendant");
+        assertAlign("Child", "Offspring");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Sibling");
+        assertNotAlign("Root", "Sibling", "Child");
+        assertAlign("Root", "Sibling", "Child", "Kin");
+        assertAlign("Root", "Sibling", "Child", "Offspring");
+        assertNotAlign("Root", "Sibling", "Child", "Offspring", "Descendant");
     }
 
     @Test
     public void givenDescendantsHavingNotImmediateChildCheckAlignmentReturnsTrueForSecondChildToAnyNodeInDescendantTree() {
         getAlignment("**", "*", "Child");
 
-        createAndAssertNotAlign("Child");
-        addLevel();
-        createAndAssertAlign("Child");
-        removeLevel();
-        createAndAssertNotAlign("Root");
-        addLevel();
-        createAndAssertAlign("Child");
-        createAndAssertNotAlign("Kin");
-        addLevel();
-        createAndAssertAlign("Child");
-        addLevel();
-        createAndAssertNotAlign("Child");
-        removeLevel();
-        createAndAssertNotAlign("Offspring");
-        addLevel();
-        createAndAssertAlign("Child");
-        addLevel();
-        createAndAssertNotAlign("Descendant");
+        assertNotAlign("Child");
+        assertAlign("Child", "Child");
+        assertNotAlign("Root");
+        assertAlign("Root", "Child");
+        assertNotAlign("Root", "Kin");
+        assertAlign("Root", "Kin", "Child");
+        assertNotAlign("Root", "Kin", "Child", "Child");
+        assertNotAlign("Root", "Kin", "Offspring");
+        assertAlign("Root", "Kin", "Offspring", "Child");
+        assertNotAlign("Root", "Kin", "Offspring", "Child", "Descendant");
     }
 
     @Test
     public void givenChildrenOfRootDescendantsCheckAlignmentReturnsTrueForAllNodesUnderRoot() {
         getAlignment("Child", "**", "*");
 
-        createAndAssertNotAlign("Root");
-        addLevel();
-        createAndAssertNotAlign("Child");
-        removeLevel();
-        createAndAssertNotAlign("Child");
-        addLevel();
-        createAndAssertAlign("Descendant");
-        createAndAssertAlign("Kin");
-        addLevel();
-        createAndAssertNotAlign("Offspring");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertNotAlign("Child");
+        assertAlign("Child", "Descendant");
+        assertAlign("Child", "Kin");
+        assertNotAlign("Child", "Kin", "Offspring");
     }
 
     @Test
     public void givenChildrenOfDescendantsCheckAlignmentReturnsTrueForRootNodes() {
         getAlignment("**", "*");
 
-        createAndAssertAlign("Root");
-        addLevel();
-        createAndAssertNotAlign("Child");
-        removeLevel();
-        createAndAssertAlign("OtherRoot");
-        addLevel();
-        createAndAssertNotAlign("Kin");
-        addLevel();
-        createAndAssertNotAlign("Descendant");
-        removeLevel();
-        removeLevel();
-        createAndAssertAlign("Child");
+        assertAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertAlign("OtherRoot");
+        assertNotAlign("OtherRoot", "Kin");
+        assertNotAlign("OtherRoot", "Kin", "Descendant");
+        assertAlign("Child");
     }
 
     @Test
     public void givenChildrenOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForRootAndChildren() {
         getAlignment("**", "**", "*");
 
-        createAndAssertAlign("Root");
-        addLevel();
-        createAndAssertAlign("Child");
-        removeLevel();
-        createAndAssertAlign("OtherRoot");
-        addLevel();
-        createAndAssertAlign("Kin");
-        addLevel();
-        createAndAssertNotAlign("Descendant");
-        removeLevel();
-        createAndAssertAlign("Offspring");
-        removeLevel();
-        createAndAssertAlign("Child");
+        assertAlign("Root");
+        assertAlign("Root", "Child");
+        assertAlign("OtherRoot");
+        assertAlign("OtherRoot", "Kin");
+        assertNotAlign("OtherRoot", "Kin", "Descendant");
+        assertAlign("OtherRoot", "Offspring");
+        assertAlign("Child");
     }
 
     @Test
     public void givenChildrenOfDescendantsOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForRootAndChildrenAndChildrenOfChildren() {
         getAlignment("**", "**", "**", "*");
 
-        createAndAssertAlign("Root");
-        addLevel();
-        createAndAssertAlign("Child");
-        addLevel();
-        createAndAssertAlign("Kin");
-        addLevel();
-        createAndAssertNotAlign("Offspring");
+        assertAlign("Root");
+        assertAlign("Root", "Child");
+        assertAlign("Root", "Child", "Kin");
+        assertNotAlign("Root", "Child", "Kin", "Offspring");
     }
 
     @Test
@@ -209,50 +151,44 @@ public class DepthSlurpAlignmentTest {
         getAlignment();
         addNthNodeToAlignment("**", 2);
 
-        createAndAssertNotAlign("Root");
-        addLevel();
-        createAndAssertNotAlign("Child");
-        createAndAssertAlign("Kin");
-        addLevel();
-        createAndAssertNotAlign("Descendant");
-        addLevel();
-        createAndAssertNotAlign("Offspring");
-        createAndAssertAlign("Descendant");
-        removeLevel();
-        createAndAssertAlign("Child");
-        createAndAssertNotAlign("Kin");
-        createAndAssertNotAlign("Child");
-        createAndAssertNotAlign("Kin");
-        removeLevel();
-        createAndAssertNotAlign("Child");
-        removeLevel();
-        createAndAssertAlign("OtherRoot");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertAlign("Root", "Kin");
+        assertNotAlign("Root", "Kin", "Descendant");
+        assertNotAlign("Root", "Kin", "Descendant", "Offspring");
+        assertAlign("Root", "Kin", "Descendant", "Descendant");
+        assertAlign("Root", "Kin", "Child");
+        assertNotAlign("Root", "Kin", "Kin");
+        assertNotAlign("Root", "Kin", "Child");
+        assertNotAlign("Root", "Kin", "Kin");
+        assertNotAlign("Root", "Child");
+        assertAlign("OtherRoot");
     }
 
     @After
     public void teardown() {
         slurpAlignment = null;
-        descendants.clear();
     }
 
-    private void addLevel() {
-        descendants.addLast(node);
+    private void assertAlign(String... nodes) {
+        Deque<XMLNode> descendants = createDescendants(nodes);
+
+        assertThat(slurpAlignment.checkAlignment(descendants, descendants.removeLast()), is(true));
     }
 
-    private void removeLevel() {
-        descendants.removeLast();
+    private void assertNotAlign(String... nodes) {
+        Deque<XMLNode> descendants = createDescendants(nodes);
+
+        assertThat(slurpAlignment.checkAlignment(descendants, descendants.removeLast()), is(false));
     }
 
-    private void createAndAssertAlign(String qName) {
-        node = nodeFactory.createNode(idFeed++, qName, Collections.<String, String> emptyMap());
+    private Deque<XMLNode> createDescendants(String... nodes) {
+        Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
 
-        assertThat(slurpAlignment.checkAlignment(descendants, node), is(true));
-    }
+        for (String node : nodes)
+            descendants.addLast(nodeFactory.createNode(idFeed++, node, Collections.<String, String> emptyMap()));
 
-    private void createAndAssertNotAlign(String qName) {
-        node = nodeFactory.createNode(idFeed++, qName, Collections.<String, String> emptyMap());
-
-        assertThat(slurpAlignment.checkAlignment(descendants, node), is(false));
+        return descendants;
     }
 
     private void getAlignment(String... nodes) {
