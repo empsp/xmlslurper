@@ -24,40 +24,40 @@ public class SlurpAlignmentFactoryTest {
     public void givenRootCheckAlignmentReturnsTrueForRootNode() {
         getAlignment("Root");
 
-        assertAlign("Root", 1);
-        assertNotAlign("Root", 2);
-        assertNotAlign("OtherRoot", 1);
-        assertAlign("Root", 1);
-        assertNotAlign("Child", 2);
+        assertAlign("Root");
+        assertNotAlign("Root", "Root");
+        assertNotAlign("OtherRoot");
+        assertAlign("Root");
+        assertNotAlign("Root", "Child");
     }
 
     @Test
     public void givenRootChildCheckAlignmentReturnsTrueForRootChild() {
         getAlignment("Root", "Child");
 
-        assertNotAlign("Root", 1);
-        assertAlign("Child", 2);
-        assertNotAlign("OtherRoot", 1);
-        assertNotAlign("Child", 2);
-        assertNotAlign("Root", 1);
-        assertNotAlign("Sibling", 2);
-        assertAlign("Child", 2);
-        assertNotAlign("Kin", 3);
-        assertAlign("Child", 2);
+        assertNotAlign("Root");
+        assertAlign("Root", "Child");
+        assertNotAlign("OtherRoot");
+        assertNotAlign("OtherRoot", "Child");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Sibling");
+        assertAlign("Root", "Child");
+        assertNotAlign("Root", "Child", "Kin");
+        assertAlign("Root", "Child");
     }
 
     @Test
     public void givenRootChildrenCheckAlignmentReturnsTrueForAllImmediateRootChildren() {
         getAlignment("Root", "*");
 
-        assertNotAlign("Root", 1);
-        assertAlign("Child", 2);
-        assertAlign("Sibling", 2);
-        assertNotAlign("Child", 3);
-        assertNotAlign("Kin", 3);
-        assertAlign("Child", 2);
-        assertNotAlign("OtherRoot", 1);
-        assertNotAlign("Child", 2);
+        assertNotAlign("Root");
+        assertAlign("Root", "Child");
+        assertAlign("Root", "Sibling");
+        assertNotAlign("Root", "Sibling", "Child");
+        assertNotAlign("Root", "Sibling", "Kin");
+        assertAlign("Root", "Child");
+        assertNotAlign("OtherRoot");
+        assertNotAlign("OtherRoot", "Child");
     }
 
     @Test
@@ -65,15 +65,15 @@ public class SlurpAlignmentFactoryTest {
         getAlignment("Root");
         addNthNodeToAlignment("Child", 2);
 
-        assertNotAlign("Root", 1);
-        assertNotAlign("Child", 2);
-        assertAlign("Child", 2);
-        assertNotAlign("Child", 2);
-        assertNotAlign("Child", 2);
-        assertNotAlign("Root", 1);
-        assertNotAlign("Child", 2);
-        assertNotAlign("Child", 3);
-        assertAlign("Child", 2);
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertAlign("Root", "Child");
+        assertNotAlign("Root", "Child");
+        assertNotAlign("Root", "Child");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertNotAlign("Root", "Child", "Child");
+        assertAlign("Root", "Child");
     }
 
     @Test
@@ -81,15 +81,149 @@ public class SlurpAlignmentFactoryTest {
         getAlignment("Root");
         addNthNodeToAlignment("*", 2);
 
-        assertNotAlign("Root", 1);
-        assertNotAlign("Child", 2);
-        assertAlign("Kin", 2);
-        assertNotAlign("Descendant", 2);
-        assertNotAlign("Offspring", 2);
-        assertNotAlign("Root", 1);
-        assertNotAlign("Kin", 2);
-        assertNotAlign("Child", 3);
-        assertAlign("Child", 2);
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertAlign("Root", "Kin");
+        assertNotAlign("Root", "Descendant");
+        assertNotAlign("Root", "Offspring");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Kin");
+        assertNotAlign("Root", "Kin", "Child");
+        assertAlign("Root", "Child");
+    }
+
+    @Ignore
+    @Test
+    public void givenRootDescendantsCheckAlignmentReturnTrueForAllNodesUnderRoot() {
+        getAlignment("Root", "**");
+
+        assertNotAlign("Root");
+        assertAlign("Root", "Child");
+        assertAlign("Root", "Child", "Child");
+        assertAlign("Root", "Sibling");
+        assertAlign("Root", "Sibling", "Kin");
+        assertAlign("Root", "Child");
+        assertNotAlign("OtherRoot");
+        assertNotAlign("OtherRoot", "Child");
+    }
+
+    @Ignore
+    @Test
+    public void givenDescendantsHavingChildCheckAlignmentReturnsTrueForFirstChildInDescendantTree() {
+        getAlignment("**", "Child");
+
+        assertAlign("Child");
+        assertNotAlign("Root");
+        assertAlign("Root", "Child");
+        assertNotAlign("Root", "Sibling");
+        assertAlign("Root", "Sibling", "Child");
+        assertAlign("Root", "Child");
+        assertNotAlign("Root", "Child", "Kin");
+        assertNotAlign("Root", "Child", "Kin", "Child");
+    }
+
+    @Ignore
+    @Test
+    public void givenDescendantsOfChildOfAnyRootCheckAlignmentReturnsTrueForAllNodesUnderChildUnderAnyRoot() {
+        getAlignment("*", "Child", "**");
+
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertAlign("Root", "Child", "Descendant");
+        assertNotAlign("Root", "Sibling");
+        assertNotAlign("Root", "Sibling", "Kin");
+        assertNotAlign("Root", "Child");
+        assertNotAlign("OtherRoot");
+        assertNotAlign("OtherRoot", "Child");
+        assertAlign("OtherRoot", "Child", "Descendant");
+        assertAlign("OtherRoot", "Child", "Kin");
+        assertAlign("OtherRoot", "Child", "Kin", "Offspring");
+    }
+
+    @Ignore
+    @Test
+    public void givenChildrenOfDescendantsHavingChildCheckAlignmentReturnsTrueForImmediateChildrenOfFirstChildInDescendantTree() {
+        getAlignment("**", "Child", "*");
+
+        assertNotAlign("Child");
+        assertAlign("Child", "Kin");
+        assertNotAlign("Child", "Kin", "Descendant");
+        assertAlign("Child", "Offspring");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Sibling");
+        assertNotAlign("Root", "Sibling", "Child");
+        assertAlign("Root", "Sibling", "Child", "Kin");
+        assertAlign("Root", "Sibling", "Child", "Offspring");
+        assertNotAlign("Root", "Sibling", "Child", "Offspring", "Descendant");
+    }
+
+    @Ignore
+    @Test
+    public void givenDescendantsHavingNotImmediateChildCheckAlignmentReturnsTrueForSecondChildToAnyNodeInDescendantTree() {
+        getAlignment("**", "*", "Child");
+
+        assertNotAlign("Child");
+        assertAlign("Child", "Child");
+        assertNotAlign("Root");
+        assertAlign("Root", "Child");
+        assertNotAlign("Root", "Kin");
+        assertAlign("Root", "Kin", "Child");
+        assertNotAlign("Root", "Kin", "Child", "Child");
+        assertNotAlign("Root", "Kin", "Offspring");
+        assertAlign("Root", "Kin", "Offspring", "Child");
+        assertNotAlign("Root", "Kin", "Offspring", "Child", "Descendant");
+    }
+
+    @Ignore
+    @Test
+    public void givenChildrenOfRootDescendantsCheckAlignmentReturnsTrueForAllNodesUnderRoot() {
+        getAlignment("Child", "**", "*");
+
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertNotAlign("Child");
+        assertAlign("Child", "Descendant");
+        assertAlign("Child", "Kin");
+        assertNotAlign("Child", "Kin", "Offspring");
+    }
+
+    @Ignore
+    @Test
+    public void givenChildrenOfDescendantsCheckAlignmentReturnsTrueForRootNodes() {
+        getAlignment("**", "*");
+
+        assertAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertAlign("OtherRoot");
+        assertNotAlign("OtherRoot", "Kin");
+        assertNotAlign("OtherRoot", "Kin", "Descendant");
+        assertNotAlign("OtherRoot", "Child");
+        assertAlign("Child");
+    }
+
+    @Ignore
+    @Test
+    public void givenChildrenOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForRootAndChildren() {
+        getAlignment("**", "**", "*");
+
+        assertAlign("Root");
+        assertAlign("Root", "Child");
+        assertAlign("OtherRoot");
+        assertAlign("OtherRoot", "Kin");
+        assertNotAlign("OtherRoot", "Kin", "Descendant");
+        assertAlign("OtherRoot", "Offspring");
+        assertAlign("Child");
+    }
+
+    @Ignore
+    @Test
+    public void givenChildrenOfDescendantsOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForRootAndChildrenAndChildrenOfChildren() {
+        getAlignment("**", "**", "**", "*");
+
+        assertAlign("Root");
+        assertAlign("Root", "Child");
+        assertAlign("Root", "Child", "Kin");
+        assertNotAlign("Root", "Child", "Kin", "Offspring");
     }
 
     @Ignore
@@ -98,151 +232,18 @@ public class SlurpAlignmentFactoryTest {
         getAlignment();
         addNthNodeToAlignment("**", 2);
 
-        assertNotAlign("Root", 1);
-        assertNotAlign("Child", 2);
-        assertAlign("Kin", 2);
-        assertNotAlign("Descendant", 3);
-        assertNotAlign("Offspring", 4);
-        assertAlign("Descendant", 4);
-        assertAlign("Child", 3);
-        assertNotAlign("Kin", 3);
-        assertNotAlign("Child", 3);
-        assertNotAlign("Kin", 3);
-        assertNotAlign("Child", 2);
-        assertAlign("OtherRoot", 1);
-    }
-
-    @Ignore
-    @Test
-    public void givenRootDescendantsCheckAlignmentReturnTrueForAllNodesUnderRoot() {
-        getAlignment("Root", "**");
-
-        assertNotAlign("Root", 1);
-        assertAlign("Child", 2);
-        assertAlign("Child", 3);
-        assertAlign("Sibling", 2);
-        assertAlign("Kin", 3);
-        assertAlign("Child", 2);
-        assertNotAlign("OtherRoot", 1);
-        assertNotAlign("Child", 2);
-    }
-
-    @Ignore
-    @Test
-    public void givenDescendantsOfChildOfAnyRootCheckAlignmentReturnsTrueForAllNodesUnderChildUnderAnyRoot() {
-        getAlignment("*", "Child", "**");
-
-        assertNotAlign("Root", 1);
-        assertNotAlign("Child", 2);
-        assertAlign("Descendant", 3);
-        assertNotAlign("Sibling", 2);
-        assertNotAlign("Kin", 3);
-        assertNotAlign("Child", 2);
-        assertNotAlign("OtherRoot", 1);
-        assertNotAlign("Child", 2);
-        assertAlign("Descendant", 3);
-        assertAlign("Kin", 3);
-        assertAlign("Offspring", 4);
-    }
-
-    @Ignore
-    @Test
-    public void givenDescendantsHavingChildCheckAlignmentReturnsTrueForFirstChildInDescendantTree() {
-        getAlignment("**", "Child");
-
-        assertAlign("Child", 1);
-        assertNotAlign("Root", 1);
-        assertAlign("Child", 2);
-        assertNotAlign("Sibling", 2);
-        assertAlign("Child", 3);
-        assertAlign("Child", 2);
-        assertNotAlign("Kin", 3);
-        assertNotAlign("Child", 4);
-    }
-
-    @Ignore
-    @Test
-    public void givenChildrenOfDescendantsHavingChildCheckAlignmentReturnsTrueForImmediateChildrenOfFirstChildInDescendantTree() {
-        getAlignment("**", "Child", "*");
-
-        assertNotAlign("Child", 1);
-        assertAlign("Kin", 2);
-        assertNotAlign("Descendant", 3);
-        assertAlign("Offspring", 2);
-        assertNotAlign("Root", 1);
-        assertNotAlign("Sibling", 2);
-        assertNotAlign("Child", 3);
-        assertAlign("Kin", 4);
-        assertAlign("Offspring", 4);
-        assertNotAlign("Descendant", 5);
-    }
-
-    @Ignore
-    @Test
-    public void givenDescendantsHavingNotImmediateChildCheckAlignmentReturnsTrueForSecondChildToAnyNodeInDescendantTree() {
-        getAlignment("**", "*", "Child");
-
-        assertNotAlign("Child", 1);
-        assertAlign("Child", 2);
-        assertNotAlign("Root", 1);
-        assertAlign("Child", 2);
-        assertNotAlign("Kin", 2);
-        assertAlign("Child", 3);
-        assertNotAlign("Child", 4);
-        assertNotAlign("Offspring", 3);
-        assertAlign("Child", 4);
-        assertNotAlign("Descendant", 5);
-    }
-
-    @Ignore
-    @Test
-    public void givenChildrenOfRootDescendantsCheckAlignmentReturnsTrueForImmediateChildrenOfChildNode() {
-        getAlignment("Child", "**", "*");
-
-        assertNotAlign("Root", 1);
-        assertNotAlign("Child", 2);
-        assertNotAlign("Child", 1);
-        assertAlign("Descendant", 2);
-        assertAlign("Kin", 2);
-        assertNotAlign("Offspring", 3);
-    }
-
-    @Ignore
-    @Test
-    public void givenChildrenOfDescendantsCheckAlignmentReturnsTrueForRootNodes() {
-        getAlignment("**", "*");
-
-        assertAlign("Root", 1);
-        assertAlign("Child", 1);
-        assertNotAlign("Child", 2);
-        assertAlign("OtherRoot", 1);
-        assertNotAlign("Kin", 2);
-        assertNotAlign("Descendant", 3);
-    }
-
-    @Ignore
-    @Test
-    public void givenChildrenOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForRootAndChildren() {
-        getAlignment("**", "**", "*");
-
-        assertAlign("Root", 1);
-        assertAlign("Child", 2);
-        assertAlign("OtherRoot", 1);
-        assertAlign("Kin", 2);
-        assertNotAlign("Descendant", 3);
-        assertAlign("Offspring", 2);
-        assertAlign("Child", 1);
-    }
-
-    @Ignore
-    @Test
-    public void givenChildrenOfDescendantsOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForRootAndChildrenAndChildrenOfChildren() {
-        getAlignment("**", "**", "**", "*");
-
-        assertAlign("Root", 1);
-        assertAlign("Child", 2);
-        assertAlign("Kin", 3);
-        assertNotAlign("Offspring", 4);
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertAlign("Root", "Kin");
+        assertNotAlign("Root", "Kin", "Descendant");
+        assertNotAlign("Root", "Kin", "Descendant", "Offspring");
+        assertAlign("Root", "Kin", "Descendant", "Descendant");
+        assertAlign("Root", "Kin", "Child");
+        assertNotAlign("Root", "Kin", "Kin");
+        assertNotAlign("Root", "Kin", "Child");
+        assertNotAlign("Root", "Kin", "Kin");
+        assertNotAlign("Root", "Child");
+        assertAlign("OtherRoot");
     }
 
     @After
@@ -250,16 +251,28 @@ public class SlurpAlignmentFactoryTest {
         slurpAlignment = null;
     }
 
-    private void assertAlign(String qName, int depth) {
+    private void oldAssertAlign(String qName, int depth) {
         XMLNode node = nodeFactory.createNode(idFeed++, qName, Collections.<String, String> emptyMap());
 
         assertThat(slurpAlignment.checkAlignment(depth, node), is(true));
     }
 
-    private void assertNotAlign(String qName, int depth) {
+    private void assertAlign(String... nodes) {
+        XMLNode lastNode = nodeFactory.createNode(idFeed++, nodes[nodes.length - 1], Collections.<String, String> emptyMap());
+
+        assertThat(slurpAlignment.checkAlignment(nodes.length, lastNode), is(true));
+    }
+
+    private void oldAssertNotAlign(String qName, int depth) {
         XMLNode node = nodeFactory.createNode(idFeed++, qName, Collections.<String, String> emptyMap());
 
         assertThat(slurpAlignment.checkAlignment(depth, node), is(false));
+    }
+
+    private void assertNotAlign(String... nodes) {
+        XMLNode lastNode = nodeFactory.createNode(idFeed++, nodes[nodes.length - 1], Collections.<String, String> emptyMap());
+
+        assertThat(slurpAlignment.checkAlignment(nodes.length, lastNode), is(false));
     }
 
     private void getAlignment(String... nodes) {

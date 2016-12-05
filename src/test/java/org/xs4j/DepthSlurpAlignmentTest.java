@@ -120,6 +120,7 @@ public class DepthSlurpAlignmentTest {
         assertAlign("OtherRoot");
         assertNotAlign("OtherRoot", "Kin");
         assertNotAlign("OtherRoot", "Kin", "Descendant");
+        assertNotAlign("OtherRoot", "Child");
         assertAlign("Child");
     }
 
