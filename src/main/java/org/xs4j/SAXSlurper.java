@@ -75,7 +75,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         nodeNotifier.onStartNode(elementParser.parseStartElement(uri, localName, qName, attributes));
 
-        checkConditionsForTermination();
+        terminateParsingIfPossible();
     }
 
     @Override
@@ -87,17 +87,17 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
             lastNode.setText(lastText == null ? text : lastText + text);
         }
 
-        checkConditionsForTermination();
+        terminateParsingIfPossible();
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         nodeNotifier.onEndNode();
 
-        checkConditionsForTermination();
+        terminateParsingIfPossible();
     }
 
-    private void checkConditionsForTermination() throws SAXException {
+    private void terminateParsingIfPossible() throws SAXException {
         if (isOnlyFindDataAvailable && nodeNotifier.isFindDataEmpty())
             throw new ParsingTerminationException();
     }
