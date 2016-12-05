@@ -14,6 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * Created by mturski on 11/19/2016.
  */
+@SuppressWarnings("Duplicates")
 public class DepthSlurpAlignmentTest {
     private static long idFeed;
 

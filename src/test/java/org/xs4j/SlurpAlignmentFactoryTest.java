@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * Created by mturski on 11/17/2016.
  */
+@SuppressWarnings("Duplicates")
 public class SlurpAlignmentFactoryTest {
     private static long idFeed;
 
