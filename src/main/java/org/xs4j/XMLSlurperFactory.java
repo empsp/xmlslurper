@@ -47,24 +47,13 @@ public class XMLSlurperFactory {
 
         NodeFactory nodeFactory = getNodeFactory();
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
-        SlurpFactory slurpFactory = getSlurpFactory(findData, findAllData, slurpAlignmentFactory);
-        NodeNotifier nodeNotifier = getNodeNotifier(findData, findAllData);
 
-        SAXSlurper saxSlurper = new SAXSlurper(
+        return new SAXSlurper(
                 getSaxParserFactory(isNamespaceAwarenessDisabled),
                 nodeFactory,
-                slurpFactory,
-                nodeNotifier,
+                getSlurpFactory(findData, findAllData, slurpAlignmentFactory),
+                getNodeNotifier(findData, findAllData),
                 getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, nodeFactory));
-
-        StAXSlurper staxSlurper = new StAXSlurper(
-                getXMLInputFactory(),
-                nodeFactory,
-                slurpFactory,
-                nodeNotifier,
-                getStAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, nodeFactory));
-
-        return new LazyEngineSlurper(slurpFactory, nodeNotifier, staxSlurper, saxSlurper);
     }
 
     static NodeFactory getNodeFactory() {
@@ -120,54 +109,10 @@ public class XMLSlurperFactory {
         return saxParserFactory;
     }
 
-    static XMLInputFactory getXMLInputFactory() {
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
-
-        return xmlInputFactory;
-    }
-
     static NamespaceSensitiveElementParser getSAXNamespaceSensitiveElementParser(boolean isNamespaceAwarenessDisabled, NodeFactory nodeFactory) {
         if (isNamespaceAwarenessDisabled)
             return new SAXSlurper.SAXNamespaceBlindElementParser(nodeFactory);
         else
             return new SAXSlurper.SAXNamespaceAwareElementParser(nodeFactory);
-    }
-
-    static NamespaceSensitiveElementParser getStAXNamespaceSensitiveElementParser(boolean isNamespaceAwarenessDisabled, NodeFactory nodeFactory) {
-        if (isNamespaceAwarenessDisabled)
-            return new StAXSlurper.StAXNamespaceBlindElementParser(nodeFactory);
-        else
-            return new StAXSlurper.StAXNamespaceAwareElementParser(nodeFactory);
-    }
-
-    public class LazyEngineSlurper implements XMLSlurper {
-        private final SlurpFactory slurpFactory;
-        private final NodeNotifier nodeNotifier;
-
-        private final StAXSlurper staxSlurper;
-        private final SAXSlurper saxSlurper;
-
-        LazyEngineSlurper(SlurpFactory slurpFactory, NodeNotifier nodeNotifier, StAXSlurper staxSlurper, SAXSlurper saxSlurper) {
-            this.slurpFactory = slurpFactory;
-            this.nodeNotifier = nodeNotifier;
-            this.staxSlurper = staxSlurper;
-            this.saxSlurper = saxSlurper;
-        }
-
-        @Override
-        public SlurpNode getNodes(@Nullable String... nodes) {
-            return slurpFactory.createSlurpNode(nodes);
-        }
-
-        @Override
-        public void parse(@NotNull InputStream inputStream) throws Exception {
-            requireNonNull(inputStream);
-
-            if (nodeNotifier.isOnlyFindDataAvailable())
-                staxSlurper.parse(inputStream);
-            else
-                saxSlurper.parse(inputStream);
-        }
     }
 }

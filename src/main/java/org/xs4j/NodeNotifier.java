@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by mturski on 11/25/2016.
  */
-final class NodeNotifier {
+class NodeNotifier {
     private final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
     private final List<FindData> findData;
     private final List<FindData> findAllData;

@@ -33,6 +33,8 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private InputStream inputStream;
     private SAXParser parser;
 
+    private boolean isOnlyFindDataAvailable;
+
     SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier, NamespaceSensitiveElementParser elementParser) {
         this.saxParserFactory = saxParserFactory;
         this.nodeFactory = nodeFactory;
@@ -50,12 +52,16 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     public void parse(@NotNull InputStream inputStream) throws ParserConfigurationException, SAXException, IOException, XMLStreamException {
         requireNonNull(inputStream);
 
+        isOnlyFindDataAvailable = nodeNotifier.isOnlyFindDataAvailable();
+
         this.inputStream = inputStream;
         try {
             parser = saxParserFactory.newSAXParser();
             parser.parse(inputStream, this);
         } catch (ParserConfigurationException e) {
             throw e;
+        } catch (ParsingTerminationException e) {
+            // do not rethrow
         } catch (SAXException e) {
             throw e;
         } catch (IOException e) {
@@ -68,6 +74,8 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         nodeNotifier.onStartNode(elementParser.parseStartElement(uri, localName, qName, attributes));
+
+        checkConditionsForTermination();
     }
 
     @Override
@@ -78,11 +86,20 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
             String lastText = lastNode.getText();
             lastNode.setText(lastText == null ? text : lastText + text);
         }
+
+        checkConditionsForTermination();
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         nodeNotifier.onEndNode();
+
+        checkConditionsForTermination();
+    }
+
+    private void checkConditionsForTermination() throws SAXException {
+        if (isOnlyFindDataAvailable && nodeNotifier.isFindDataEmpty())
+            throw new ParsingTerminationException();
     }
 
     private void close() throws XMLStreamException, IOException {
@@ -143,5 +160,8 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
             return attributeByName;
         }
+    }
+
+    static class ParsingTerminationException extends SAXException {
     }
 }
