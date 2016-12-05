@@ -274,22 +274,10 @@ public class SlurpAlignmentFactoryTest {
         slurpAlignment = null;
     }
 
-    private void oldAssertAlign(String qName, int depth) {
-        XMLNode node = nodeFactory.createNode(idFeed++, qName, Collections.<String, String> emptyMap());
-
-        assertThat(slurpAlignment.checkAlignment(depth, node), is(true));
-    }
-
     private void assertAlign(String... nodes) {
         XMLNode lastNode = nodeFactory.createNode(idFeed++, nodes[nodes.length - 1], Collections.<String, String> emptyMap());
 
         assertThat(slurpAlignment.checkAlignment(nodes.length, lastNode), is(true));
-    }
-
-    private void oldAssertNotAlign(String qName, int depth) {
-        XMLNode node = nodeFactory.createNode(idFeed++, qName, Collections.<String, String> emptyMap());
-
-        assertThat(slurpAlignment.checkAlignment(depth, node), is(false));
     }
 
     private void assertNotAlign(String... nodes) {
