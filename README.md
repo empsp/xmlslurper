@@ -33,29 +33,53 @@ dependencies {
 
 ## Usage
 
+### Terminology
+
+- Element is a xml element that either begins with a start-tag and ends with a matching end-tag or consists only of an empty-element tag.
+- Node is a Java data structure reflecting a particular xml element
+- Path is a location of the node within the document tree eg. 'Foo.Bar.Baz' provides 'Baz' node that is a child of 'Bar' node that is a child of 'Foo' root document node.
+
+### Capabilities
+
 The following is a list of XMLSlurper capabilities:
 
-1. Read all the elements (with attributes and text) from the xml file.
-2. Read all the elements that match the given path.
-3. Read all the elements that contain the given attribute.
-4. Read all the elements that have the given attribute with specific value/values different than/value matching given regex expression.
-5. Read all the elements that are siblings (`*`) under a given elements.
-6. Read all the elements that are descendants (`**`) of a given elements.
-7. Combine the siblings (`*`) and descendants (`**`) to gain even more fine-grained search results.
-8. All of the above except that n-th elements will be choosen that match the given path/attribute/value with respect to siblings (`*`) and descendants (`**`).
-9. Or, a single first/n-th element will be choosen that match the given path/attribute/value with respect to siblings (`*`) and descendants (`**`). After the element is provided, the parser will break further xml file processing.
+1. Read all elements (with attributes and text) from the xml file.
+2. Read all elements that match the given path.
+3. Read all elements that match the given path and have the given attribute.
+4. Read all elements that match the given path and have the attribute with specific value/values different than/value matching regex expression.
+5. Read all elements that are children of the given element (wildcard `*`).
+6. Read all elements that are descendants of the given element (wildcard `**`).
+7. Read n-th/all n-th elements with respect to capabilities above.
 
-All of the above will return searched nodes together with parent nodes of those nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file. The returned information will be split among two events, start node and end node events. End node events contain additional information regarding nodes' text. The developer can decide if both events are of his interest, or only the start node or only the end node.
+All of the above will return nodes together with their parent. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the xml file. The returned information will be split among two events, start node and end node events. End node events contain additional information regarding nodes' text. The developer can decide if both events are of his interest, or only the start node or only the end node.
 
 Additionally the library ensures that:
 
 1. `@NotNull`/`@Nullable` interfaces will be adhered to.
 2. XMLSlurper will release all of the resources after the execution (including the `InputStream` given).
 3. Single XMLSlurper instance can be reused many times, however the paths must be redefined.
-4. `XMLNode` objects are meaningfully equal only by the ids which will be unique only to the scope of a single xml file processing. Consecutive parsing of a different xml file will produce objects with different data but with matching ids. Therefore `XMLNode` objects are not fit and designed to be stored, instead the information should be extracted and the objects should be left for garbage collection.
+4. `XMLNode` objects are meaningfully equal only by the ids which will be unique only to the scope of a single xml file processing. Consecutive parsing of a different xml file will produce nodes with different data but matching ids. Therefore `XMLNode` objects are not fit and designed to be stored, instead the information should be extracted and the objects should be left for garbage collection.
 5. Namespace awareness can be turned on/off (feature turned on by default).
 
-### Movie Database sample xml file
+#### Advanced search
+
+##### Sibling search - wildcard \*
+
+Any time it is required to retrieve all children of the given element, a wildcard (`*`) character can be used as a node name. Similary as in XPath, wildcards can be stacked to get all grandchildren (and so on..) of the given element.
+
+##### Descendants search - double wildcard \*\*
+
+It is also possible to retrieve all elements being descendants of the given element with double wildcard (`**`) character.
+
+(Current)
+Using double wildcard with additional node name at the end of the path eg. '\*\*.Movie' will return all first nodes named 'Movie' found traversing path beginning from the root element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would not be shown.
+
+(Scheduled)
+Using double wildcard with additional node name at the end of the path eg. '\*\*.Movie' will return all nodes named 'Movie' found traversing path beginning from the root element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would be shown, as well.
+
+### Examples
+
+#### Movie Database sample xml file
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
@@ -96,27 +120,7 @@ Additionally the library ensures that:
 </MovieDb>
 ```
 
-### Sibling and Descendant search
-
-#### Sibling search - wildcard \*
-
-Any time it is required to retrieve all immediate children under a specific element, a wildcard (`*`) character can be used as a node name. Similary as in XPath, wildcards can be stacked to get children of a children (of a children and so on..) of the specific element. Having the path '*.fr:Franchise.*' will return not only 'Movie' immediate children nodes but also 'Studios' node.
-
-#### Descendants search - double wildcard \*\*
-
-It is also possible to retrieve all elements being descendants of a specific element with double wildcard (`**`) character.
-
-##### Subject to discussion
-
-(Current)
-Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all first elements named 'Movie' found traversing path beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would not be shown.
-
-or
-
-(Proposition)
-Searching for descendants with specific node at the end eg. '\*\*.Movie' will return all elements named 'Movie' found traversing path beginning from the 'MovieDb' element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would be shown, as well.
-
-### Scenarios
+#### Scenarios
 
 1. Simple 'take all' approach
 	
@@ -145,7 +149,7 @@ Searching for descendants with specific node at the end eg. '\*\*.Movie' will re
 	5 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
 	Comment | Here, at end node event, the text value of the 'LeadActor' node is finally available.
 	6 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}`
-	Comment | Another start node event, and the text value of a 'LeadActress' node is `null`, however the text value of the 'Cast' parent node has been updated with additional white characters.
+	Comment | Another start node event, and the text value of a 'LeadActress' node is `null`, however the text value of the 'Cast' parent node has been updated with additional white characters found before processing 'LeadActress'.
 	7 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
 	8 | `parent=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}, node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t\n\t\t', attrByQName={}}`
 	9 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={title=Titanic, director=James Cameron}}`
