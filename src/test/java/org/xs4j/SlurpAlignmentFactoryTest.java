@@ -160,6 +160,28 @@ public class SlurpAlignmentFactoryTest {
 
     @Ignore
     @Test
+    public void givenDescendantsOfChildBeingDescendantCheckAlignmentReturnsTrueForPathsContainingChildNode() {
+        getAlignment("**", "Child", "**");
+
+        assertNotAlign("Child");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertAlign("Root", "Child", "Kin");
+        assertNotAlign("Root", "Kin");
+        assertNotAlign("Root", "Kin", "Child");
+        assertAlign("Root", "Kin", "Child", "Offspring");
+        assertNotAlign("Root", "Kin", "Offspring");
+        assertNotAlign("Root", "Offspring");
+        assertNotAlign("Child");
+        assertAlign("Child", "Kin");
+        assertAlign("Child", "Kin", "Descendant");
+        assertAlign("Child", "Kin", "Descendant", "Offspring");
+        assertAlign("Child", "Kin", "Child");
+        assertAlign("Child", "Child");
+    }
+
+    @Ignore
+    @Test
     public void givenDescendantsHavingNotImmediateChildCheckAlignmentReturnsTrueForSecondChildToAnyNodeInDescendantTree() {
         getAlignment("**", "*", "Child");
 
