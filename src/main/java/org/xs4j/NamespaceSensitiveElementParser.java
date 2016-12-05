@@ -14,10 +14,6 @@ abstract class NamespaceSensitiveElementParser {
         this.nodeFactory = nodeFactory;
     }
 
-    XMLNode parseStartElement(XMLStreamReader parser) {
-        throw new UnsupportedOperationException();
-    }
-
     XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes) {
         throw new UnsupportedOperationException();
     }
