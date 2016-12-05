@@ -86,8 +86,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
             String lastText = lastNode.getText();
             lastNode.setText(lastText == null ? text : lastText + text);
         }
-
-        terminateParsingIfPossible();
     }
 
     @Override
