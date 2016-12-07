@@ -22,11 +22,10 @@ class NodeNotifier {
 
     void onStartNode(XMLNode node) {
         XMLNode parent = descendants.peekLast();
+        descendants.addLast(node);
 
         notifyFindListenersOnStartNode(parent, node);
         notifyFindAllListenersOnStartNode(parent, node);
-
-        descendants.addLast(node);
     }
 
     private void notifyFindListenersOnStartNode(XMLNode parent, XMLNode node) {
@@ -35,7 +34,7 @@ class NodeNotifier {
         while(findDataIt.hasNext()) {
             FindData data = findDataIt.next();
 
-            if (data.alignedNodeIds.isEmpty() && data.slurpAlignment.checkAlignment(descendants, node)) {
+            if (data.alignedNodeIds.isEmpty() && data.slurpAlignment.checkAlignment(descendants)) {
                 data.alignedNodeIds.addLast(node.getId());
 
                 if (data.startNodeListener != null) {
@@ -51,7 +50,7 @@ class NodeNotifier {
 
     private void notifyFindAllListenersOnStartNode(XMLNode parent, XMLNode node) {
         for (FindData data : findAllData)
-            if (data.slurpAlignment.checkAlignment(descendants, node)) {
+            if (data.slurpAlignment.checkAlignment(descendants)) {
                 if (data.startNodeListener != null)
                     data.startNodeListener.onNode(parent, node);
 

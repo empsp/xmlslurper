@@ -235,13 +235,13 @@ public class DepthSlurpAlignmentTest {
     private void assertAlign(String... nodes) {
         Deque<XMLNode> descendants = createDescendants(nodes);
 
-        assertThat(slurpAlignment.checkAlignment(descendants, descendants.removeLast()), is(true));
+        assertThat(slurpAlignment.checkAlignment(descendants), is(true));
     }
 
     private void assertNotAlign(String... nodes) {
         Deque<XMLNode> descendants = createDescendants(nodes);
 
-        assertThat(slurpAlignment.checkAlignment(descendants, descendants.removeLast()), is(false));
+        assertThat(slurpAlignment.checkAlignment(descendants), is(false));
     }
 
     private Deque<XMLNode> createDescendants(String... nodes) {

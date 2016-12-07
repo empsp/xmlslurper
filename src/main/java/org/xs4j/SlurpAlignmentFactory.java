@@ -99,7 +99,7 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
+        boolean checkAlignment(Deque<XMLNode> descendants) {
             return true;
         }
 
@@ -136,8 +136,8 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            return checkAlignment(descendants.size() + 1, lastNode); // +1 for lastNode which is a detached part of descendants
+        boolean checkAlignment(Deque<XMLNode> descendants) {
+            return checkAlignment(descendants.size(), descendants.peekLast()); // +1 for lastNode which is a detached part of descendants
         }
 
         @Override
@@ -159,48 +159,36 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            Iterator<XMLNode> nodeIter = descendants.iterator();
+        boolean checkAlignment(Deque<XMLNode> descendants) {
+            Iterator<XMLNode> descIter = descendants.iterator();
             XMLNode descendant;
             String name;
 
-            for (int namePathIndex = 0; namePathIndex < namePath.size(); namePathIndex++) {
-                name = namePath.get(namePathIndex);
-                descendant = nodeIter.hasNext() ? nodeIter.next() : lastNode;
+            for (int index = 0; index < namePath.size() && descIter.hasNext(); index++) {
+                name = namePath.get(index);
+                descendant = descIter.next();
 
-                if (name.equals(DEPTH_MARKER))
-                    return checkAlignmentTraverseBackwards(descendants, lastNode, descendant, namePathIndex);
-                else if ((!name.equals(descendant.getQName()) && !name.equals(SIBLING_MARKER)) || descendant.equals(lastNode)) // if matching name but it's the last node and namePath still has extra ** node, then not aligned
+                if (name.equals(DEPTH_MARKER)) {
+                    if (index == namePath.size() - 1) // if ** was last in the path, then aligned
+                        return true;
+                    else if (!descIter.hasNext()) // if descendant was last node and the path is not emptied yet, then not aligned
+                        return false;
+
+                    return checkAlignmentTraversingBackwardsUntilIndex(descendants, index);
+                } else if ((!name.equals(descendant.getQName()) && !name.equals(SIBLING_MARKER)))
                     break;
             }
 
             return false;
         }
 
-        private boolean checkAlignmentTraverseBackwards(Deque<XMLNode> descendants, XMLNode lastNode, XMLNode descendant, int namePathIndex) {
+        private boolean checkAlignmentTraversingBackwardsUntilIndex(Deque<XMLNode> descendants, int namePathForwardTraverseIndex) {
             String name;
+            XMLNode descendant;
             boolean isDescendantMode = false;
 
-            if (namePathIndex == namePath.size() - 1) // if ** was last in the path, then aligned
-                return true;
-            else if (descendant == lastNode) // if descendant was last node and the path is not emptied yet, then not aligned
-                return false;
-
-            name = namePath.get(namePath.size() - 1);
-            descendant = lastNode;
-
-            if (name.equals(descendant.getQName()) || name.equals(SIBLING_MARKER)) {
-                // do nothing
-            } else if (name.equals(DEPTH_MARKER)) {
-                isDescendantMode = true;
-            } else
-                return false;
-
             Iterator<XMLNode> descIter = descendants.descendingIterator();
-            for (int index = namePath.size() - 2; index > namePathIndex; index--) {
-                if (!descIter.hasNext()) // the path still has an item but the descendants are emptied, then not aligned
-                    return false;
-
+            for (int index = namePath.size() - 1; index > namePathForwardTraverseIndex && descIter.hasNext(); index--) { // the path still has an item but the descendants are emptied, then not aligned
                 name = namePath.get(index);
                 descendant = descIter.next();
 
@@ -222,48 +210,6 @@ final class SlurpAlignmentFactory {
 
             return descIter.hasNext();
         }
-
-//        @Override
-//        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-//            Iterator<String> nameIt = namePath.iterator();
-//            String name = nameIt.next();
-//            boolean isPrevNameDepthMarker = false;
-//            boolean isSiblingAfterDepthMarker = false;
-//
-//            for (XMLNode descendant : descendants) {
-//                if (name.equals(DEPTH_MARKER)) {
-//                    if (!nameIt.hasNext())
-//                        return true;
-//
-//                    isPrevNameDepthMarker = true;
-//                    name = nameIt.next();
-//                }
-//
-//                if (name.equals(SIBLING_MARKER)) {
-//                    if (!nameIt.hasNext())
-//                        return false;
-//
-//                    if (isPrevNameDepthMarker)
-//                        isSiblingAfterDepthMarker = true;
-//
-//                    isPrevNameDepthMarker = false;
-//                    name = nameIt.next();
-//                } else if (name.equals(descendant.getQName())) {
-//                    if (!nameIt.hasNext())
-//                        return false;
-//
-//                    isSiblingAfterDepthMarker = false;
-//                    isPrevNameDepthMarker = false;
-//                    name = nameIt.next();
-//                } else if (!isPrevNameDepthMarker && !isSiblingAfterDepthMarker)
-//                    return false;
-//            }
-//
-//            while (name.equals(DEPTH_MARKER) && nameIt.hasNext())
-//                name = nameIt.next();
-//
-//            return !nameIt.hasNext() && (name.equals(lastNode.getQName()) || name.equals(SIBLING_MARKER) || name.equals(DEPTH_MARKER));
-//        }
 
         @Override
         public List<String> getPath() {
@@ -291,10 +237,10 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            countOccurences(descendants.size() + 1);
+        boolean checkAlignment(Deque<XMLNode> descendants) {
+            countOccurences(descendants.size());
 
-            return slurpAlignment.checkAlignment(descendants, lastNode) && indexByDepth.peekLast() == nodeIndex;
+            return slurpAlignment.checkAlignment(descendants) && indexByDepth.peekLast() == nodeIndex;
         }
 
         private void countOccurences(int depth) {
@@ -333,8 +279,8 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            return slurpAlignment.checkAlignment(descendants, lastNode) && lastNode.hasAttribute(attrQName);
+        boolean checkAlignment(Deque<XMLNode> descendants) {
+            return slurpAlignment.checkAlignment(descendants) && descendants.peekLast().hasAttribute(attrQName);
         }
 
         @Override
@@ -360,8 +306,8 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            return slurpAlignment.checkAlignment(descendants, lastNode) && attrValue.equals(lastNode.getAttribute(attrQName));
+        boolean checkAlignment(Deque<XMLNode> descendants) {
+            return slurpAlignment.checkAlignment(descendants) && attrValue.equals(descendants.peekLast().getAttribute(attrQName));
         }
 
         @Override
@@ -401,9 +347,9 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            if (slurpAlignment.checkAlignment(descendants, lastNode)) {
-                String actualAttrValue = lastNode.getAttribute(attrQName);
+        boolean checkAlignment(Deque<XMLNode> descendants) {
+            if (slurpAlignment.checkAlignment(descendants)) {
+                String actualAttrValue = descendants.peekLast().getAttribute(attrQName);
 
                 return actualAttrValue != null && isAttributeValueOutsideExcludedRange(actualAttrValue);
             }
@@ -439,9 +385,9 @@ final class SlurpAlignmentFactory {
         }
 
         @Override
-        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            if (slurpAlignment.checkAlignment(descendants, lastNode)) {
-                String actualAttrValue = lastNode.getAttribute(attrQName);
+        boolean checkAlignment(Deque<XMLNode> descendants) {
+            if (slurpAlignment.checkAlignment(descendants)) {
+                String actualAttrValue = descendants.peekLast().getAttribute(attrQName);
 
                 return actualAttrValue != null && valuePattern.matcher(actualAttrValue).find();
             }

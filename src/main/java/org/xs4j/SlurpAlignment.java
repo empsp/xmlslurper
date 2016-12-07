@@ -9,7 +9,7 @@ import java.util.List;
 abstract class SlurpAlignment {
     abstract boolean checkAlignment(int depth, XMLNode lastNode);
 
-    abstract boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode);
+    abstract boolean checkAlignment(Deque<XMLNode> descendants);
 
     abstract List<String> getPath();
 }
