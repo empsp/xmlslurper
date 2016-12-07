@@ -160,45 +160,110 @@ final class SlurpAlignmentFactory {
 
         @Override
         boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
-            Iterator<String> nameIt = namePath.iterator();
-            String name = nameIt.next();
-            boolean isPrevNameDepthMarker = false;
-            boolean isSiblingAfterDepthMarker = false;
+            Iterator<XMLNode> nodeIter = descendants.iterator();
+            XMLNode descendant;
+            String name;
 
-            for (XMLNode descendant : descendants) {
-                if (name.equals(DEPTH_MARKER)) {
-                    if (!nameIt.hasNext())
-                        return true;
+            for (int namePathIndex = 0; namePathIndex < namePath.size(); namePathIndex++) {
+                name = namePath.get(namePathIndex);
+                descendant = nodeIter.hasNext() ? nodeIter.next() : lastNode;
 
-                    isPrevNameDepthMarker = true;
-                    name = nameIt.next();
-                }
-
-                if (name.equals(SIBLING_MARKER)) {
-                    if (!nameIt.hasNext())
-                        return false;
-
-                    if (isPrevNameDepthMarker)
-                        isSiblingAfterDepthMarker = true;
-
-                    isPrevNameDepthMarker = false;
-                    name = nameIt.next();
-                } else if (name.equals(descendant.getQName())) {
-                    if (!nameIt.hasNext())
-                        return false;
-
-                    isSiblingAfterDepthMarker = false;
-                    isPrevNameDepthMarker = false;
-                    name = nameIt.next();
-                } else if (!isPrevNameDepthMarker && !isSiblingAfterDepthMarker)
-                    return false;
+                if (name.equals(DEPTH_MARKER))
+                    return checkAlignmentTraverseBackwards(descendants, lastNode, descendant, namePathIndex);
+                else if ((!name.equals(descendant.getQName()) && !name.equals(SIBLING_MARKER)) || descendant.equals(lastNode)) // if matching name but it's the last node and namePath still has extra ** node, then not aligned
+                    break;
             }
 
-            while (name.equals(DEPTH_MARKER) && nameIt.hasNext())
-                name = nameIt.next();
-
-            return !nameIt.hasNext() && (name.equals(lastNode.getQName()) || name.equals(SIBLING_MARKER) || name.equals(DEPTH_MARKER));
+            return false;
         }
+
+        private boolean checkAlignmentTraverseBackwards(Deque<XMLNode> descendants, XMLNode lastNode, XMLNode descendant, int namePathIndex) {
+            String name;
+            boolean isDescendantMode = false;
+
+            if (namePathIndex == namePath.size() - 1) // if ** was last in the path, then aligned
+                return true;
+            else if (descendant == lastNode) // if descendant was last node and the path is not emptied yet, then not aligned
+                return false;
+
+            name = namePath.get(namePath.size() - 1);
+            descendant = lastNode;
+
+            if (name.equals(descendant.getQName()) || name.equals(SIBLING_MARKER)) {
+                // do nothing
+            } else if (name.equals(DEPTH_MARKER)) {
+                isDescendantMode = true;
+            } else
+                return false;
+
+            Iterator<XMLNode> descIter = descendants.descendingIterator();
+            for (int index = namePath.size() - 2; index > namePathIndex; index--) {
+                if (!descIter.hasNext()) // the path still has an item but the descendants are emptied, then not aligned
+                    return false;
+
+                name = namePath.get(index);
+                descendant = descIter.next();
+
+                do {
+                    if (name.equals(descendant.getQName()) || name.equals(SIBLING_MARKER)) {
+                        isDescendantMode = false;
+                    } else if (name.equals(DEPTH_MARKER)) {
+                        isDescendantMode = true;
+                        break;
+                    } else if (isDescendantMode) { // names don't match however ** was previously so traverse until found
+                        if (!descIter.hasNext()) // names eventually must match but here descendants run out, then not aligned
+                            return false;
+
+                        descendant = descIter.next();
+                    } else
+                        return false;
+                } while (isDescendantMode);
+            }
+
+            return descIter.hasNext();
+        }
+
+//        @Override
+//        boolean checkAlignment(Deque<XMLNode> descendants, XMLNode lastNode) {
+//            Iterator<String> nameIt = namePath.iterator();
+//            String name = nameIt.next();
+//            boolean isPrevNameDepthMarker = false;
+//            boolean isSiblingAfterDepthMarker = false;
+//
+//            for (XMLNode descendant : descendants) {
+//                if (name.equals(DEPTH_MARKER)) {
+//                    if (!nameIt.hasNext())
+//                        return true;
+//
+//                    isPrevNameDepthMarker = true;
+//                    name = nameIt.next();
+//                }
+//
+//                if (name.equals(SIBLING_MARKER)) {
+//                    if (!nameIt.hasNext())
+//                        return false;
+//
+//                    if (isPrevNameDepthMarker)
+//                        isSiblingAfterDepthMarker = true;
+//
+//                    isPrevNameDepthMarker = false;
+//                    name = nameIt.next();
+//                } else if (name.equals(descendant.getQName())) {
+//                    if (!nameIt.hasNext())
+//                        return false;
+//
+//                    isSiblingAfterDepthMarker = false;
+//                    isPrevNameDepthMarker = false;
+//                    name = nameIt.next();
+//                } else if (!isPrevNameDepthMarker && !isSiblingAfterDepthMarker)
+//                    return false;
+//            }
+//
+//            while (name.equals(DEPTH_MARKER) && nameIt.hasNext())
+//                name = nameIt.next();
+//
+//            return !nameIt.hasNext() && (name.equals(lastNode.getQName()) || name.equals(SIBLING_MARKER) || name.equals(DEPTH_MARKER));
+//        }
 
         @Override
         public List<String> getPath() {

@@ -64,17 +64,19 @@ public class SlurpAlignmentFactoryTest {
     @Test
     public void given2ndParticularChildOfRootCheckAlignmentReturnsTrueForEverySecondPathStartingWithRootHaving2ndLevelNodeMatchingName() {
         getAlignment("Root");
-        addNthNodeToAlignment("Kin", 2); //changed
+        addNthNodeToAlignment("Kin", 2);
 
         assertNotAlign("Root");
-        assertNotAlign("Root", "Kin"); //changed
-        assertAlign("Root", "Kin"); //changed
-        assertNotAlign("Root", "Kin"); //changed
-        assertNotAlign("Root", "Kin"); //changed
+        assertNotAlign("Root", "Kin");
         assertNotAlign("Root");
-        assertNotAlign("Root", "Kin"); //changed
-        assertNotAlign("Root", "Kin", "Kin"); //changed
-        assertAlign("Root", "Kin"); //changed
+        assertNotAlign("Root", "Kin");
+        assertAlign("Root", "Kin");
+        assertNotAlign("Root", "Kin");
+        assertNotAlign("Root", "Kin");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Kin");
+        assertNotAlign("Root", "Kin", "Kin");
+        assertAlign("Root", "Kin");
     }
 
     @Test
@@ -128,14 +130,14 @@ public class SlurpAlignmentFactoryTest {
     public void givenChildDescendantCheckAlignmentReturnsTrueForAllPathsEndingWithChild() {
         getAlignment("**", "Child");
 
-        assertAlign("Child");
+        assertNotAlign("Child");
         assertNotAlign("Root");
         assertAlign("Root", "Child");
         assertNotAlign("Root", "Sibling");
         assertAlign("Root", "Sibling", "Child");
         assertAlign("Root", "Child");
         assertNotAlign("Root", "Child", "Kin");
-        assertAlign("Root", "Child", "Kin", "Child"); //changed
+        assertAlign("Root", "Child", "Kin", "Child");
     }
 
     @Ignore
@@ -147,19 +149,20 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Root", "Child");
         assertAlign("Root", "Child", "Descendant");
         assertNotAlign("Root", "Sibling");
+        assertNotAlign("Root", "Sibling", "Child");
+        assertNotAlign("Root", "Sibling", "Child", "Kin");
         assertNotAlign("Root", "Sibling", "Kin");
         assertNotAlign("Root", "Child");
-        assertNotAlign("Child"); //added
-        assertNotAlign("Child", "Child"); //added
-        assertAlign("Child", "Child", "Child"); //added
-        assertNotAlign("Child", "Kin"); //added
+        assertNotAlign("Child");
+        assertNotAlign("Child", "Child");
+        assertAlign("Child", "Child", "Child");
+        assertNotAlign("Child", "Kin");
         assertNotAlign("OtherRoot");
         assertNotAlign("OtherRoot", "Child");
-        assertAlign("OtherRoot", "Child", "Descendant");
         assertAlign("OtherRoot", "Child", "Kin");
         assertAlign("OtherRoot", "Child", "Kin", "Offspring");
-        assertNotAlign("OtherRoot", "Child", "Kin", "Child"); //added
-        assertAlign("OtherRoot", "Child", "Kin", "Child", "Offspring"); //added
+        assertAlign("OtherRoot", "Child", "Kin", "Child");
+        assertAlign("OtherRoot", "Child", "Kin", "Child", "Offspring");
     }
 
     @Ignore
@@ -168,17 +171,19 @@ public class SlurpAlignmentFactoryTest {
         getAlignment("**", "Child", "*");
 
         assertNotAlign("Child");
-        assertAlign("Child", "Kin");
+        assertNotAlign("Child", "Kin");
         assertNotAlign("Child", "Kin", "Descendant");
-        assertAlign("Child", "Offspring");
+        assertNotAlign("Child", "Offspring");
+        assertNotAlign("Child", "Offspring", "Child");
+        assertAlign("Child", "Offspring", "Child", "Kin");
         assertNotAlign("Root");
         assertNotAlign("Root", "Sibling");
         assertNotAlign("Root", "Sibling", "Child");
         assertAlign("Root", "Sibling", "Child", "Kin");
         assertAlign("Root", "Sibling", "Child", "Offspring");
         assertNotAlign("Root", "Sibling", "Child", "Offspring", "Descendant");
-        assertNotAlign("Root", "Sibling", "Child", "Offspring", "Child"); //added
-        assertAlign("Root", "Sibling", "Child", "Offspring", "Child", "Descendant"); //added
+        assertNotAlign("Root", "Sibling", "Child", "Offspring", "Child");
+        assertAlign("Root", "Sibling", "Child", "Offspring", "Child", "Descendant");
     }
 
     @Ignore
@@ -190,22 +195,26 @@ public class SlurpAlignmentFactoryTest {
         assertNotAlign("Root");
         assertNotAlign("Root", "Child");
         assertAlign("Root", "Child", "Kin");
-        assertNotAlign("Root", "Child", "Kin", "Child"); //added
-        assertAlign("Root", "Child", "Kin", "Child", "Descendant"); //added
-        assertAlign("Root", "Child", "Kin", "Offspring"); //added
-        assertAlign("Root", "Child", "Offspring"); //added
+        assertAlign("Root", "Child", "Kin", "Child");
+        assertAlign("Root", "Child", "Kin", "Child", "Descendant");
+        assertAlign("Root", "Child", "Kin", "Offspring");
+        assertAlign("Root", "Child", "Offspring");
         assertNotAlign("Root", "Kin");
         assertNotAlign("Root", "Kin", "Child");
         assertAlign("Root", "Kin", "Child", "Offspring");
         assertNotAlign("Root", "Kin", "Offspring");
         assertNotAlign("Root", "Offspring");
         assertNotAlign("Child");
-        assertAlign("Child", "Kin");
-        assertAlign("Child", "Kin", "Descendant");
-        assertAlign("Child", "Kin", "Descendant", "Offspring");
-        assertNotAlign("Child", "Kin", "Child"); //changed
-        assertNotAlign("Child", "Child"); //changed
-        assertAlign("Child", "Child", "Kin"); //added
+        assertNotAlign("Child", "Kin");
+        assertNotAlign("Child", "Kin", "Descendant");
+        assertNotAlign("Child", "Kin", "Descendant", "Offspring");
+        assertNotAlign("Child", "Kin", "Child");
+        assertAlign("Child", "Kin", "Child", "Descendant");
+        assertNotAlign("Child", "Kin", "Descendant");
+        assertNotAlign("Child", "Child");
+        assertAlign("Child", "Child", "Kin");
+        assertAlign("Child", "Child", "Child");
+        assertAlign("Child", "Child", "Child", "Child");
     }
 
     @Ignore
@@ -214,19 +223,19 @@ public class SlurpAlignmentFactoryTest {
         getAlignment("**", "*", "Child");
 
         assertNotAlign("Child");
-        assertAlign("Child", "Child");
-        assertAlign("Child", "Child", "Child"); //added
-        assertNotAlign("Child", "Child", "Kin"); //added
-        assertNotAlign("Child", "Kin"); //added
+        assertNotAlign("Child", "Child");
+        assertAlign("Child", "Child", "Child");
+        assertNotAlign("Child", "Child", "Kin");
+        assertNotAlign("Child", "Kin");
         assertNotAlign("Root");
-        assertAlign("Root", "Child");
+        assertNotAlign("Root", "Child");
         assertNotAlign("Root", "Kin");
         assertAlign("Root", "Kin", "Child");
-        assertAlign("Root", "Kin", "Child", "Child"); //changed
+        assertAlign("Root", "Kin", "Child", "Child");
         assertNotAlign("Root", "Kin", "Offspring");
         assertAlign("Root", "Kin", "Offspring", "Child");
         assertNotAlign("Root", "Kin", "Offspring", "Child", "Descendant");
-        assertAlign("Root", "Kin", "Offspring", "Child", "Descendant", "Child"); //added
+        assertAlign("Root", "Kin", "Offspring", "Child", "Descendant", "Child");
     }
 
     @Ignore
@@ -236,13 +245,13 @@ public class SlurpAlignmentFactoryTest {
 
         assertNotAlign("Root");
         assertNotAlign("Root", "Child");
-        assertNotAlign("Root", "Child", "Child"); //added
-        assertNotAlign("Root", "Kin"); //added
+        assertNotAlign("Root", "Child", "Child");
+        assertNotAlign("Root", "Kin");
         assertNotAlign("Child");
-        assertAlign("Child", "Descendant");
-        assertAlign("Child", "Kin");
-        assertAlign("Child", "Kin", "Offspring"); //changed
-        assertAlign("Child", "Kin", "Offspring", "Child"); //added
+        assertNotAlign("Child", "Descendant");
+        assertNotAlign("Child", "Kin");
+        assertAlign("Child", "Kin", "Offspring");
+        assertAlign("Child", "Kin", "Offspring", "Child");
     }
 
     @Ignore
@@ -250,13 +259,13 @@ public class SlurpAlignmentFactoryTest {
     public void givenChildrendOfDescendantsCheckAlignmentReturnsTrueForAllPaths() {
         getAlignment("**", "*");
 
-        assertAlign("Root");
-        assertAlign("Root", "Child"); //changed
-        assertAlign("OtherRoot");
-        assertAlign("OtherRoot", "Kin"); //changed
-        assertAlign("OtherRoot", "Kin", "Descendant"); //changed
-        assertAlign("OtherRoot", "Child"); //changed
-        assertAlign("Child");
+        assertNotAlign("Root");
+        assertAlign("Root", "Child");
+        assertNotAlign("OtherRoot");
+        assertAlign("OtherRoot", "Kin");
+        assertAlign("OtherRoot", "Kin", "Descendant");
+        assertAlign("OtherRoot", "Child");
+        assertNotAlign("Child");
     }
 
     @Ignore
@@ -264,13 +273,13 @@ public class SlurpAlignmentFactoryTest {
     public void givenChildrenOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForAllPaths() {
         getAlignment("**", "**", "*");
 
-        assertAlign("Root");
-        assertAlign("Root", "Child");
-        assertAlign("OtherRoot");
-        assertAlign("OtherRoot", "Kin");
-        assertAlign("OtherRoot", "Kin", "Descendant"); //changed
-        assertAlign("OtherRoot", "Offspring");
-        assertAlign("Child");
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertNotAlign("OtherRoot");
+        assertNotAlign("OtherRoot", "Kin");
+        assertAlign("OtherRoot", "Kin", "Descendant");
+        assertNotAlign("OtherRoot", "Offspring");
+        assertNotAlign("Child");
     }
 
     @Ignore
@@ -278,10 +287,10 @@ public class SlurpAlignmentFactoryTest {
     public void givenChildrenOfDescendantsOfDescendantsOfDescendantsCheckAlignmentReturnsTrueForAllPaths() {
         getAlignment("**", "**", "**", "*");
 
-        assertAlign("Root");
-        assertAlign("Root", "Child");
-        assertAlign("Root", "Child", "Kin");
-        assertAlign("Root", "Child", "Kin", "Offspring"); //changed
+        assertNotAlign("Root");
+        assertNotAlign("Root", "Child");
+        assertNotAlign("Root", "Child", "Kin");
+        assertAlign("Root", "Child", "Kin", "Offspring");
     }
 
     @Ignore
