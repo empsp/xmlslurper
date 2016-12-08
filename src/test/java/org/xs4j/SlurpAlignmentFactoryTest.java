@@ -63,8 +63,8 @@ public class SlurpAlignmentFactoryTest {
 
     @Test
     public void given2ndParticularChildOfRootCheckAlignmentReturnsTrueForEverySecondPathStartingWithRootHaving2ndLevelNodeMatchingName() {
-        getAlignment("Root");
-        addNthNodeToAlignment("Kin", 2);
+        getAlignment("Root", "Kin");
+        addNthNodeSelectionToAlignment(2);
 
         assertNotAlign("Root");
         assertNotAlign("Root", "Kin");
@@ -81,8 +81,8 @@ public class SlurpAlignmentFactoryTest {
 
     @Test
     public void given2ndChildOfRootCheckAlignmentReturnsTrueForEverySecondPathStartingWithRootHavingAnyAt2ndLevel() {
-        getAlignment("Root");
-        addNthNodeToAlignment("*", 2);
+        getAlignment("Root", "*");
+        addNthNodeSelectionToAlignment(2);
 
         assertNotAlign("Root");
         assertNotAlign("Root", "Child");
@@ -296,8 +296,8 @@ public class SlurpAlignmentFactoryTest {
     @Ignore
     @Test
     public void givenAll2ndNodesCheckAlignmentReturnsTrueForEverySecondNodeAtAnyDepth() {
-        getAlignment();
-        addNthNodeToAlignment("**", 2);
+        getAlignment("**");
+        addNthNodeSelectionToAlignment(2);
 
         assertNotAlign("Root");
         assertNotAlign("Root", "Child");
@@ -334,7 +334,7 @@ public class SlurpAlignmentFactoryTest {
         slurpAlignment = alignmentFactory.createAlignmentAndAddNodes(nodes);
     }
 
-    private void addNthNodeToAlignment(String qName, long nodeIndex) {
-        slurpAlignment = alignmentFactory.copyAlignmentAndAddNthNode(slurpAlignment, qName, nodeIndex);
+    private void addNthNodeSelectionToAlignment(long nodeIndex) {
+        slurpAlignment = alignmentFactory.copyAlignmentAndSelectNthNode(slurpAlignment, nodeIndex);
     }
 }

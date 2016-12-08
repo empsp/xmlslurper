@@ -210,8 +210,8 @@ public class DepthSlurpAlignmentTest {
 
     @Test
     public void givenAll2ndNodesCheckAlignmentReturnsTrueForEverySecondNodeAtAnyDepth() {
-        getAlignment();
-        addNthNodeToAlignment("**", 2);
+        getAlignment("**");
+        addNthNodeSelectionToAlignment(2);
 
         assertNotAlign("Root");
         assertNotAlign("Root", "Child");
@@ -257,7 +257,7 @@ public class DepthSlurpAlignmentTest {
         slurpAlignment = alignmentFactory.createAlignmentAndAddNodes(nodes);
     }
 
-    private void addNthNodeToAlignment(String qName, long nodeIndex) {
-        slurpAlignment = alignmentFactory.copyAlignmentAndAddNthNode(slurpAlignment, qName, nodeIndex);
+    private void addNthNodeSelectionToAlignment(long nodeIndex) {
+        slurpAlignment = alignmentFactory.copyAlignmentAndSelectNthNode(slurpAlignment, nodeIndex);
     }
 }

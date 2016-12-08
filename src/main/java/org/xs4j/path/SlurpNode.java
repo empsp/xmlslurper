@@ -10,7 +10,7 @@ public interface SlurpNode extends Slurp {
     SlurpNode node(@NotNull String qName);
 
     @NotNull
-    SlurpNode node(@NotNull String qName, long nodeIndex);
+    SlurpNode get(long nodeIndex);
 
     @NotNull
     SlurpAttribute attr(@NotNull String qName);
