@@ -7,6 +7,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xs4j.path.SlurpNode;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -36,6 +37,8 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private boolean isOnlyFindDataAvailable;
 
     SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier, NamespaceSensitiveElementParser elementParser) {
+        idFeed = 0L;
+
         this.saxParserFactory = saxParserFactory;
         this.nodeFactory = nodeFactory;
         this.slurpFactory = slurpFactory;
@@ -133,8 +136,20 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         private Map<String, String> parseAttributes(Attributes attributes) {
             Map<String, String> attributeByName = new HashMap<String, String>();
 
-            for (int index = 0; index < attributes.getLength(); index++)
-                attributeByName.put(attributes.getQName(index), attributes.getValue(index));
+            String uri;
+            String qName;
+            int prefixIndex;
+            String attrNamespace;
+            for (int index = 0; index < attributes.getLength(); index++) {
+                qName = attributes.getQName(index);
+                attributeByName.put(qName, attributes.getValue(index));
+
+                prefixIndex = qName.indexOf(NodeFactory.QNAME_SEPARATOR);
+                if (prefixIndex > 0) {
+                    attrNamespace = XMLConstants.XMLNS_ATTRIBUTE + NodeFactory.QNAME_SEPARATOR + qName.substring(0, prefixIndex);
+                    attributeByName.put(attrNamespace, attributes.getURI(index));
+                }
+            }
 
             return attributeByName;
         }

@@ -370,14 +370,14 @@ public class XMLSlurperIT {
         listener = mock(NodeListener.class);
 
         // when
-        getNodes("**", "other:OtherObject").findAll(listener, null);
+        getNodes("**", "other:OtherObject", "OtherObject").attr("other:attr2").findAll(listener, null);
         parser.parse(getResource("namespaceTestCase.xml"));
 
         // then
         Map<String, String> otherObjectAttrs = new HashMap<String, String>();
         otherObjectAttrs.put("xmlns:other", "http://other");
-        otherObjectAttrs.put("other:attr3", "123");
-        XMLNode otherObject = createNode(3L, "http://other", "other", "OtherObject", otherObjectAttrs);
+        otherObjectAttrs.put("other:attr2", "OTHER = 123,OTHER_OBJECT = 125");
+        XMLNode otherObject = createNode(3L, "http://general", null, "OtherObject", otherObjectAttrs);
 
         ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
         verify(listener).onNode(nodeCaptor.capture(), nodeCaptor.capture());
@@ -389,8 +389,10 @@ public class XMLSlurperIT {
         assertThat(actualOtherObject.getNamespace(), is(otherObject.getNamespace()));
         assertThat(actualOtherObject.getPrefix(), is(otherObject.getPrefix()));
         assertThat(actualOtherObject.getLocalName(), is(otherObject.getLocalName()));
-        assertThat(actualOtherObject.getQName(), CoreMatchers.is(otherObject.getPrefix() + NodeFactory.QNAME_SEPARATOR + otherObject.getLocalName()));
+        assertThat(actualOtherObject.getQName(), is(otherObject.getQName()));
         assertThat(actualOtherObject.getAttributes(), is(otherObject.getAttributes()));
+
+
     }
 
     @After

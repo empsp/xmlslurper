@@ -122,11 +122,11 @@ public final class XMLNodeImpl implements XMLNode {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        if (!(o instanceof XMLNode))
-            return false;
+        XMLNodeImpl xmlNode = (XMLNodeImpl) o;
 
-        return id == ((XMLNode)o).getId();
+        return id == xmlNode.id;
     }
 
     @Override
