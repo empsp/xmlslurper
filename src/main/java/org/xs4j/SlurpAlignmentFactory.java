@@ -160,21 +160,22 @@ final class SlurpAlignmentFactory {
 
         @Override
         boolean checkAlignment(Deque<XMLNode> descendants) {
+            Iterator<String> nameIter = namePath.iterator();
             Iterator<XMLNode> descIter = descendants.iterator();
             XMLNode descendant;
             String name;
 
-            for (int index = 0; index < namePath.size() && descIter.hasNext(); index++) {
-                name = namePath.get(index);
+            for (int index = 0; nameIter.hasNext() && descIter.hasNext(); index++) {
+                name = nameIter.next();
                 descendant = descIter.next();
 
                 if (name.equals(DEPTH_MARKER)) {
-                    if (index == namePath.size() - 1) // if ** was last in the path, then aligned
+                    if (!nameIter.hasNext()) // if descendants marker was last in the path, then aligned
                         return true;
                     else if (!descIter.hasNext()) // if descendant was last node and the path is not emptied yet, then not aligned
                         return false;
-
-                    return checkAlignmentTraversingBackwardsUntilIndex(descendants, index);
+                    else
+                        return checkDescendantsAlignmentTraversingBackwardsUntilIndex(descendants, index);
                 } else if ((!name.equals(descendant.getQName()) && !name.equals(SIBLING_MARKER)))
                     break;
             }
@@ -182,13 +183,13 @@ final class SlurpAlignmentFactory {
             return false;
         }
 
-        private boolean checkAlignmentTraversingBackwardsUntilIndex(Deque<XMLNode> descendants, int namePathForwardTraverseIndex) {
+        private boolean checkDescendantsAlignmentTraversingBackwardsUntilIndex(Deque<XMLNode> descendants, int namePathIndex) {
+            Iterator<XMLNode> descIter = descendants.descendingIterator();
             String name;
             XMLNode descendant;
             boolean isDescendantMode = false;
 
-            Iterator<XMLNode> descIter = descendants.descendingIterator();
-            for (int index = namePath.size() - 1; index > namePathForwardTraverseIndex && descIter.hasNext(); index--) { // the path still has an item but the descendants are emptied, then not aligned
+            for (int index = namePath.size() - 1; index > namePathIndex && descIter.hasNext(); index--) {
                 name = namePath.get(index);
                 descendant = descIter.next();
 
@@ -197,8 +198,8 @@ final class SlurpAlignmentFactory {
                         isDescendantMode = false;
                     } else if (name.equals(DEPTH_MARKER)) {
                         isDescendantMode = true;
-                        break;
-                    } else if (isDescendantMode) { // names don't match however ** was previously so traverse until found
+                        break; // descendants marker found yet move to another element on namePath
+                    } else if (isDescendantMode) { // names don't match however descendants marker was previously found so then traverse until match found
                         if (!descIter.hasNext()) // names eventually must match but here descendants run out, then not aligned
                             return false;
 
