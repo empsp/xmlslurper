@@ -69,13 +69,7 @@ Any time it is required to retrieve all children of the given element, a wildcar
 
 ##### Descendants search - double wildcard \*\*
 
-It is also possible to retrieve all elements being descendants of the given element with double wildcard (`**`) character.
-
-(Current)
-Using double wildcard with additional node name at the end of the path eg. '\*\*.Movie' will return all first nodes named 'Movie' found traversing path beginning from the root element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would not be shown.
-
-(Scheduled)
-Using double wildcard with additional node name at the end of the path eg. '\*\*.Movie' will return all nodes named 'Movie' found traversing path beginning from the root element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would be shown, as well.
+It is also possible to retrieve all elements being descendants of the given element with double wildcard (`**`) character. Using double wildcard with additional node name at the end of the path eg. '\*\*.Movie' will return all nodes named 'Movie' found traversing path beginning from the root element. Given the above example any 'Movie' element found underneath the parent 'Movie' element would be shown, as well.
 
 ### Examples
 
@@ -356,7 +350,7 @@ Using double wildcard with additional node name at the end of the path eg. '\*\*
 	
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-	xmlSlurper.getNodes("**", "fr:Franchise").node("Movie", 2).find(null, (franchise, movie) -> {
+	xmlSlurper.getNodes("**", "fr:Franchise", "Movie").get(2).find(null, (franchise, movie) -> {
 		// your code here
 	});
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
