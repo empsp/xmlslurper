@@ -136,7 +136,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         private Map<String, String> parseAttributes(Attributes attributes) {
             Map<String, String> attributeByName = new HashMap<String, String>();
 
-            String uri;
             String qName;
             int prefixIndex;
             String attrNamespace;
