@@ -1,5 +1,6 @@
 package org.xs4j;
 
+import javax.xml.XMLConstants;
 import java.util.Map;
 
 /**
@@ -7,6 +8,7 @@ import java.util.Map;
  */
 abstract class NodeFactory {
     static final String QNAME_SEPARATOR = ":";
+    static final String XMLNS_WITH_SEPARATOR = XMLConstants.XMLNS_ATTRIBUTE + QNAME_SEPARATOR;
 
     abstract XMLNode createNode(long id, String localName, Map<String, String> attributeByName);
 

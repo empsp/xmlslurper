@@ -128,14 +128,13 @@ public class StAXSlurper implements XMLSlurper {
 
                 if (!prefix.isEmpty()) {
                     attributeByName.put(prefix + NodeFactory.QNAME_SEPARATOR + parser.getAttributeLocalName(index), parser.getAttributeValue(index));
-                    attributeByName.put(XMLConstants.XMLNS_ATTRIBUTE + NodeFactory.QNAME_SEPARATOR + prefix, parser.getAttributeNamespace(index));
+                    attributeByName.put(NodeFactory.XMLNS_WITH_SEPARATOR + prefix, parser.getAttributeNamespace(index));
                 } else
                     attributeByName.put(parser.getAttributeLocalName(index), parser.getAttributeValue(index));
             }
 
-            String xmlns = XMLConstants.XMLNS_ATTRIBUTE + NodeFactory.QNAME_SEPARATOR;
             for(int index = 0; index < parser.getNamespaceCount(); index++)
-                attributeByName.put(xmlns + parser.getNamespacePrefix(index), parser.getNamespaceURI(index));
+                attributeByName.put(NodeFactory.XMLNS_WITH_SEPARATOR + parser.getNamespacePrefix(index), parser.getNamespaceURI(index));
 
             return attributeByName;
         }

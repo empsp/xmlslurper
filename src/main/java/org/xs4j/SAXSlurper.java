@@ -7,7 +7,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xs4j.path.SlurpNode;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -145,7 +144,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
                 prefixIndex = qName.indexOf(NodeFactory.QNAME_SEPARATOR);
                 if (prefixIndex > 0) {
-                    attrNamespace = XMLConstants.XMLNS_ATTRIBUTE + NodeFactory.QNAME_SEPARATOR + qName.substring(0, prefixIndex);
+                    attrNamespace = NodeFactory.XMLNS_WITH_SEPARATOR + qName.substring(0, prefixIndex);
                     attributeByName.put(attrNamespace, attributes.getURI(index));
                 }
             }
