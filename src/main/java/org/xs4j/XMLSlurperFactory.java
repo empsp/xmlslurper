@@ -6,14 +6,21 @@ import org.xs4j.NodeNotifier.FindData;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLInputFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.xs4j.util.NotNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/8/2016.
  */
 public class XMLSlurperFactory {
+    public enum ParserType {
+        STAX_PARSER, SAX_PARSER
+    }
+
     private static XMLSlurperFactory instance;
 
     public static XMLSlurperFactory getInstance() {
@@ -47,6 +54,37 @@ public class XMLSlurperFactory {
                 getSlurpFactory(findData, findAllData, slurpAlignmentFactory),
                 getNodeNotifier(findData, findAllData),
                 getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, nodeFactory));
+    }
+
+    public XMLSlurper createXMLSlurper(ParserType parserType) {
+        requireNonNull(parserType);
+
+        List<FindData> findData = new ArrayList<FindData>();
+        List<FindData> findAllData = new ArrayList<FindData>();
+
+        NodeFactory nodeFactory = getNodeFactory();
+        SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
+        SlurpFactory slurpFactory = getSlurpFactory(findData, findAllData, slurpAlignmentFactory);
+        NodeNotifier nodeNotifier = getNodeNotifier(findData, findAllData);
+
+        switch(parserType) {
+            case STAX_PARSER:
+                return new StAXSlurper(
+                        getXMLInputFactory(),
+                        nodeFactory,
+                        slurpFactory,
+                        nodeNotifier,
+                        getStAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, nodeFactory));
+            case SAX_PARSER:
+                return new SAXSlurper(
+                        getSaxParserFactory(isNamespaceAwarenessDisabled),
+                        nodeFactory,
+                        slurpFactory,
+                        nodeNotifier,
+                        getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, nodeFactory));
+        }
+
+        throw new IllegalArgumentException();
     }
 
     static NodeFactory getNodeFactory() {
@@ -102,10 +140,24 @@ public class XMLSlurperFactory {
         return saxParserFactory;
     }
 
+    static XMLInputFactory getXMLInputFactory() {
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
+
+        return xmlInputFactory;
+    }
+
     static NamespaceSensitiveElementParser getSAXNamespaceSensitiveElementParser(boolean isNamespaceAwarenessDisabled, NodeFactory nodeFactory) {
         if (isNamespaceAwarenessDisabled)
             return new SAXSlurper.SAXNamespaceBlindElementParser(nodeFactory);
         else
             return new SAXSlurper.SAXNamespaceAwareElementParser(nodeFactory);
+    }
+
+    static NamespaceSensitiveElementParser getStAXNamespaceSensitiveElementParser(boolean isNamespaceAwarenessDisabled, NodeFactory nodeFactory) {
+        if (isNamespaceAwarenessDisabled)
+            return new StAXSlurper.StAXNamespaceBlindElementParser(nodeFactory);
+        else
+            return new StAXSlurper.StAXNamespaceAwareElementParser(nodeFactory);
     }
 }
