@@ -120,11 +120,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     @Override
     public void characters(char ch[], int start, int length) throws SAXException {
         XMLNode lastNode = nodeNotifier.peekLastDescendant();
-
-        String text = new String(ch, start, length);
-        String lastText = lastNode.getText();
-
-        lastNode.setText(lastText == null ? text : lastText + text);
+        XMLNodeFactory.appendText(lastNode, ch, start, length);
     }
 
     @Override

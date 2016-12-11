@@ -30,4 +30,8 @@ public final class XMLNodeFactory {
     public XMLNode createNode(long id, String namespace, String prefix, String localName, Map<String, String> attributeByName) {
         return new XMLNodeImpl(id, namespace, prefix, localName, attributeByName);
     }
+
+    static void appendText(XMLNode node, char[] ch, int start, int length) {
+        ((XMLNodeImpl)node).appendText(ch, start, length);
+    }
 }

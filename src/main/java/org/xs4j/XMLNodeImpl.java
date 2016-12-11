@@ -3,6 +3,7 @@ package org.xs4j;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,13 +13,16 @@ import static org.xs4j.util.NotNullValidator.requireNonNull;
  * Created by mturski on 11/9/2016.
  */
 public final class XMLNodeImpl implements XMLNode {
+    public static final int DEFAULT_SIZE = 16;
+
     private final long id;
 
     private String namespace;
     private String prefix;
     private String localName;
 
-    private String text;
+    private int charactersSize = 0;
+    private char[] characters = new char[DEFAULT_SIZE];
 
     private Map<String, String> attributeByQName;
 
@@ -70,19 +74,21 @@ public final class XMLNodeImpl implements XMLNode {
         return prefix != null ? prefix + XMLNodeFactory.QNAME_SEPARATOR + localName : localName;
     }
 
-    @Override
     public String getText() {
-        return text;
+        if (charactersSize > 0)
+            return new String(characters, 0, charactersSize);
+        else
+            return null;
     }
 
-    @Override
     public void setText(@Nullable String text) {
-        this.text = text;
+        this.characters = text.toCharArray();
+        this.charactersSize = characters.length;
     }
 
     @Override
     public Map<String, String> getAttributes() {
-        return attributeByQName;
+        return new HashMap<String, String>(attributeByQName);
     }
 
     @Override
@@ -117,11 +123,11 @@ public final class XMLNodeImpl implements XMLNode {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
 
-        XMLNodeImpl xmlNode = (XMLNodeImpl) o;
+        if (!(o instanceof XMLNode))
+            return false;
 
-        return id == xmlNode.id;
+        return id == ((XMLNode)o).getId();
     }
 
     @Override
@@ -136,8 +142,20 @@ public final class XMLNodeImpl implements XMLNode {
                 ", namespace='" + namespace + '\'' +
                 ", prefix='" + prefix + '\'' +
                 ", localName='" + localName + '\'' +
-                ", text='" + text + '\'' +
+                ", text='" + getText() + '\'' +
                 ", attributeByQName=" + attributeByQName +
                 '}';
+    }
+
+
+    void appendText(char[] ch, int start, int length) {
+        int lenAfterConcat = charactersSize + length;
+        int extLength = characters.length << 1;
+
+        if (lenAfterConcat > characters.length - 1)
+            characters = Arrays.copyOf(characters, extLength < lenAfterConcat ? lenAfterConcat << 1 : extLength );
+
+        System.arraycopy(ch, start, characters, charactersSize, length);
+        charactersSize += length;
     }
 }
