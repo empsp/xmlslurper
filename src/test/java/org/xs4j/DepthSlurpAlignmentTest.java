@@ -1,7 +1,6 @@
 package org.xs4j;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayDeque;
@@ -19,7 +18,7 @@ public class DepthSlurpAlignmentTest {
     private static long idFeed;
 
     private static final SlurpAlignmentFactory alignmentFactory = XMLSlurperFactory.getSlurpAlignmentFactory();
-    private static final NodeFactory nodeFactory = XMLSlurperFactory.getNodeFactory();
+    private static final XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
 
     private SlurpAlignment slurpAlignment;
 
@@ -248,7 +247,7 @@ public class DepthSlurpAlignmentTest {
         Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
 
         for (String node : nodes)
-            descendants.addLast(nodeFactory.createNode(idFeed++, node, Collections.<String, String> emptyMap()));
+            descendants.addLast(xmlNodeFactory.createNode(idFeed++, node, Collections.<String, String> emptyMap()));
 
         return descendants;
     }

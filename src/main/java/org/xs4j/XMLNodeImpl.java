@@ -22,15 +22,10 @@ public final class XMLNodeImpl implements XMLNode {
 
     private Map<String, String> attributeByQName;
 
-    XMLNodeImpl(long id, String localName, Map<String, String> attributeByQName) {
+    XMLNodeImpl(long id, String namespace, String prefix, String localName, Map<String, String> attributeByQName) {
         this.id = id;
         this.localName = requireNonNull(localName);
         this.attributeByQName = requireNonNull(attributeByQName);
-    }
-
-    XMLNodeImpl(long id, String namespace, String prefix, String localName, Map<String, String> attributeByQName) {
-        this(id, localName, attributeByQName);
-
         this.namespace = namespace;
         this.prefix = prefix;
     }
@@ -72,7 +67,7 @@ public final class XMLNodeImpl implements XMLNode {
 
     @Override
     public String getQName() {
-        return prefix != null ? prefix + NodeFactory.QNAME_SEPARATOR + localName : localName;
+        return prefix != null ? prefix + XMLNodeFactory.QNAME_SEPARATOR + localName : localName;
     }
 
     @Override

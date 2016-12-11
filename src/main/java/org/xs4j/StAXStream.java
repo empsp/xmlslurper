@@ -56,7 +56,7 @@ public class StAXStream implements XMLStream {
         for (Map.Entry<String, String> entry : node.getAttributes().entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
-            int separatorIndex = name.indexOf(NodeFactory.QNAME_SEPARATOR);
+            int separatorIndex = name.indexOf(XMLNodeFactory.QNAME_SEPARATOR);
 
             if (name.startsWith(XMLConstants.XMLNS_ATTRIBUTE))
                 if (separatorIndex > 0)

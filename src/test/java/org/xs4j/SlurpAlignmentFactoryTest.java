@@ -17,7 +17,7 @@ public class SlurpAlignmentFactoryTest {
     private static long idFeed;
 
     private static final SlurpAlignmentFactory alignmentFactory = XMLSlurperFactory.getSlurpAlignmentFactory();
-    private static final NodeFactory nodeFactory = XMLSlurperFactory.getNodeFactory();
+    private static final XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
 
     private SlurpAlignment slurpAlignment;
 
@@ -319,13 +319,13 @@ public class SlurpAlignmentFactoryTest {
     }
 
     private void assertAlign(String... nodes) {
-        XMLNode lastNode = nodeFactory.createNode(idFeed++, nodes[nodes.length - 1], Collections.<String, String> emptyMap());
+        XMLNode lastNode = xmlNodeFactory.createNode(idFeed++, nodes[nodes.length - 1], Collections.<String, String> emptyMap());
 
         assertThat(slurpAlignment.checkAlignment(nodes.length, lastNode), is(true));
     }
 
     private void assertNotAlign(String... nodes) {
-        XMLNode lastNode = nodeFactory.createNode(idFeed++, nodes[nodes.length - 1], Collections.<String, String> emptyMap());
+        XMLNode lastNode = xmlNodeFactory.createNode(idFeed++, nodes[nodes.length - 1], Collections.<String, String> emptyMap());
 
         assertThat(slurpAlignment.checkAlignment(nodes.length, lastNode), is(false));
     }

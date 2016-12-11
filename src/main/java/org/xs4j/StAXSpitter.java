@@ -24,7 +24,7 @@ public class StAXSpitter implements XMLSpitter {
     @Override
     public XMLStream write(OutputStream outputStream) {
         try {
-            return doSputter(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
+            return doWrite(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
@@ -33,7 +33,7 @@ public class StAXSpitter implements XMLSpitter {
     @Override
     public XMLStream write(OutputStream outputStream, String version) {
         try {
-            return doSputter(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, version);
+            return doWrite(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, version);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
@@ -42,13 +42,13 @@ public class StAXSpitter implements XMLSpitter {
     @Override
     public XMLStream write(OutputStream outputStream, String version, String encoding) {
         try {
-            return doSputter(outputStream, encoding, version);
+            return doWrite(outputStream, encoding, version);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
     }
 
-    private XMLStream doSputter(OutputStream outputStream, String encoding, String version) throws XMLStreamException {
+    private XMLStream doWrite(OutputStream outputStream, String encoding, String version) throws XMLStreamException {
         XMLStreamWriter writer = xmlOutputFactory.createXMLStreamWriter(outputStream);
         writer.writeStartDocument(encoding, version);
 

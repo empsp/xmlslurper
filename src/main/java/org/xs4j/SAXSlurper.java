@@ -120,11 +120,11 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     @Override
     public void characters(char ch[], int start, int length) throws SAXException {
         XMLNode lastNode = nodeNotifier.peekLastDescendant();
+
         String text = new String(ch, start, length);
-        if (text != null) {
-            String lastText = lastNode.getText();
-            lastNode.setText(lastText == null ? text : lastText + text);
-        }
+        String lastText = lastNode.getText();
+
+        lastNode.setText(lastText == null ? text : lastText + text);
     }
 
     @Override
@@ -159,16 +159,16 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     static class SAXNamespaceAwareElementParser extends NamespaceSensitiveElementParser {
-        private final NodeFactory nodeFactory;
+        private final XMLNodeFactory xmlNodeFactory;
 
-        SAXNamespaceAwareElementParser(NodeFactory nodeFactory) {
-            this.nodeFactory = nodeFactory;
+        SAXNamespaceAwareElementParser(XMLNodeFactory xmlNodeFactory) {
+            this.xmlNodeFactory = xmlNodeFactory;
         }
 
         @Override
         XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes) {
-            int qNameSeparatorIndex = qName.indexOf(NodeFactory.QNAME_SEPARATOR);
-            return nodeFactory.createNode(
+            int qNameSeparatorIndex = qName.indexOf(XMLNodeFactory.QNAME_SEPARATOR);
+            return xmlNodeFactory.createNode(
                     idFeed++,
                     uri.isEmpty() ? null : uri,
                     qNameSeparatorIndex >= 0 ? qName.substring(0, qNameSeparatorIndex) : null,
@@ -186,9 +186,9 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
                 qName = attributes.getQName(index);
                 attributeByName.put(qName, attributes.getValue(index));
 
-                prefixIndex = qName.indexOf(NodeFactory.QNAME_SEPARATOR);
+                prefixIndex = qName.indexOf(XMLNodeFactory.QNAME_SEPARATOR);
                 if (prefixIndex > 0) {
-                    attrNamespace = NodeFactory.XMLNS_WITH_SEPARATOR + qName.substring(0, prefixIndex);
+                    attrNamespace = XMLNodeFactory.XMLNS_WITH_SEPARATOR + qName.substring(0, prefixIndex);
                     attributeByName.put(attrNamespace, attributes.getURI(index));
                 }
             }
@@ -198,15 +198,15 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     static class SAXNamespaceBlindElementParser extends NamespaceSensitiveElementParser {
-        private final NodeFactory nodeFactory;
+        private final XMLNodeFactory xmlNodeFactory;
 
-        SAXNamespaceBlindElementParser(NodeFactory nodeFactory) {
-            this.nodeFactory = nodeFactory;
+        SAXNamespaceBlindElementParser(XMLNodeFactory xmlNodeFactory) {
+            this.xmlNodeFactory = xmlNodeFactory;
         }
 
         @Override
         XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes) {
-            return nodeFactory.createNode(idFeed++, localName, parseAttributes(attributes));
+            return xmlNodeFactory.createNode(idFeed++, localName, parseAttributes(attributes));
         }
 
         private Map<String, String> parseAttributes(Attributes attributes) {

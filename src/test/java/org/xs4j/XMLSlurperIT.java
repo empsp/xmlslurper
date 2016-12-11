@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
  * Created by mturski on 11/10/2016.
  */
 public class XMLSlurperIT {
-    private static final NodeFactory nodeFactory = XMLSlurperFactory.getNodeFactory();
+    private static final XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
 
     private XMLSlurper parser = XMLSlurperFactory.getInstance().createXMLSlurper();
     private NodeListener listener;
@@ -460,10 +460,10 @@ public class XMLSlurperIT {
     }
 
     private XMLNode createNode(long id, String localName) {
-        return nodeFactory.createNode(id, localName, Collections.<String, String> emptyMap());
+        return xmlNodeFactory.createNode(id, localName, Collections.<String, String> emptyMap());
     }
 
     private XMLNode createNode(long id, String namespace, String prefix, String localName, Map<String, String> attributeByQName) {
-        return nodeFactory.createNode(id, namespace, prefix, localName, attributeByQName);
+        return xmlNodeFactory.createNode(id, namespace, prefix, localName, attributeByQName);
     }
 }

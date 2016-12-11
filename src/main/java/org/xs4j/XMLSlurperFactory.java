@@ -10,7 +10,6 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.SchemaFactory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by mturski on 11/8/2016.
@@ -40,7 +39,7 @@ public class XMLSlurperFactory {
         List<FindData> findData = new ArrayList<FindData>();
         List<FindData> findAllData = new ArrayList<FindData>();
 
-        NodeFactory nodeFactory = getNodeFactory();
+        XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
 
         return new SAXSlurper(
@@ -48,21 +47,7 @@ public class XMLSlurperFactory {
                 getSchemaFactory(),
                 getSlurpFactory(findData, findAllData, slurpAlignmentFactory),
                 getNodeNotifier(findData, findAllData),
-                getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, nodeFactory));
-    }
-
-    static NodeFactory getNodeFactory() {
-        return new NodeFactory() {
-            @Override
-            XMLNode createNode(long id, String localName, Map<String, String> attributeByName) {
-                return new XMLNodeImpl(id, localName, attributeByName);
-            }
-
-            @Override
-            XMLNode createNode(long id, String namespace, String prefix, String localName, Map<String, String> attributeByName) {
-                return new XMLNodeImpl(id, namespace, prefix, localName, attributeByName);
-            }
-        };
+                getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, xmlNodeFactory));
     }
 
     static NodeNotifier getNodeNotifier(List<FindData> findData,
@@ -109,10 +94,10 @@ public class XMLSlurperFactory {
                 .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     }
 
-    static NamespaceSensitiveElementParser getSAXNamespaceSensitiveElementParser(boolean isNamespaceAwarenessDisabled, NodeFactory nodeFactory) {
+    static NamespaceSensitiveElementParser getSAXNamespaceSensitiveElementParser(boolean isNamespaceAwarenessDisabled, XMLNodeFactory xmlNodeFactory) {
         if (isNamespaceAwarenessDisabled)
-            return new SAXSlurper.SAXNamespaceBlindElementParser(nodeFactory);
+            return new SAXSlurper.SAXNamespaceBlindElementParser(xmlNodeFactory);
         else
-            return new SAXSlurper.SAXNamespaceAwareElementParser(nodeFactory);
+            return new SAXSlurper.SAXNamespaceAwareElementParser(xmlNodeFactory);
     }
 }

@@ -18,7 +18,7 @@ import static org.xs4j.XMLSlurperFactory.*;
  * Created by mturski on 12/5/2016.
  */
 public class SAXSlurperIT {
-    private static final NodeFactory nodeFactory = XMLSlurperFactory.getNodeFactory();
+    private static final XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
 
     private XMLSlurper slurper;
 
@@ -89,7 +89,7 @@ public class SAXSlurperIT {
     }
 
     private XMLNode createNode(long id, String name) {
-        return nodeFactory.createNode(id, name, Collections.<String, String> emptyMap());
+        return xmlNodeFactory.createNode(id, name, Collections.<String, String> emptyMap());
     }
 
     private InputStream getResource(String resourceName) {
@@ -102,13 +102,13 @@ public class SAXSlurperIT {
 
         NodeNotifier nodeNotifier = spy(getNodeNotifier(findData, findAllData));
 
-        NodeFactory nodeFactory = getNodeFactory();
+        XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
         slurper = new SAXSlurper(
                 getSaxParserFactory(true),
                 getSchemaFactory(),
                 getSlurpFactory(findData, findAllData, getSlurpAlignmentFactory()),
                 nodeNotifier,
-                getSAXNamespaceSensitiveElementParser(false, nodeFactory));
+                getSAXNamespaceSensitiveElementParser(false, xmlNodeFactory));
 
         return nodeNotifier;
     }
