@@ -2,7 +2,6 @@ package org.xs4j;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -11,6 +10,7 @@ import org.xs4j.listener.NodeListener;
 import org.xs4j.path.Slurp;
 import org.xs4j.path.SlurpNode;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +30,6 @@ public class XMLSlurperIT {
 
     private XMLSlurper parser = XMLSlurperFactory.getInstance().createXMLSlurper();
     private NodeListener listener;
-
 
     @Test
     public void givenInitialSlurpNodeFindAllReturnsAllNodesInOrder() throws Exception {
@@ -391,8 +390,46 @@ public class XMLSlurperIT {
         assertThat(actualOtherObject.getLocalName(), is(otherObject.getLocalName()));
         assertThat(actualOtherObject.getQName(), is(otherObject.getQName()));
         assertThat(actualOtherObject.getAttributes(), is(otherObject.getAttributes()));
+    }
 
+    @Test
+    public void givenSchemaIgnorableCharactersAreNotPartOfTheText() throws Exception {
+        // given
+        listener = mock(NodeListener.class);
 
+        // when
+        getNodes("ObjectTree", "Object").findAll(null, listener);
+        parser.parse(getResource("borderTestCase.xml"), getResourceAsFile("borderTestCaseSchema.xsd"));
+
+        // then
+        ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
+        verify(listener).onNode(nodeCaptor.capture(), nodeCaptor.capture());
+        verifyNoMoreInteractions(listener);
+
+        List<XMLNode> actualNodes = nodeCaptor.getAllValues();
+        XMLNode actualOtherObject = actualNodes.get(1);
+
+        assertNull(actualOtherObject.getText());
+    }
+
+    @Test
+    public void givenSchemaSignificantCharactersArePartOfTheText() throws Exception {
+        // given
+        listener = mock(NodeListener.class);
+
+        // when
+        getNodes("ObjectTree", "OtherObject").findAll(null, listener);
+        parser.parse(getResource("borderTestCase.xml"), getResourceAsFile("borderTestCaseSchema.xsd"));
+
+        // then
+        ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
+        verify(listener).onNode(nodeCaptor.capture(), nodeCaptor.capture());
+        verifyNoMoreInteractions(listener);
+
+        List<XMLNode> actualNodes = nodeCaptor.getAllValues();
+        XMLNode actualOtherObject = actualNodes.get(1);
+
+        assertThat(actualOtherObject.getText(), is("\n        \n        \n    "));
     }
 
     @After
@@ -402,6 +439,10 @@ public class XMLSlurperIT {
 
     private InputStream getResource(String resourceName) {
         return getClass().getResourceAsStream(resourceName);
+    }
+
+    private File getResourceAsFile(String resourceName) {
+        return new File(getClass().getResource(resourceName).getPath());
     }
 
     private SlurpNode getNodes(String... nodePath) {

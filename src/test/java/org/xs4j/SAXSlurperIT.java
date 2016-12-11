@@ -105,7 +105,7 @@ public class SAXSlurperIT {
         NodeFactory nodeFactory = getNodeFactory();
         slurper = new SAXSlurper(
                 getSaxParserFactory(true),
-                nodeFactory,
+                getSchemaFactory(),
                 getSlurpFactory(findData, findAllData, getSlurpAlignmentFactory()),
                 nodeNotifier,
                 getSAXNamespaceSensitiveElementParser(false, nodeFactory));

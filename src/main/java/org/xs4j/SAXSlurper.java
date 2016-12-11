@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xs4j.path.SlurpNode;
 
@@ -11,6 +12,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -25,7 +29,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private static long idFeed;
 
     private final SAXParserFactory saxParserFactory;
-    private final NodeFactory nodeFactory;
+    private final SchemaFactory schemaFactory;
     private final SlurpFactory slurpFactory;
     private final NodeNotifier nodeNotifier;
     private final NamespaceSensitiveElementParser elementParser;
@@ -35,11 +39,15 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
     private boolean isOnlyFindDataAvailable;
 
-    SAXSlurper(SAXParserFactory saxParserFactory, NodeFactory nodeFactory, SlurpFactory slurpFactory, NodeNotifier nodeNotifier, NamespaceSensitiveElementParser elementParser) {
+    SAXSlurper(SAXParserFactory saxParserFactory,
+               SchemaFactory schemaFactory,
+               SlurpFactory slurpFactory,
+               NodeNotifier nodeNotifier,
+               NamespaceSensitiveElementParser elementParser) {
         idFeed = 0L;
 
         this.saxParserFactory = saxParserFactory;
-        this.nodeFactory = nodeFactory;
+        this.schemaFactory = schemaFactory;
         this.slurpFactory = slurpFactory;
         this.nodeNotifier = nodeNotifier;
         this.elementParser = elementParser;
@@ -59,6 +67,35 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         this.inputStream = inputStream;
         try {
             parser = saxParserFactory.newSAXParser();
+            saxParserFactory.setValidating(false);
+            parser.parse(inputStream, this);
+        } catch (ParserConfigurationException e) {
+            throw e;
+        } catch (ParsingTerminationException e) {
+            // do not rethrow
+        } catch (SAXException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            close();
+        }
+    }
+
+    @Override
+    public void parse(@NotNull InputStream inputStream, @NotNull File schemaFile) throws ParserConfigurationException, SAXException, IOException, XMLStreamException {
+        requireNonNull(inputStream);
+        requireNonNull(schemaFile);
+
+        isOnlyFindDataAvailable = nodeNotifier.isOnlyFindDataAvailable();
+
+        this.inputStream = inputStream;
+        try {
+            Schema schema = schemaFactory.newSchema(schemaFile);
+            saxParserFactory.setSchema(schema);
+
+            parser = saxParserFactory.newSAXParser();
+            saxParserFactory.setValidating(true);
             parser.parse(inputStream, this);
         } catch (ParserConfigurationException e) {
             throw e;
@@ -97,6 +134,11 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         terminateParsingIfPossible();
     }
 
+    @Override
+    public void error(SAXParseException e) throws SAXException {
+        throw e;
+    }
+
     private void terminateParsingIfPossible() throws SAXException {
         if (isOnlyFindDataAvailable && nodeNotifier.isFindDataEmpty())
             throw new ParsingTerminationException();
@@ -117,8 +159,10 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     static class SAXNamespaceAwareElementParser extends NamespaceSensitiveElementParser {
+        private final NodeFactory nodeFactory;
+
         SAXNamespaceAwareElementParser(NodeFactory nodeFactory) {
-            super(nodeFactory);
+            this.nodeFactory = nodeFactory;
         }
 
         @Override
@@ -154,8 +198,10 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     static class SAXNamespaceBlindElementParser extends NamespaceSensitiveElementParser {
+        private final NodeFactory nodeFactory;
+
         SAXNamespaceBlindElementParser(NodeFactory nodeFactory) {
-            super(nodeFactory);
+            this.nodeFactory = nodeFactory;
         }
 
         @Override
