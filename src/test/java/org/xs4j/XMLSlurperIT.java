@@ -10,9 +10,6 @@ import org.xs4j.listener.NodeListener;
 import org.xs4j.path.Slurp;
 import org.xs4j.path.SlurpNode;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,14 +18,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
+import static org.xs4j.TestUtil.*;
 
 /**
  * Created by mturski on 11/10/2016.
  */
 public class XMLSlurperIT {
-    private static final XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
-
     private XMLSlurper parser = XMLSlurperFactory.getInstance().createXMLSlurper();
+
     private NodeListener listener;
 
     @Test
@@ -144,7 +141,7 @@ public class XMLSlurperIT {
         objectSlurpNode.findAll(objectListener);
         objectSlurpNode.node("OtherObject").findAll(otherObjectListener);
 
-        parser.parse(getResource("borderTestCase.xml"));
+        parser.parse(getResource(this, "borderTestCase.xml"));
 
         // then
         XMLNode root = createNode(0L, "ObjectTree");
@@ -176,7 +173,7 @@ public class XMLSlurperIT {
 
         // when
         getNodes().node("**").node("Object").findAll(listener, null);
-        parser.parse(getResource("simpleTestCase.xml"));
+        parser.parse(getResource(this, "simpleTestCase.xml"));
 
         // then
         verify(listener).onNode(any(XMLNode.class), any(XMLNode.class));
@@ -201,7 +198,7 @@ public class XMLSlurperIT {
 
         // when
         getNodes().node("**").node("Object").findAll(null, listener);
-        parser.parse(getResource("simpleTestCase.xml"));
+        parser.parse(getResource(this, "simpleTestCase.xml"));
 
         // then
         verify(listener).onNode(any(XMLNode.class), any(XMLNode.class));
@@ -370,7 +367,7 @@ public class XMLSlurperIT {
 
         // when
         getNodes("**", "other:OtherObject", "OtherObject").attr("other:attr2").findAll(listener, null);
-        parser.parse(getResource("namespaceTestCase.xml"));
+        parser.parse(getResource(this, "namespaceTestCase.xml"));
 
         // then
         Map<String, String> otherObjectAttrs = new HashMap<String, String>();
@@ -399,7 +396,7 @@ public class XMLSlurperIT {
 
         // when
         getNodes("ObjectTree", "Object").findAll(null, listener);
-        parser.parse(getResource("borderTestCase.xml"), getResourceAsFile("borderTestCaseSchema.xsd"));
+        parser.parse(getResource(this, "borderTestCase.xml"), getResourceAsFile(this, "borderTestCaseSchema.xsd"));
 
         // then
         ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
@@ -419,7 +416,7 @@ public class XMLSlurperIT {
 
         // when
         getNodes("ObjectTree", "OtherObject").findAll(null, listener);
-        parser.parse(getResource("borderTestCase.xml"), getResourceAsFile("borderTestCaseSchema.xsd"));
+        parser.parse(getResource(this, "borderTestCase.xml"), getResourceAsFile(this, "borderTestCaseSchema.xsd"));
 
         // then
         ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
@@ -437,14 +434,6 @@ public class XMLSlurperIT {
         listener = null;
     }
 
-    private InputStream getResource(String resourceName) {
-        return getClass().getResourceAsStream(resourceName);
-    }
-
-    private File getResourceAsFile(String resourceName) {
-        return new File(getClass().getResource(resourceName).getPath());
-    }
-
     private SlurpNode getNodes(String... nodePath) {
         return parser.getNodes(nodePath);
     }
@@ -456,14 +445,6 @@ public class XMLSlurperIT {
     private void parse(String resourcePath, Slurp slurp) throws Exception {
         slurp.findAll(listener);
 
-        parser.parse(getResource(resourcePath));
-    }
-
-    private XMLNode createNode(long id, String localName) {
-        return xmlNodeFactory.createNode(id, localName, Collections.<String, String> emptyMap());
-    }
-
-    private XMLNode createNode(long id, String namespace, String prefix, String localName, Map<String, String> attributeByQName) {
-        return xmlNodeFactory.createNode(id, namespace, prefix, localName, attributeByQName);
+        parser.parse(getResource(this, resourcePath));
     }
 }

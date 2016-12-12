@@ -8,18 +8,17 @@ import org.xs4j.listener.NodeListener;
 import javax.xml.stream.XMLStreamException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static org.xs4j.TestUtil.createNode;
+import static org.xs4j.TestUtil.getResource;
 import static org.xs4j.XMLSlurperFactory.*;
 
 /**
  * Created by mturski on 12/5/2016.
  */
 public class SAXSlurperIT {
-    private static final XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
-
     private XMLSlurper slurper;
 
     @Test
@@ -30,7 +29,7 @@ public class SAXSlurperIT {
 
         // when
         slurper.getNodes().find(listener);
-        slurper.parse(getResource("simpleTestCase.xml"));
+        slurper.parse(getResource(this, "simpleTestCase.xml"));
 
         // then
         XMLNode root = createNode(0L, "ObjectTree");
@@ -47,7 +46,7 @@ public class SAXSlurperIT {
 
         // when
         slurper.getNodes().find(listener, null);
-        slurper.parse(getResource("simpleTestCase.xml"));
+        slurper.parse(getResource(this, "simpleTestCase.xml"));
 
         // then
         XMLNode root = createNode(0L, "ObjectTree");
@@ -68,7 +67,7 @@ public class SAXSlurperIT {
 
         // when
         slurper.getNodes().node("ObjectTree").node("Object").find(null, listener);
-        slurper.parse(getResource("simpleTestCase.xml"));
+        slurper.parse(getResource(this, "simpleTestCase.xml"));
 
         // then
         XMLNode root = createNode(0L, "ObjectTree");
@@ -86,14 +85,6 @@ public class SAXSlurperIT {
     @After
     public void teardown() {
         slurper = null;
-    }
-
-    private XMLNode createNode(long id, String name) {
-        return xmlNodeFactory.createNode(id, name, Collections.<String, String> emptyMap());
-    }
-
-    private InputStream getResource(String resourceName) {
-        return getClass().getResourceAsStream(resourceName);
     }
 
     private NodeNotifier createSlurperWithSpyNodeNotifier() throws XMLStreamException {
