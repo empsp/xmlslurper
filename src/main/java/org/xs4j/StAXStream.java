@@ -58,16 +58,15 @@ public class StAXStream implements XMLStream {
             String value = entry.getValue();
             int separatorIndex = name.indexOf(XMLNodeFactory.QNAME_SEPARATOR);
 
-            if (name.startsWith(XMLConstants.XMLNS_ATTRIBUTE))
+            if (name.startsWith(XMLConstants.XMLNS_ATTRIBUTE)) {
                 if (separatorIndex > 0)
                     writer.writeNamespace(name.substring(separatorIndex), value);
                 else
                     writer.writeDefaultNamespace(value);
-            else if (separatorIndex > 0) {
+            } else if (separatorIndex > 0) {
                 writer.writeAttribute(name.substring(0, separatorIndex), "", name.substring(separatorIndex), value);
-            } else {
+            } else
                 writer.writeAttribute(name, value);
-            }
         }
     }
 
