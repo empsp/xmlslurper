@@ -66,8 +66,9 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
         this.inputStream = inputStream;
         try {
+            saxParserFactory.setSchema(null);
+
             parser = saxParserFactory.newSAXParser();
-            saxParserFactory.setValidating(false);
             parser.parse(inputStream, this);
         } catch (ParserConfigurationException e) {
             throw e;
@@ -95,7 +96,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
             saxParserFactory.setSchema(schema);
 
             parser = saxParserFactory.newSAXParser();
-            saxParserFactory.setValidating(true);
             parser.parse(inputStream, this);
         } catch (ParserConfigurationException e) {
             throw e;
