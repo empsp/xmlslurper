@@ -428,15 +428,17 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	```java
 	XMLSpitter xmlSpitter = XMLSpitterFactory.getInstance().createXMLSpitter();
-    Deque<XMLStream> streams = new ArrayDeque<XMLStream>();
-
-    XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-    xmlSlurper.getNodes("**", "Movie").findAll((parent, movie) -> {
-		try (FileOutputStream fos = new FileOutputStream("movie" + movie.getId() + ".xml")) {
-			XMLStream stream = xmlSpitter.write(fos, "1.0", "UTF-8");
+	Deque<XMLStream> streams = new ArrayDeque<XMLStream>();
+	
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
+	xmlSlurper.getNodes("**", "Movie").findAll((parent, movie) -> {
+		try {
+			XMLStream stream = xmlSpitter.write(new FileOutputStream("movie" + movie.getId() + ".xml"), "1.0", "UTF-8");
 			stream.writeStartElement(node);
 
 			streams.addLast(stream);
+		} catch (FileNotFoundException e) {
+			// handle IO related exception
 		}
 	}, (parent, movie) -> {
 		XMLStream stream = streams.removeLast();
@@ -473,3 +475,44 @@ It is also possible to retrieve all elements being descendants of the given elem
 	```
 	
 	Namespace related information is written automatically. Formatting information is absent, it is up to the developer to include formatting code to the XML document generator/splitter.
+	
+	If the aim is for a simple split of XML document like the one above, a compact version can be used to achieve the same goal with additional auto formatting being done.
+	
+	```java
+	XMLSpitterFactory xmlSpitterFactory = XMLSpitterFactory.getInstance();
+	XMLSpitter xmlSpitter = xmlSpitterFactory.createXMLSpitter();
+	OutputStreamSupplier osSupplier = xmlSpitterFactory.createOutputStreamSupplier();
+    	
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
+	SlurpNode movieNode = xmlSlurper.getNodes("**", "Movie");
+	movieNode.findAll((parent, movie) -> {
+		try {
+			osSupplier.set(new FileOutputStream("Movie" + movie.getId() + ".xml"));
+		} catch (FileNotFoundException e) {
+			// handle IO related exception
+		}
+	});
+	xmlSpitter.splitAll(movieNode, movieNode.node("**"), osSupplier);
+	
+	try {
+		xmlSlurper.parse(new FileInputStream("samplefile.xml"), new File("samplefileSchema.xsd"));
+	} catch (ParserConfigurationException | SAXException | IOException e) {
+		// handle XMLSlurper related exceptions
+	} catch (XMLStreamRuntimeException e) {
+		// handle XMLStream related exception
+	}
+	```
+	
+	Output of one of the generated 'Movie' XML documents is as follows:
+	
+	movie1.xml:
+	
+	```xml
+	<?xml version="1.0" encoding="UTF-8"?>
+	<Movie xmlns="http://movieDb" title="Titanic" director="James Cameron">
+		<Cast>
+			<LeadActor>Leonardo DiCaprio</LeadActor>
+			<LeadActress>Kate Winslet</LeadActress>
+		</Cast>
+	</Movie>
+	```
