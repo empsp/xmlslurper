@@ -441,8 +441,7 @@ A convenient API for writing XML documents using `XMLNode` objects which can be 
 		XMLStream stream = streams.removeLast();
 
 		stream.writeEndElement();
-		stream.flush();
-		stream.close();
+		stream.close(); // flushing occurs also upon closing
 	});
 
 	xmlSlurper.getNodes("**", "Movie", "**").findAll((movie, node) -> streams.peekLast().writeStartElement(node), (movie, node) -> {
@@ -450,6 +449,7 @@ A convenient API for writing XML documents using `XMLNode` objects which can be 
 
 		stream.writeCharacters(node.getText());
 		stream.writeEndElement();
+		stream.flush();
 	});
 
 	try {

@@ -5,6 +5,7 @@ import com.sun.istack.Nullable;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xml.sax.SAXException;
+import org.xs4j.XMLSpitter.OutputStreamSupplier;
 import org.xs4j.listener.NodeListener;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -121,6 +122,32 @@ public class XMLSpitterIT {
 
         String actualXML = getXMLData(streamCaptor.getAllValues());
         String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Object xmlns=\"http://general\" attr2=\"E=1\" attr1=\"SOMEOBJ\"><OtherObject attr1=\"OTHEROBJ\"></OtherObject></Object>";
+        assertThat(actualXML, is(expectedXML));
+    }
+
+    @Test
+    public void givenInputXMLWithSchemaExtractWithFormattingIntoNewXML() throws Exception {
+        // given
+        final OutputStream outputStream = mock(OutputStream.class);
+        OutputStreamSupplier osSupplier = new OutputStreamSupplier() {
+            @Override
+            public OutputStream supply() {
+                return outputStream;
+            }
+        };
+
+        // when
+        xmlSpitter.write(xmlSlurper.getNodes("**", "Object"), xmlSlurper.getNodes("**", "Object", "**"), osSupplier, "1.0", "UTF-8");
+        xmlSlurper.parse(getResource(this, "namespaceTestCase.xml"), getResourceAsFile(this, "namespaceTestCaseSchema.xsd"));
+
+        // then
+        ArgumentCaptor<Integer> streamCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(outputStream, atLeastOnce()).write(streamCaptor.capture());
+        verify(outputStream, times(2)).flush();
+        verifyNoMoreInteractions(outputStream);
+
+        String actualXML = getXMLData(streamCaptor.getAllValues());
+        String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Object xmlns=\"http://general\" attr2=\"E=1\" attr1=\"SOMEOBJ\">\n    <OtherObject attr1=\"OTHEROBJ\">\n    </OtherObject>\n</Object>";
         assertThat(actualXML, is(expectedXML));
     }
 
