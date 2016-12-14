@@ -432,11 +432,13 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 	xmlSlurper.getNodes("**", "Movie").findAll((parent, movie) -> {
-		try (FileOutputStream fos = new FileOutputStream("movie" + movie.getId() + ".xml")) {
-			XMLStream stream = xmlSpitter.write(fos, "1.0", "UTF-8");
+		try {
+			XMLStream stream = xmlSpitter.write(new FileOutputStream("movie" + movie.getId() + ".xml"), "1.0", "UTF-8");
 			stream.writeStartElement(node);
 
 			streams.addLast(stream);
+		} catch (FileNotFoundException e) {
+			// handle IO related exception
 		}
 	}, (parent, movie) -> {
 		XMLStream stream = streams.removeLast();
