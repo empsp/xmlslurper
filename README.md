@@ -1,10 +1,7 @@
 Table of contents:
-* [XMLSlurper](#xmlslurper-for-java)
-
-An attempt to port parsing capabilities offered by Groovy XMLSlurper into the Java world. The following is not planned to be accurate projection, instead the most useful functions will be implemented.
-* [XMLSpitter](#xmlspitter)
-
-A convenient API for writing XML documents using `XMLNode` objects which can be either created via `XMLNodeFactory` or obtained from the documents currently being parsed, hence allowing developers to split/overwrite the existing documents.
+---------------
+* [XMLSlurper](#xmlslurper-for-java)<br />An attempt to port parsing capabilities offered by Groovy XMLSlurper into the Java world. The following is not planned to be accurate projection, instead the most useful functions will be implemented.
+* [XMLSpitter](#xmlspitter)<br />A convenient API for writing XML documents using `XMLNode` objects which can be either created via `XMLNodeFactory` or obtained from the documents currently being parsed, hence allowing developers to split/overwrite the existing documents.
 
 XMLSlurper for Java
 ===============
