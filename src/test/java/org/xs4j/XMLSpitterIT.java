@@ -25,7 +25,8 @@ import static org.xs4j.TestUtil.getResourceAsFile;
  * Created by mturski on 12/12/2016.
  */
 public class XMLSpitterIT {
-    private static final XMLSpitter xmlSpitter = XMLSpitterFactory.getInstance().createXMLSpitter();
+    private static final XMLSpitterFactory xmlSpitterFactory = XMLSpitterFactory.getInstance();
+    private static final XMLSpitter xmlSpitter = xmlSpitterFactory.createXMLSpitter();
     private static final XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 
     @Test
@@ -129,15 +130,10 @@ public class XMLSpitterIT {
     public void givenInputXMLWithSchemaExtractWithFormattingIntoNewXML() throws Exception {
         // given
         final OutputStream outputStream = mock(OutputStream.class);
-        OutputStreamSupplier osSupplier = new OutputStreamSupplier() {
-            @Override
-            public OutputStream supply() {
-                return outputStream;
-            }
-        };
+        OutputStreamSupplier osSupplier = xmlSpitterFactory.createOutputStreamSupplier().set(outputStream);
 
         // when
-        xmlSpitter.write(xmlSlurper.getNodes("**", "Object"), xmlSlurper.getNodes("**", "Object", "**"), osSupplier, "1.0", "UTF-8");
+        xmlSpitter.splitAll(xmlSlurper.getNodes("**", "Object"), xmlSlurper.getNodes("**", "Object", "**"), osSupplier, "1.0", "UTF-8");
         xmlSlurper.parse(getResource(this, "namespaceTestCase.xml"), getResourceAsFile(this, "namespaceTestCaseSchema.xsd"));
 
         // then

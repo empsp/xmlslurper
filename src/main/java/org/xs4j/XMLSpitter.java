@@ -14,13 +14,21 @@ public interface XMLSpitter {
 
     XMLStream write(OutputStream outputStream, String version, String encoding);
 
-    void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier);
+    void split(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier);
 
-    void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version);
+    void split(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version);
 
-    void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding);
+    void split(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding);
+
+    void splitAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier);
+
+    void splitAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version);
+
+    void splitAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding);
 
     interface OutputStreamSupplier {
         OutputStream supply();
+
+        OutputStreamSupplier set(OutputStream os);
     }
 }
