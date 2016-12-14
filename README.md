@@ -140,7 +140,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 	1 | `parent=null, node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='null', attrByQName={xmlns=http://movieDb}}`
 	Comment | The first event is a start node event on a root node. In such a case, parent will have a `null` value.
 	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={title=Titanic, director=James Cameron}}`
-	Comment | 'MovieDb' parent node's text has been updated with new line and spaces (here symbolized by tab `\t` character) that there are before the start of a 'Movie' node. The information may be irrelevant and could be omitted, however without a schema `mixed` attribute on the element definition, XMLSlurper doesn't know how to handle whitespaces, therefore it's safe to assume that all characters count.
+	Comment | 'MovieDb' parent node's text has been updated with new line and spaces (here symbolized by tab `\t` character) that there are before the start of a 'Movie' node. The information may be irrelevant and could have been omitted, however without a schema `mixed` attribute on the element definition, XMLSlurper won't know how to handle whitespaces, therefore it's safe to assume that all characters count.
 	3 | `parent=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}, node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='null', attrByQName={}}`
 	Comment | 'Movie' parent node's text has been updated with white characters as well.
 	4 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}`
@@ -461,7 +461,7 @@ A convenient API for writing XML documents using `XMLNode` objects which can be 
 	}
 	```
 	
-	The above snippet of code is going to extract and create not only immediate children 'Movie' nodes but also the ones placed under 'fr:Franchise' node. By providing a XSD schema file for the XML document ignorable characters (indentations/carriage returns etc. in the input document) are going to be truly ignored. Notice, handling of `XMLStream` related exceptions occurs on `XMLSlurper.parse()` method. `XMLStreamException`, produced by the `XMLStream`, has been wrapped in `XMLStreamRuntimeException` inheriting from `RuntimeException` for convenience and still should be caught and handled.
+	The above snippet of code is going to extract and create not only immediate children 'Movie' nodes but also the ones placed under 'fr:Franchise' node. By providing a XSD schema file, ignorable characters (indentations/carriage returns etc.) are going to be truly ignored in the input XML document. Notice, handling of `XMLStream` related exceptions occurs on `XMLSlurper.parse()` method. `XMLStreamException`, produced by the `XMLStream`, has been wrapped in `XMLStreamRuntimeException` inheriting from `RuntimeException` for convenience and still should be caught and handled.
 	
 	Output of one of the generated 'Movie' XML documents is as follows:
 	
