@@ -10,13 +10,8 @@ public final class XMLNodeFactory {
     static final String QNAME_SEPARATOR = ":";
     static final String XMLNS_WITH_SEPARATOR = XMLConstants.XMLNS_ATTRIBUTE + QNAME_SEPARATOR;
 
-    private static XMLNodeFactory instance;
-
     public static XMLNodeFactory getInstance() {
-        if (instance == null)
-            instance = new XMLNodeFactory();
-
-        return instance;
+        return new XMLNodeFactory();
     }
 
     private XMLNodeFactory() {

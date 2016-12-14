@@ -4,7 +4,10 @@ import com.sun.istack.Nullable;
 import org.xs4j.listener.NodeListener;
 
 /**
- * Created by mturski on 11/8/2016.
+ * Base API for node/attribute name/attribute value searching. Provides methods to attach {@link NodeListener} objects
+ * and hence retrieve required nodes. Allows searching for single occurrence/multiple occurrences of required nodes.
+ *
+ * @author <a href="mailto:turski.marek@gmail.com">Marek Turski</a>
  */
 public interface Slurp {
     void find(@Nullable NodeListener nodeListener);

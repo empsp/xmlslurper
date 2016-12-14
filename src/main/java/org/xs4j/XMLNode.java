@@ -6,7 +6,9 @@ import com.sun.istack.Nullable;
 import java.util.Map;
 
 /**
- * Created by mturski on 11/8/2016.
+ * A data structure that holds information regarding parsed nodes.
+ *
+ * @author <a href="mailto:turski.marek@gmail.com">Marek Turski</a>
  */
 public interface XMLNode {
     long getId();

@@ -8,10 +8,10 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xs4j.path.SlurpNode;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
@@ -59,7 +59,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     @Override
-    public void parse(@NotNull InputStream inputStream) throws ParserConfigurationException, SAXException, IOException, XMLStreamException {
+    public void parse(@NotNull InputStream inputStream) throws ParserConfigurationException, SAXException, IOException {
         requireNonNull(inputStream);
 
         isOnlyFindDataAvailable = nodeNotifier.isOnlyFindDataAvailable();
@@ -84,7 +84,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     @Override
-    public void parse(@NotNull InputStream inputStream, @NotNull File schemaFile) throws ParserConfigurationException, SAXException, IOException, XMLStreamException {
+    public void parse(@NotNull InputStream inputStream, @NotNull File schemaFile) throws ParserConfigurationException, SAXException, IOException {
         requireNonNull(inputStream);
         requireNonNull(schemaFile);
 
@@ -97,8 +97,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
 
             parser = saxParserFactory.newSAXParser();
             parser.parse(inputStream, this);
-        } catch (ParserConfigurationException e) {
-            throw e;
         } catch (ParsingTerminationException e) {
             // do not rethrow
         } catch (SAXException e) {
@@ -140,7 +138,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
             throw new ParsingTerminationException();
     }
 
-    private void close() throws XMLStreamException, IOException {
+    private void close() throws IOException {
         idFeed = 0L;
 
         nodeNotifier.reset();
@@ -183,7 +181,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
                 attributeByName.put(qName, attributes.getValue(index));
 
                 prefixIndex = qName.indexOf(XMLNodeFactory.QNAME_SEPARATOR);
-                if (prefixIndex > 0) {
+                if (prefixIndex > 0 && !qName.startsWith(XMLConstants.XMLNS_ATTRIBUTE)) {
                     attrNamespace = XMLNodeFactory.XMLNS_WITH_SEPARATOR + qName.substring(0, prefixIndex);
                     attributeByName.put(attrNamespace, attributes.getURI(index));
                 }

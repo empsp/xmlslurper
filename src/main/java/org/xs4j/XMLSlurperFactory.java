@@ -15,13 +15,8 @@ import java.util.List;
  * Created by mturski on 11/8/2016.
  */
 public class XMLSlurperFactory {
-    private static XMLSlurperFactory instance;
-
     public static XMLSlurperFactory getInstance() {
-        if (instance == null)
-            instance = new XMLSlurperFactory();
-
-        return instance;
+        return new XMLSlurperFactory();
     }
 
     private boolean isNamespaceAwarenessDisabled;

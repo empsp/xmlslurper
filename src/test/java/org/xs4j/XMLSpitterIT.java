@@ -86,6 +86,44 @@ public class XMLSpitterIT {
         assertThat(actualXML, is(expectedXML));
     }
 
+    @Test
+    public void givenInputXMLWithSchemaExtractAPartIntoNewXMLWithForeignNamespaceDefinitionIncluded() throws Exception {
+        // given
+        final OutputStream outputStream = mock(OutputStream.class);
+
+        // when
+        createXML(outputStream, asList("**", "other:OtherObject"), asList("**", "other:OtherObject", "**"), "namespaceTestCase.xml", "namespaceTestCaseSchema.xsd");
+
+        // then
+        ArgumentCaptor<Integer> streamCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(outputStream, atLeastOnce()).write(streamCaptor.capture());
+        verify(outputStream).flush();
+        verifyNoMoreInteractions(outputStream);
+
+        String actualXML = getXMLData(streamCaptor.getAllValues());
+        String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><other:OtherObject other:attr3=\"123\"><OtherObject xmlns=\"http://general\" attr2=\"OTHER =123,OTHER_OBJECT= 124\"></OtherObject><OtherObject other:attr2=\"OTHER = 123,OTHER_OBJECT = 125\"></OtherObject></other:OtherObject>";
+        assertThat(actualXML, is(expectedXML));
+    }
+
+    @Test
+    public void givenInputXMLWithSchemaExtractAPartIntoNewXMLWithDefaultNamespaceDefinitionIncluded() throws Exception {
+        // given
+        final OutputStream outputStream = mock(OutputStream.class);
+
+        // when
+        createXML(outputStream, asList("**", "Object"), asList("**", "Object", "**"), "namespaceTestCase.xml", "namespaceTestCaseSchema.xsd");
+
+        // then
+        ArgumentCaptor<Integer> streamCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(outputStream, atLeastOnce()).write(streamCaptor.capture());
+        verify(outputStream).flush();
+        verifyNoMoreInteractions(outputStream);
+
+        String actualXML = getXMLData(streamCaptor.getAllValues());
+        String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Object xmlns=\"http://general\" attr2=\"E=1\" attr1=\"SOMEOBJ\"><OtherObject attr1=\"OTHEROBJ\"></OtherObject></Object>";
+        assertThat(actualXML, is(expectedXML));
+    }
+
     private void createXML(
             final OutputStream outputStream,
             List<String> parentPath,
