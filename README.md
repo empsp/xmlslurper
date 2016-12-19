@@ -433,7 +433,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 	xmlSlurper.getNodes("**", "Movie").findAll((parent, movie) -> {
 		try {
-			XMLStream stream = xmlSpitter.write(new FileOutputStream("movie" + movie.getId() + ".xml"), "1.0", "UTF-8");
+			XMLStream stream = xmlSpitter.createStream(new FileOutputStream("movie" + movie.getId() + ".xml"), "1.0", "UTF-8");
 			stream.writeStartElement(node);
 
 			streams.addLast(stream);
@@ -492,7 +492,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 			// handle IO related exception
 		}
 	});
-	xmlSpitter.splitAll(movieNode, movieNode.node("**"), osSupplier);
+	xmlSpitter.writeAll(movieNode, movieNode.node("**"), osSupplier);
 	
 	try {
 		xmlSlurper.parse(new FileInputStream("samplefile.xml"), new File("samplefileSchema.xsd"));
