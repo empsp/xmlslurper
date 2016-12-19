@@ -24,12 +24,25 @@ public class XMLSlurperFactory {
     private XMLSlurperFactory() {
     }
 
+    /**
+     * Disables namespace awareness. By default namespace awareness is turned on. By disabling namespace awareness, the
+     * parser created with {@link XMLSlurperFactory#createXMLSlurper} will ignore any namespace related data. For
+     * convenience the following method returns <code>this</code> instance of {@link XMLSlurperFactory}.
+     *
+     * @return <code>this</code> instance of <code>XMLSlurperFactory</code>
+     */
     public XMLSlurperFactory disableNamespaceAwareness() {
         this.isNamespaceAwarenessDisabled = true;
 
         return this;
     }
 
+    /**
+     * Returns a new instance of {@link XMLSlurper} with namespace awareness configured with
+     * {@link XMLSlurperFactory#disableNamespaceAwareness}.
+     *
+     * @return a new instance of <code>XMLSlurper</code>
+     */
     public XMLSlurper createXMLSlurper() {
         List<FindData> findData = new ArrayList<FindData>();
         List<FindData> findAllData = new ArrayList<FindData>();

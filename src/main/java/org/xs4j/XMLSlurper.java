@@ -20,7 +20,8 @@ import java.io.InputStream;
 public interface XMLSlurper {
     /**
      * Allows {@link NodeListener} instances to be attached to parser in order to retrieve parsed nodes. Simultaneously
-     * search pattern can be further extended to include node/attribute names/attribute values.
+     * search pattern can be further extended to include node/attribute names/attribute values. When used without
+     * <code>nodes</code> parameter, all nodes are searched by default.
      *
      * @param nodes array that narrows the search to particular XPath/GPath similar pattern
      * @return a search node API that further extends search capabilities

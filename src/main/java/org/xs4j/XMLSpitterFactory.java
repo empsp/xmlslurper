@@ -16,12 +16,22 @@ public class XMLSpitterFactory {
     private XMLSpitterFactory() {
     }
 
+    /**
+     * Returns a new instance of {@link XMLSpitter}
+     *
+     * @return a new instance of <code>XMLSpitter</code>
+     */
     public XMLSpitter createXMLSpitter() {
         XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
         return new StAXSpitter(xmlOutputFactory);
     }
 
+    /**
+     * A convenient method to acquire generic {@link OutputStreamSupplier}.
+     *
+     * @return a new instance of <code>OutputStreamSupplier</code>
+     */
     public OutputStreamSupplier createOutputStreamSupplier() {
         return new OutputStreamSupplier() {
             private OutputStream outputStream;
