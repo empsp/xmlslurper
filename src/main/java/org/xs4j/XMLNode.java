@@ -6,7 +6,7 @@ import com.sun.istack.Nullable;
 import java.util.Map;
 
 /**
- * A data structure that holds information regarding parsed nodes.
+ * A data structure holding information about a XML element.
  *
  * @author <a href="mailto:turski.marek@gmail.com">Marek Turski</a>
  */

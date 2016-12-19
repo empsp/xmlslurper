@@ -133,7 +133,7 @@ public class XMLSpitterIT {
         OutputStreamSupplier osSupplier = xmlSpitterFactory.createOutputStreamSupplier().set(outputStream);
 
         // when
-        xmlSpitter.splitAll(xmlSlurper.getNodes("**", "Object"), xmlSlurper.getNodes("**", "Object", "**"), osSupplier, "1.0", "UTF-8");
+        xmlSpitter.writeAll(xmlSlurper.getNodes("**", "Object"), xmlSlurper.getNodes("**", "Object", "**"), osSupplier, "1.0", "UTF-8");
         xmlSlurper.parse(getResource(this, "namespaceTestCase.xml"), getResourceAsFile(this, "namespaceTestCaseSchema.xsd"));
 
         // then
@@ -176,7 +176,7 @@ public class XMLSpitterIT {
         xmlSlurper.getNodes(parentPath.toArray(new String[0])).find(new NodeListener() {
             @Override
             public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
-                streams[0] = xmlSpitter.write(outputStream);
+                streams[0] = xmlSpitter.createStream(outputStream);
                 streams[0].writeStartElement(node);
             }
         }, new NodeListener() {

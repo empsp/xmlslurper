@@ -19,7 +19,7 @@ import java.io.InputStream;
  */
 public interface XMLSlurper {
     /**
-     * Allows {@link NodeListener} objects to be attached to parser in order to retrieve parsed nodes. Simultaneously
+     * Allows {@link NodeListener} instances to be attached to parser in order to retrieve parsed nodes. Simultaneously
      * search pattern can be further extended to include node/attribute names/attribute values.
      *
      * @param nodes array that narrows the search to particular XPath/GPath similar pattern
@@ -29,7 +29,7 @@ public interface XMLSlurper {
     SlurpNode getNodes(@Nullable String... nodes);
 
     /**
-     * Triggers the parsing process on the given {@link java.io.InputStream}.
+     * Triggers the parsing process on the given {@link InputStream}.
      *
      * @param inputStream containing the content to be parsed
      * @throws ParserConfigurationException if a parser cannot be created which satisfies the requested configuration
@@ -39,7 +39,7 @@ public interface XMLSlurper {
     void parse(@NotNull InputStream inputStream) throws ParserConfigurationException, SAXException, IOException;
 
     /**
-     * Triggers the parsing process on the given {@link java.io.InputStream} with the given {@link Schema}.
+     * Triggers the parsing process on the given {@link InputStream} with the given {@link Schema}.
      *
      * @param inputStream containing the content to be parsed
      * @param schemaFile <code>Schema</code> to be used for XML document validation purposes

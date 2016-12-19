@@ -3,7 +3,9 @@ package org.xs4j.path;
 import com.sun.istack.NotNull;
 
 /**
- * Created by mturski on 11/8/2016.
+ *
+ *
+ * @author <a href="mailto:turski.marek@gmail.com">Marek Turski</a>
  */
 public interface SlurpAttribute extends Slurp {
     @NotNull

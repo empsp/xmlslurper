@@ -33,70 +33,70 @@ public class StAXSpitter implements XMLSpitter {
     }
 
     @Override
-    public XMLStream write(OutputStream outputStream) {
+    public void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier) {
+        startWriteOne(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
+    }
+
+    @Override
+    public void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version) {
+        startWriteOne(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
+    }
+
+    @Override
+    public void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding) {
+        startWriteOne(documentNode, contentNodes, outputStreamSupplier, encoding, version);
+    }
+
+    @Override
+    public void writeAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier) {
+        startWriteAll(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
+    }
+
+    @Override
+    public void writeAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version) {
+        startWriteAll(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
+    }
+
+    @Override
+    public void writeAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding) {
+        startWriteAll(documentNode, contentNodes, outputStreamSupplier, encoding, version);
+    }
+
+    @Override
+    public XMLStream createStream(OutputStream outputStream) {
         try {
-            return startWritingAll(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
+            return createStreamAndStartWrite(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
     }
 
     @Override
-    public XMLStream write(OutputStream outputStream, String version) {
+    public XMLStream createStream(OutputStream outputStream, String version) {
         try {
-            return startWritingAll(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, version);
+            return createStreamAndStartWrite(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, version);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
     }
 
     @Override
-    public XMLStream write(OutputStream outputStream, String version, String encoding) {
+    public XMLStream createStream(OutputStream outputStream, String version, String encoding) {
         try {
-            return startWritingAll(outputStream, encoding, version);
+            return createStreamAndStartWrite(outputStream, encoding, version);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
     }
 
-    @Override
-    public void split(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier) {
-        startWritingSingle(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
-    }
-
-    @Override
-    public void split(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version) {
-        startWritingSingle(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
-    }
-
-    @Override
-    public void split(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding) {
-        startWritingSingle(documentNode, contentNodes, outputStreamSupplier, encoding, version);
-    }
-
-    @Override
-    public void splitAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier) {
-        startWritingAll(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
-    }
-
-    @Override
-    public void splitAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version) {
-        startWritingAll(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
-    }
-
-    @Override
-    public void splitAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding) {
-        startWritingAll(documentNode, contentNodes, outputStreamSupplier, encoding, version);
-    }
-
-    private XMLStream startWritingAll(OutputStream outputStream, String encoding, String version) throws XMLStreamException {
+    private XMLStream createStreamAndStartWrite(OutputStream outputStream, String encoding, String version) throws XMLStreamException {
         XMLStreamWriter writer = xmlOutputFactory.createXMLStreamWriter(outputStream);
         writer.writeStartDocument(encoding, version);
 
         return new StAXStream(idFeed++, writer);
     }
 
-    private void startWritingSingle(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier osSupplier, final String encoding, final String version) {
+    private void startWriteOne(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier osSupplier, final String encoding, final String version) {
         final XMLStream[] streams = new XMLStream[1];
         final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
 
@@ -108,7 +108,7 @@ public class StAXSpitter implements XMLSpitter {
                 new EndContentHandler(streams, descendants));
     }
 
-    private void startWritingAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier osSupplier, final String encoding, final String version) {
+    private void startWriteAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier osSupplier, final String encoding, final String version) {
         final XMLStream[] streams = new XMLStream[1];
         final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
 
@@ -138,7 +138,7 @@ public class StAXSpitter implements XMLSpitter {
         @Override
         public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
             try {
-                streams[0] = startWritingAll(osSupplier.supply(), encoding, version);
+                streams[0] = createStreamAndStartWrite(osSupplier.supply(), encoding, version);
                 streams[0].writeCharacters(NEWLINE);
                 streams[0].writeStartElement(node);
 

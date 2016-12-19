@@ -24,16 +24,16 @@ public class XMLSpitterFactory {
 
     public OutputStreamSupplier createOutputStreamSupplier() {
         return new OutputStreamSupplier() {
-            private OutputStream os;
+            private OutputStream outputStream;
 
             @Override
             public OutputStream supply() {
-                return os;
+                return outputStream;
             }
 
             @Override
-            public OutputStreamSupplier set(OutputStream os) {
-                this.os = os;
+            public OutputStreamSupplier set(OutputStream outputStream) {
+                this.outputStream = outputStream;
 
                 return this;
             }
