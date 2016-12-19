@@ -490,7 +490,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 	SlurpNode movieNode = xmlSlurper.getNodes("**", "Movie");
 	movieNode.findAll((parent, movie) -> {
 		try {
-			osSupplier.set(new FileOutputStream("Movie" + movie.getId() + ".xml"));
+			osSupplier.set(new FileOutputStream("movie" + movie.getId() + ".xml"));
 		} catch (FileNotFoundException e) {
 			// handle IO related exception
 		}
