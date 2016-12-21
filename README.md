@@ -12,7 +12,7 @@ The basic idea is to facilitate reading of XML documents by combining XPath/GPat
 
 ## Download
 
-### Maven (soon)
+### Maven
 
 In order to use the library in your maven project, just declare the dependency inside your pom.xml file:
 
@@ -24,7 +24,7 @@ In order to use the library in your maven project, just declare the dependency i
 </dependency>
 ```
 
-### Gradle (soon)
+### Gradle
 
 In order to use the library in your gradle project, just declare the dependency inside your build.gradle file:
 
