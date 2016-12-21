@@ -8,8 +8,14 @@
  */
 
 // Apply the java plugin to add support for Java
+
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
+
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 group = 'org.xs4j'
 archivesBaseName = 'xmlslurper'
@@ -40,4 +46,59 @@ dependencies {
     // 'test.useTestNG()' to your build script.
     testCompile 'junit:junit:4.12'
     testCompile "org.mockito:mockito-core:1.10.19"
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "MIT License"
+            url "http://www.opensource.org/licenses/mit-license.php"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            name "Marek Turski"
+            email "turski.marek@gmail.com"
+        }
+    }
+}
+
+
+publishing {
+    publications {
+        XMLSlurperPublication(MavenPublication) {
+            from components.java
+            groupId 'org.xs4j'
+            artifactId 'xmlslurper'
+            version '2.0.0'
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'An attempt to port parsing capabilities offered by Groovy XMLSlurper into the Java world. The following is not planned to be accurate projection, instead the most useful functions will be implemented.')
+                root.appendNode('name', 'XMLSlurper for Java')
+                root.appendNode('url', 'https://github.com/empsp/xmlslurper')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'maven'
+        name = 'org.xs4j:xmlslurper'
+        userOrg = 'empsp'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/empsp/xmlslurper.git'
+        version {
+            name = '2.0.0'
+            vcsTag = 'v2.0.0'
+        }
+        publications = ['XMLSlurperPublication']
+
+        githubRepo = 'empsp/xmlslurper'
+        githubReleaseNotesFile = 'README.md'
+    }
 }
