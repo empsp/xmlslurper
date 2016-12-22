@@ -1,13 +1,14 @@
 package org.xs4j;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Arrays;
 
 /**
  * Created by mturski on 12/22/2016.
  */
 class PositionCounter {
-    private Deque<Long> posByDepth = new ArrayDeque<Long>();
+    public static final int DEFAULT_SIZE = 4;
+
+    private long[] posByDepth = new long[DEFAULT_SIZE];
     private int prevDepth;
 
     PositionCounter() {
@@ -15,22 +16,23 @@ class PositionCounter {
 
     long getNodePosition(int depth) {
         if (depth > prevDepth)
-            posByDepth.addLast(1L);
-        else if (depth == prevDepth)
-            posByDepth.addLast(posByDepth.removeLast() + 1);
-        else {
-            posByDepth.removeLast();
+            growWhenMaxCapacity(depth);
+        else if (depth < prevDepth)
+            posByDepth[depth] = 0L;
 
-            if (posByDepth.size() > 0)
-                posByDepth.addLast(posByDepth.removeLast() + 1);
-        }
-
+        posByDepth[depth - 1]++;
         prevDepth = depth;
-        return posByDepth.peekLast();
+
+        return posByDepth[depth - 1];
+    }
+
+    private void growWhenMaxCapacity(int depth) {
+        if (depth >= posByDepth.length)
+            posByDepth = Arrays.copyOf(posByDepth, posByDepth.length << 1);
     }
 
     void reset() {
-        posByDepth.clear();
+        posByDepth = new long[DEFAULT_SIZE];
         prevDepth = 0;
     }
 }
