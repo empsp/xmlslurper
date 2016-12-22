@@ -142,23 +142,23 @@ It is also possible to retrieve all elements being descendants of the given elem
 	--- | ---
 	1 | `node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='null', attrByQName={xmlns=http://movieDb}}, node.getParent()=null`
 	Comment | The first event is a start node event on a root node. In such a case, parent will have a `null` value.
-	2 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={title=Titanic, director=James Cameron}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	2 | `node=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={title=Titanic, director=James Cameron}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
 	Comment | 'MovieDb' parent node's text has been updated with new line and spaces (here symbolized by tab `\t` character) that there are before the start of a 'Movie' node. The information may be irrelevant and could have been omitted, however without a schema `mixed` attribute on the element definition, XMLSlurper won't know how to handle whitespaces, therefore it's safe to assume that all characters count.
-	3 | `node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='null', attrByQName={}}, node.getParent()=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}`
+	3 | `node=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='null', attrByQName={}}, node.getParent()=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}`
 	Comment | 'Movie' parent node's text has been updated with white characters as well.
-	4 | `node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	4 | `node=XMLNode{id=3, position=1, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
 	Comment | As a start node event, the text value of a 'LeadActor' node is still `null`.
-	5 | `node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	5 | `node=XMLNode{id=3, position=1, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}, node.getParent()=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
 	Comment | Here, at end node event, the text value of the 'LeadActor' node is finally available.
-	6 | `node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	6 | `node=XMLNode{id=4, position=2, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
 	Comment | Another start node event, and the text value of a 'LeadActress' node is `null`, however the text value of the 'Cast' parent node has been updated with additional white characters found before processing 'LeadActress'.
-	7 | `node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
-	8 | `node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t\n\t\t', attrByQName={}}, node.getParent()=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}`
-	9 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={title=Titanic, director=James Cameron}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
-	10 | `node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	7 | `node=XMLNode{id=4, position=2, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}, node.getParent()=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	8 | `node=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t\n\t\t', attrByQName={}}, node.getParent()=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}`
+	9 | `node=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={title=Titanic, director=James Cameron}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	10 | `node=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 	Comment | 'Franchise' node is from a separate namespace. Namespace and prefix fields will reflect that fact. Attributes hold additional metadata attribute 'xmlns:fr' and it's available together with ordinary attributes. Attribute 'title' has a prefix 'fr' which distinguishes it from the other nodes' 'title' attributes.
 	.. | | 
-	46 | `node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}}, node.getParent()=null` |
+	46 | `node=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}}, node.getParent()=null` |
 
 2. Read all 'Movie' nodes directly under 'MovieDb' root node
 
@@ -174,10 +174,10 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
-	2 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
-	3 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
-	4 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	1 | `node=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	2 | `node=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	3 | `node=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	4 | `node=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 
 3. Read all nodes having 'title' attribute
 
@@ -193,15 +193,15 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
-	2 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
-	3 | `node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	1 | `node=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	2 | `node=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	3 | `node=XMLNode{id=6, position=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
 	Comment | 'Franchise' node is only available here as a parent node. It has not been found as a node because it has a 'title' attribute within different namespace.
-	4 | `node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
-	5 | `node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
-	6 | `node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
-	7 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
-	8 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	4 | `node=XMLNode{id=6, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	5 | `node=XMLNode{id=10, position=2, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	6 | `node=XMLNode{id=10, position=2, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	7 | `node=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	8 | `node=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 
 	
 	However, searching for an attribute with prefix (qName) will have different results:
@@ -218,9 +218,9 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	1 | `node=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 	Comment | Here, 'Franchise' node is a result node having a parent node 'MovieDb'.
-	2 | `node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	2 | `node=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 
 4. Read all nodes having 'title' attribute value containing word 'Furious' or equal to 'Forest Gump'
 	
@@ -257,12 +257,12 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
-	2 | `node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
-	3 | `node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
-	4 | `node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
-	5 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
-	6 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	1 | `node=XMLNode{id=6, position=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	2 | `node=XMLNode{id=6, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	3 | `node=XMLNode{id=10, position=2, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	4 | `node=XMLNode{id=10, position=2, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	5 | `node=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	6 | `node=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, position=1, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 
 
 5. Read cast from movies (excluding franchises)
@@ -281,14 +281,14 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
-	2 | `node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
-	3 | `node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
-	4 | `node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
-	5 | `node=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}, node.getParent()=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
-	6 | `node=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}, node.getParent()=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
-	7 | `node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}, node.getParent()=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
-	8 | `node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}, node.getParent()=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	1 | `node=XMLNode{id=3, position=1, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	2 | `node=XMLNode{id=3, position=1, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}, node.getParent()=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	3 | `node=XMLNode{id=4, position=2, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	4 | `node=XMLNode{id=4, position=2, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}, node.getParent()=XMLNode{id=2, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	5 | `node=XMLNode{id=18, position=1, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}, node.getParent()=XMLNode{id=17, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	6 | `node=XMLNode{id=18, position=1, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}, node.getParent()=XMLNode{id=17, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	7 | `node=XMLNode{id=19, position=2, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}, node.getParent()=XMLNode{id=17, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	8 | `node=XMLNode{id=19, position=2, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}, node.getParent()=XMLNode{id=17, position=1, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
 	
 	However, we've lost the information regarding which movie given cast belongs to. Also, some of the events are meaningless because text information is not yet available. Lets fix that:
 	
@@ -317,10 +317,10 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
-	2 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
-	3 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}`
-	4 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
+	1 | `movie=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=3, position=1, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
+	2 | `movie=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=4, position=2, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
+	3 | `movie=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=18, position=1, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}`
+	4 | `movie=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=19, position=2, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
 	
 	Still, there is even simpler way to get movie information from children nodes of the 'Cast' nodes:
 	
@@ -359,14 +359,14 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
-	2 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
-	3 | `movie=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, person=XMLNode{id=8, namespace='null', prefix='null', localName='LeadActor', text='Vin Diesel', attrByQName={}}`
-	4 | `movie=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, person=XMLNode{id=9, namespace='null', prefix='null', localName='LeadActress', text='Michelle Rodriguez', attrByQName={}}`
-	5 | `movie=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, person=XMLNode{id=12, namespace='null', prefix='null', localName='LeadActor', text='Vin Diesel', attrByQName={}}`
-	6 | `movie=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, person=XMLNode{id=13, namespace='null', prefix='null', localName='LeadActress', text='Eva Mendes', attrByQName={}}`
-	7 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}`
-	8 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
+	1 | `movie=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=3, position=1, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
+	2 | `movie=XMLNode{id=1, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=4, position=2, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
+	3 | `movie=XMLNode{id=6, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, person=XMLNode{id=8, position=1, namespace='null', prefix='null', localName='LeadActor', text='Vin Diesel', attrByQName={}}`
+	4 | `movie=XMLNode{id=6, position=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, person=XMLNode{id=9, position=2, namespace='null', prefix='null', localName='LeadActress', text='Michelle Rodriguez', attrByQName={}}`
+	5 | `movie=XMLNode{id=10, position=2, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, person=XMLNode{id=12, position=1, namespace='null', prefix='null', localName='LeadActor', text='Vin Diesel', attrByQName={}}`
+	6 | `movie=XMLNode{id=10, position=2, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, person=XMLNode{id=13, position=2, namespace='null', prefix='null', localName='LeadActress', text='Eva Mendes', attrByQName={}}`
+	7 | `movie=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=18, position=1, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}`
+	8 | `movie=XMLNode{id=16, position=3, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=19, position=2, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
 
 7. Read second movie in the 'Fast and Furious' franchise and end parsing.
 	
@@ -382,7 +382,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `movie=XMLNodeImpl{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attributeByQName={director=John Singleton, title=2 Fast 2 Furious}}, movie.getParent()=XMLNodeImpl{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attributeByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	1 | `movie=XMLNodeImpl{id=10, position=2, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attributeByQName={director=John Singleton, title=2 Fast 2 Furious}}, movie.getParent()=XMLNodeImpl{id=5, position=2, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attributeByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
 	
 
 # XMLSpitter
