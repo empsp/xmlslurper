@@ -44,7 +44,7 @@ public interface XMLNode {
     @NotNull
     Map<String, String> getAttributes();
 
-    void setAttributes(@NotNull Map<String, String> attributeByName);
+    void setAttributes(@NotNull Map<String, String> attributeByQName);
 
     boolean hasAttribute(@NotNull String name);
 
