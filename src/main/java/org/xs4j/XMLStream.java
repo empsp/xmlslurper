@@ -1,5 +1,8 @@
 package org.xs4j;
 
+import org.xs4j.util.NotNull;
+import org.xs4j.util.Nullable;
+
 import java.io.OutputStream;
 
 /**
@@ -21,7 +24,7 @@ public interface XMLStream {
      * @param node to retrieve data from
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void writeElement(XMLNode node);
+    void writeElement(@NotNull XMLNode node);
 
     /**
      * Write start-tag (with attributes) of an element.
@@ -29,7 +32,7 @@ public interface XMLStream {
      * @param node to retrieve data from
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void writeStartElement(XMLNode node);
+    void writeStartElement(@NotNull XMLNode node);
 
     /**
      * Write text of the element currently opened with start-tag.
@@ -37,7 +40,7 @@ public interface XMLStream {
      * @param characters to write
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void writeCharacters(String characters);
+    void writeCharacters(@Nullable String characters);
 
     /**
      * Write end-tag of the element opened with start-tag.
@@ -52,7 +55,7 @@ public interface XMLStream {
      * @param node to match the end-tag
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void writeEndElement(XMLNode node);
+    void writeEndElement(@NotNull XMLNode node);
 
     /**
      * Flush the content into the underlying {@link OutputStream}.

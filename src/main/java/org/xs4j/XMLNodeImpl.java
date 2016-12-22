@@ -1,13 +1,13 @@
 package org.xs4j;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
+import org.xs4j.util.NotNull;
+import org.xs4j.util.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.xs4j.util.NotNullValidator.requireNonNull;
+import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/9/2016.

@@ -1,8 +1,8 @@
 package org.xs4j.listener;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
 import org.xs4j.XMLNode;
+import org.xs4j.util.NotNull;
+import org.xs4j.util.Nullable;
 
 /**
  * Defines an API that allows reading XML document's parsed elements.

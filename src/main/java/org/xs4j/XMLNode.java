@@ -1,7 +1,7 @@
 package org.xs4j;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
+import org.xs4j.util.NotNull;
+import org.xs4j.util.Nullable;
 
 import java.util.Map;
 
