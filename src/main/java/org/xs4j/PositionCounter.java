@@ -20,10 +20,9 @@ class PositionCounter {
         else if (depth < prevDepth)
             posByDepth[depth] = 0L;
 
-        posByDepth[depth - 1]++;
         prevDepth = depth;
 
-        return posByDepth[depth - 1];
+        return ++posByDepth[depth - 1];
     }
 
     private void growWhenMaxCapacity(int depth) {
