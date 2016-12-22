@@ -15,19 +15,13 @@ class PositionCounter {
     }
 
     long getNodePosition(int depth) {
-        if (depth > prevDepth)
-            growWhenMaxCapacity(depth);
+        if (depth >= posByDepth.length)
+            posByDepth = Arrays.copyOf(posByDepth, posByDepth.length << 1);
         else if (depth < prevDepth)
             posByDepth[depth] = 0L;
 
         prevDepth = depth;
-
         return ++posByDepth[depth - 1];
-    }
-
-    private void growWhenMaxCapacity(int depth) {
-        if (depth >= posByDepth.length)
-            posByDepth = Arrays.copyOf(posByDepth, posByDepth.length << 1);
     }
 
     void reset() {
