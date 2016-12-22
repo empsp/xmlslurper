@@ -14,6 +14,9 @@ public interface XMLNode {
     long getId();
 
     @Nullable
+    XMLNode getParent();
+
+    @Nullable
     String getNamespace();
 
     void setNamespace(@Nullable String namespace);

@@ -29,4 +29,8 @@ public final class XMLNodeFactory {
     static void appendText(XMLNode node, char[] ch, int start, int length) {
         ((XMLNodeImpl)node).appendText(ch, start, length);
     }
+
+    static void setParent(XMLNode parent, XMLNode node) {
+        ((XMLNodeImpl)node).setParent(parent);
+    }
 }

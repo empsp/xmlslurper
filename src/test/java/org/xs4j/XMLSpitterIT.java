@@ -175,25 +175,25 @@ public class XMLSpitterIT {
 
         xmlSlurper.getNodes(parentPath.toArray(new String[0])).find(new NodeListener() {
             @Override
-            public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+            public void onNode(@NotNull XMLNode node) {
                 streams[0] = xmlSpitter.createStream(outputStream);
                 streams[0].writeStartElement(node);
             }
         }, new NodeListener() {
             @Override
-            public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+            public void onNode(@NotNull XMLNode node) {
                 streams[0].writeEndElement();
                 streams[0].close();
             }
         });
         xmlSlurper.getNodes(descendantsPath.toArray(new String[0])).findAll(new NodeListener() {
             @Override
-            public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+            public void onNode(@NotNull XMLNode node) {
                 streams[0].writeStartElement(node);
             }
         }, new NodeListener() {
             @Override
-            public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+            public void onNode(@NotNull XMLNode node) {
                 streams[0].writeCharacters(node.getText());
                 streams[0].writeEndElement();
             }

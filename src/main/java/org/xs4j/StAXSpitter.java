@@ -154,7 +154,7 @@ public class StAXSpitter implements XMLSpitter {
         }
 
         @Override
-        public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+        public void onNode(@NotNull XMLNode node) {
             try {
                 streams[0] = createStreamAndStartWrite(osSupplier.supply(), encoding, version);
                 streams[0].writeCharacters(NEWLINE);
@@ -177,7 +177,7 @@ public class StAXSpitter implements XMLSpitter {
         }
 
         @Override
-        public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+        public void onNode(@NotNull XMLNode node) {
             descendants.removeLast();
 
             streams[0].writeCharacters(NEWLINE);
@@ -197,7 +197,7 @@ public class StAXSpitter implements XMLSpitter {
         }
 
         @Override
-        public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+        public void onNode(@NotNull XMLNode node) {
             streams[0].writeCharacters(NEWLINE);
             formatIndent(streams[0], descendants);
             streams[0].writeStartElement(node);
@@ -216,7 +216,7 @@ public class StAXSpitter implements XMLSpitter {
         }
 
         @Override
-        public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+        public void onNode(@NotNull XMLNode node) {
             descendants.removeLast();
 
             String characters = node.getText();

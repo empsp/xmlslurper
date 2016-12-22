@@ -21,14 +21,14 @@ class NodeNotifier {
     }
 
     void onStartNode(XMLNode node) {
-        XMLNode parent = descendants.peekLast();
+        XMLNodeFactory.setParent(descendants.peekLast(), node);
         descendants.addLast(node);
 
-        notifyFindListenersOnStartNode(parent, node);
-        notifyFindAllListenersOnStartNode(parent, node);
+        notifyFindListenersOnStartNode(node);
+        notifyFindAllListenersOnStartNode(node);
     }
 
-    private void notifyFindListenersOnStartNode(XMLNode parent, XMLNode node) {
+    private void notifyFindListenersOnStartNode(XMLNode node) {
         Iterator<FindData> findDataIt = findData.iterator();
 
         while(findDataIt.hasNext()) {
@@ -38,7 +38,7 @@ class NodeNotifier {
                 data.alignedNodeIds.addLast(node.getId());
 
                 if (data.startNodeListener != null) {
-                    data.startNodeListener.onNode(parent, node);
+                    data.startNodeListener.onNode(node);
                     data.startNodeListener = null;
 
                     if (data.endNodeListener == null)
@@ -48,11 +48,11 @@ class NodeNotifier {
         }
     }
 
-    private void notifyFindAllListenersOnStartNode(XMLNode parent, XMLNode node) {
+    private void notifyFindAllListenersOnStartNode(XMLNode node) {
         for (FindData data : findAllData)
             if (data.slurpAlignment.checkAlignment(descendants)) {
                 if (data.startNodeListener != null)
-                    data.startNodeListener.onNode(parent, node);
+                    data.startNodeListener.onNode(node);
 
                 data.alignedNodeIds.add(node.getId());
             }
@@ -60,13 +60,12 @@ class NodeNotifier {
 
     void onEndNode() {
         XMLNode node = descendants.removeLast();
-        XMLNode parent = descendants.peekLast();
 
-        notifyFindListenersOnEndNode(parent, node);
-        notifyFindAllListenersOnEndNode(parent, node);
+        notifyFindListenersOnEndNode(node);
+        notifyFindAllListenersOnEndNode(node);
     }
 
-    private void notifyFindListenersOnEndNode(XMLNode parent, XMLNode node) {
+    private void notifyFindListenersOnEndNode(XMLNode node) {
         Iterator<FindData> findDataIt = findData.iterator();
 
         while(findDataIt.hasNext()) {
@@ -74,20 +73,20 @@ class NodeNotifier {
 
             if (data.alignedNodeIds.contains(node.getId())) {
                 if (data.endNodeListener != null)
-                    data.endNodeListener.onNode(parent, node);
+                    data.endNodeListener.onNode(node);
 
                 findDataIt.remove();
             }
         }
     }
 
-    private void notifyFindAllListenersOnEndNode(XMLNode parent, XMLNode node) {
+    private void notifyFindAllListenersOnEndNode(XMLNode node) {
         for (FindData data : findAllData) {
             long nodeId = node.getId();
 
             if (data.alignedNodeIds.contains(nodeId)) {
                 if (data.endNodeListener != null)
-                    data.endNodeListener.onNode(parent, node);
+                    data.endNodeListener.onNode(node);
 
                 data.alignedNodeIds.remove(nodeId);
             }
