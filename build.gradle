@@ -19,7 +19,7 @@ apply plugin: 'maven-publish'
 
 group = 'org.xs4j'
 archivesBaseName = 'xmlslurper'
-version = 'DYNAMIC-SNAPSHOT'
+version = '2.1.0'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
