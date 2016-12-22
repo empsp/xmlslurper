@@ -159,6 +159,7 @@ public final class XMLNodeImpl implements XMLNode {
     public String toString() {
         return "XMLNodeImpl{" +
                 "id=" + id +
+                ", position=" + position +
                 ", namespace='" + namespace + '\'' +
                 ", prefix='" + prefix + '\'' +
                 ", localName='" + localName + '\'' +
