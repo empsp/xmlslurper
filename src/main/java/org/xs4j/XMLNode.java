@@ -13,6 +13,8 @@ import java.util.Map;
 public interface XMLNode {
     long getId();
 
+    long getPosition();
+
     @Nullable
     XMLNode getParent();
 

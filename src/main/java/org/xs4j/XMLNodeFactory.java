@@ -33,4 +33,8 @@ public final class XMLNodeFactory {
     static void setParent(XMLNode parent, XMLNode node) {
         ((XMLNodeImpl)node).setParent(parent);
     }
+
+    static void setPosition(XMLNode node, long position) {
+        ((XMLNodeImpl)node).setPosition(position);
+    }
 }

@@ -1,12 +1,11 @@
 package org.xs4j;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xml.sax.SAXException;
 import org.xs4j.XMLSpitter.OutputStreamSupplier;
 import org.xs4j.listener.NodeListener;
+import org.xs4j.util.NotNull;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;

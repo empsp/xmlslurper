@@ -88,7 +88,7 @@ final class SlurpAlignmentFactory {
     public SlurpAlignment copyAlignmentAndSelectNthNode(SlurpAlignment slurpAlignment, long nodeIndex) {
         List<String> qNamePath = new ArrayList<String>(slurpAlignment.getPath());
 
-        return new SlurpNthElementAlignmentWrapper(getSlurpAlignment(qNamePath), nodeIndex);
+        return new SlurpNthElementAlignmentWrapper(getSlurpAlignment(qNamePath), nodeIndex, new PositionCounter());
     }
 
     private class DefaultSlurpAlignment extends SlurpAlignment {
@@ -220,42 +220,26 @@ final class SlurpAlignmentFactory {
     private class SlurpNthElementAlignmentWrapper extends SlurpAlignment {
         private final SlurpAlignment slurpAlignment;
         private final long nodeIndex;
+        private final PositionCounter positionCounter;
 
-        private Deque<Long> indexByDepth = new ArrayDeque<Long>();
-        private int prevDepth;
-
-        public SlurpNthElementAlignmentWrapper(SlurpAlignment slurpAlignment, long nodeIndex) {
+        public SlurpNthElementAlignmentWrapper(SlurpAlignment slurpAlignment, long nodeIndex, PositionCounter positionCounter) {
             this.slurpAlignment = slurpAlignment;
             this.nodeIndex = nodeIndex;
+            this.positionCounter = positionCounter;
         }
 
         @Override
         boolean checkAlignment(int depth, XMLNode lastNode) {
-            countOccurences(depth);
+            long nodeOccurence = positionCounter.getNodePosition(depth);
 
-            return slurpAlignment.checkAlignment(depth, lastNode) && indexByDepth.peekLast() == nodeIndex;
+            return slurpAlignment.checkAlignment(depth, lastNode) && nodeOccurence == nodeIndex;
         }
 
         @Override
         boolean checkAlignment(Deque<XMLNode> descendants) {
-            countOccurences(descendants.size());
+            long nodeOccurence = positionCounter.getNodePosition(descendants.size());
 
-            return slurpAlignment.checkAlignment(descendants) && indexByDepth.peekLast() == nodeIndex;
-        }
-
-        private void countOccurences(int depth) {
-            if (depth > prevDepth)
-                indexByDepth.addLast(1L);
-            else if (depth == prevDepth)
-                indexByDepth.addLast(indexByDepth.removeLast() + 1);
-            else {
-                indexByDepth.removeLast();
-
-                if (indexByDepth.size() > 0)
-                    indexByDepth.addLast(indexByDepth.removeLast() + 1);
-            }
-
-            prevDepth = depth;
+            return slurpAlignment.checkAlignment(descendants) && nodeOccurence == nodeIndex;
         }
 
         @Override

@@ -60,7 +60,7 @@ public class XMLSlurperFactory {
 
     static NodeNotifier getNodeNotifier(List<FindData> findData,
                                         List<FindData> findAllData) {
-        return new NodeNotifier(findData, findAllData);
+        return new NodeNotifier(new PositionCounter(), findData, findAllData);
     }
 
     static SlurpAlignmentFactory getSlurpAlignmentFactory() {

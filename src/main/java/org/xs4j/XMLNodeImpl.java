@@ -16,6 +16,7 @@ public final class XMLNodeImpl implements XMLNode {
     public static final int DEFAULT_SIZE = 16;
 
     private final long id;
+    private long position;
     private XMLNode parent;
 
     private String namespace;
@@ -38,6 +39,15 @@ public final class XMLNodeImpl implements XMLNode {
     @Override
     public long getId() {
         return id;
+    }
+
+    void setPosition(long position) {
+        this.position = position;
+    }
+
+    @Override
+    public long getPosition() {
+        return position;
     }
 
     void setParent(XMLNode parent) {

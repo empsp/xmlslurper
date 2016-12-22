@@ -11,11 +11,13 @@ import java.util.List;
  * Created by mturski on 11/25/2016.
  */
 class NodeNotifier {
+    private final PositionCounter positionCounter;
     private final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
     private final List<FindData> findData;
     private final List<FindData> findAllData;
 
-    NodeNotifier(List<FindData> findData, List<FindData> findAllData) {
+    NodeNotifier(PositionCounter positionCounter, List<FindData> findData, List<FindData> findAllData) {
+        this.positionCounter = positionCounter;
         this.findData = findData;
         this.findAllData = findAllData;
     }
@@ -23,6 +25,7 @@ class NodeNotifier {
     void onStartNode(XMLNode node) {
         XMLNodeFactory.setParent(descendants.peekLast(), node);
         descendants.addLast(node);
+        XMLNodeFactory.setPosition(node, positionCounter.getNodePosition(descendants.size()));
 
         notifyFindListenersOnStartNode(node);
         notifyFindAllListenersOnStartNode(node);
@@ -98,6 +101,7 @@ class NodeNotifier {
     }
 
     void reset() {
+        positionCounter.reset();
         descendants.clear();
         findData.clear();
         findAllData.clear();

@@ -1,7 +1,5 @@
 package org.xs4j;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
 import org.junit.After;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -9,6 +7,7 @@ import org.mockito.InOrder;
 import org.xs4j.listener.NodeListener;
 import org.xs4j.path.Slurp;
 import org.xs4j.path.SlurpNode;
+import org.xs4j.util.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +68,6 @@ public class XMLSlurperIT {
         parse("simpleTestCase.xml", "ObjectTree", "Object");
 
         // then
-        XMLNode root = createNode(0L, "ObjectTree");
         XMLNode object = createNode(1L, "Object");
 
         InOrder inOrder = inOrder(listener);
@@ -100,6 +98,7 @@ public class XMLSlurperIT {
         assertThat(actualNode.getText(), is("attrValue"));
         assertThat(actualNode.getAttributes(), is(expectedAttributes));
         assertThat(actualNode.getParent().getLocalName(), is("ObjectTree"));
+        assertThat(actualNode.getPosition(), is(1L));
     }
 
     @Test
@@ -167,6 +166,7 @@ public class XMLSlurperIT {
                 assertThat(node.getLocalName(), is("Object"));
                 assertNull(node.getText());
                 assertThat(node.getAttributes(), is(expectedAttributes));
+                assertThat(node.getPosition(), is(1L));
             }
         });
 
@@ -192,6 +192,7 @@ public class XMLSlurperIT {
                 assertThat(node.getLocalName(), is("Object"));
                 assertThat(node.getText(), is("attrValue"));
                 assertThat(node.getAttributes(), is(expectedAttributes));
+                assertThat(node.getPosition(), is(1L));
             }
         });
 
@@ -385,6 +386,7 @@ public class XMLSlurperIT {
         assertThat(actualOtherObject.getLocalName(), is(otherObject.getLocalName()));
         assertThat(actualOtherObject.getQName(), is(otherObject.getQName()));
         assertThat(actualOtherObject.getAttributes(), is(otherObject.getAttributes()));
+        assertThat(actualOtherObject.getPosition(), is(2L));
 
         XMLNode actualParentObject = actualOtherObject.getParent();
 
@@ -394,6 +396,7 @@ public class XMLSlurperIT {
         assertThat(actualParentObject.getLocalName(), is(parentObject.getLocalName()));
         assertThat(actualParentObject.getQName(), is(parentObject.getQName()));
         assertThat(actualParentObject.getAttributes(), is(parentObject.getAttributes()));
+        assertThat(actualParentObject.getPosition(), is(2L));
     }
 
     @Test
