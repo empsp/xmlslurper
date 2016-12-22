@@ -58,7 +58,7 @@ The following is a list of XMLSlurper capabilities:
 6. Read all elements that are descendants of the given element (wildcard `**`).
 7. Read n-th/all n-th elements with respect to capabilities above.
 
-All of the above will return nodes together with their parent nodes. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the XML document.
+All of the above will return nodes, each having a reference to it's parent. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the XML document.
 
 Additionally the library ensures that:
 
@@ -128,7 +128,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-	xmlSlurper.getNodes().findAll((parent, node) -> {
+	xmlSlurper.getNodes().findAll(node -> {
 		// your code here
 	});
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
@@ -140,31 +140,31 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `parent=null, node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='null', attrByQName={xmlns=http://movieDb}}`
+	1 | `node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='null', attrByQName={xmlns=http://movieDb}}, node.getParent()=null`
 	Comment | The first event is a start node event on a root node. In such a case, parent will have a `null` value.
-	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={title=Titanic, director=James Cameron}}`
+	2 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={title=Titanic, director=James Cameron}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
 	Comment | 'MovieDb' parent node's text has been updated with new line and spaces (here symbolized by tab `\t` character) that there are before the start of a 'Movie' node. The information may be irrelevant and could have been omitted, however without a schema `mixed` attribute on the element definition, XMLSlurper won't know how to handle whitespaces, therefore it's safe to assume that all characters count.
-	3 | `parent=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}, node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='null', attrByQName={}}`
+	3 | `node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='null', attrByQName={}}, node.getParent()=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}`
 	Comment | 'Movie' parent node's text has been updated with white characters as well.
-	4 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}`
+	4 | `node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
 	Comment | As a start node event, the text value of a 'LeadActor' node is still `null`.
-	5 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
+	5 | `node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
 	Comment | Here, at end node event, the text value of the 'LeadActor' node is finally available.
-	6 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}`
+	6 | `node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
 	Comment | Another start node event, and the text value of a 'LeadActress' node is `null`, however the text value of the 'Cast' parent node has been updated with additional white characters found before processing 'LeadActress'.
-	7 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
-	8 | `parent=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}, node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t\n\t\t', attrByQName={}}`
-	9 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={title=Titanic, director=James Cameron}}`
-	10 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	7 | `node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	8 | `node=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t\n\t\t', attrByQName={}}, node.getParent()=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={title=Titanic, director=James Cameron}}`
+	9 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={title=Titanic, director=James Cameron}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	10 | `node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 	Comment | 'Franchise' node is from a separate namespace. Namespace and prefix fields will reflect that fact. Attributes hold additional metadata attribute 'xmlns:fr' and it's available together with ordinary attributes. Attribute 'title' has a prefix 'fr' which distinguishes it from the other nodes' 'title' attributes.
 	.. | | 
-	46 | `parent=null, node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}}` |
+	46 | `node=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t\n', attributeByQName={}}, node.getParent()=null` |
 
 2. Read all 'Movie' nodes directly under 'MovieDb' root node
 
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-	xmlSlurper.getNodes().node("MovieDb").node("Movie").findAll((parent, node) -> {
+	xmlSlurper.getNodes().node("MovieDb").node("Movie").findAll(node -> {
 		// your code here
 	});
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
@@ -174,16 +174,16 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}`
-	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}`
-	3 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
-	4 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+	1 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	2 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	3 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	4 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 
 3. Read all nodes having 'title' attribute
 
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-	xmlSlurper.getNodes().attr("title").findAll((parent, node) -> {
+	xmlSlurper.getNodes().attr("title").findAll(node -> {
 		// your code here
 	});
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
@@ -193,22 +193,22 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}`
-	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}`
-	3 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}`
+	1 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	2 | `node=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t', attrByQName={director=James Cameron, title=Titanic}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t', attrByQName={xmlns=http://movieDb}}`
+	3 | `node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
 	Comment | 'Franchise' node is only available here as a parent node. It has not been found as a node because it has a 'title' attribute within different namespace.
-	4 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}`
-	5 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}`
-	6 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}`
-	7 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
-	8 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+	4 | `node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	5 | `node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	6 | `node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	7 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	8 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 
 	
 	However, searching for an attribute with prefix (qName) will have different results:
 	
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-	xmlSlurper.getNodes().attr("fr:title").findAll((parent, node) -> {
+	xmlSlurper.getNodes().attr("fr:title").findAll(node -> {
 		// your code here
 	});
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
@@ -218,16 +218,16 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	1 | `node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='null', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 	Comment | Here, 'Franchise' node is a result node having a parent node 'MovieDb'.
-	2 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	2 | `node=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 
 4. Read all nodes having 'title' attribute value containing word 'Furious' or equal to 'Forest Gump'
 	
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 	
-	NodeListener listener = (parent, node) -> {
+	NodeListener listener = node -> {
 		// your code here
 	};
 	
@@ -243,7 +243,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 	
-	NodeListener listener = (parent, node) -> {
+	NodeListener listener = node -> {
 		// your code here
 	};
 	
@@ -257,19 +257,19 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}`
-	2 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}`
-	3 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}`
-	4 | `parent=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}`
-	5 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
-	6 | `parent=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}, node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}`
+	1 | `node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	2 | `node=XMLNode{id=6, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=Rob Cohen, title=The Fast and the Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	3 | `node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	4 | `node=XMLNode{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attrByQName={director=John Singleton, title=2 Fast 2 Furious}}, node.getParent()=XMLNode{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attrByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
+	5 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='null', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
+	6 | `node=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t\n\t\t\n\t\t\n\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, node.getParent()=XMLNode{id=0, namespace='null', prefix='null', localName='MovieDb', text='\n\t\n\t\n\t', attrByQName={xmlns=http://movieDb}}`
 
 
 5. Read cast from movies (excluding franchises)
 	
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-	xmlSlurper.getNodes("MovieDb", "Movie", "Cast", "*").findAll((parent, node) -> {
+	xmlSlurper.getNodes("MovieDb", "Movie", "Cast", "*").findAll(node -> {
 		// your code here
 	});
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
@@ -281,14 +281,14 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}`
-	2 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}`
-	3 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}`
-	4 | `parent=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
-	5 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}`
-	6 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}, node=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}`
-	7 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}`
-	8 | `parent=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}, node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
+	1 | `node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	2 | `node=XMLNode{id=3, namespace='null', prefix='null', localName='LeadActor', text='Leonardo DiCaprio', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	3 | `node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	4 | `node=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}, node.getParent()=XMLNode{id=2, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	5 | `node=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='null', attrByQName={}}, node.getParent()=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	6 | `node=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}, node.getParent()=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t', attrByQName={}}`
+	7 | `node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='null', attrByQName={}}, node.getParent()=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
+	8 | `node=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}, node.getParent()=XMLNode{id=17, namespace='null', prefix='null', localName='Cast', text='\n\t\t\t\n\t\t\t', attrByQName={}}`
 	
 	However, we've lost the information regarding which movie given cast belongs to. Also, some of the events are meaningless because text information is not yet available. Lets fix that:
 	
@@ -296,14 +296,14 @@ It is also possible to retrieve all elements being descendants of the given elem
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 	
 	Map<XMLNode, XMLNode> movieByCast = new HashMap<>();
-	NodeListener castListener = (cast, person) -> {
-		XMLNode movie = movieByCast.get(cast);
+	NodeListener castListener = person -> {
+		XMLNode movie = movieByCast.get(person.getParent());
 		
 		// your code here
 	};
 	
 	SlurpNode cast = xmlSlurper.getNodes("MovieDb", "Movie", "Cast");
-	cast.findAll((movie, cast) -> movieByCast.put(cast, movie), null);
+	cast.findAll(cast -> movieByCast.put(cast, cast.getParent()), null);
 	cast.node("*").findAll(null, castListener);
 	
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
@@ -327,14 +327,14 @@ It is also possible to retrieve all elements being descendants of the given elem
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 	
 	Deque<XMLNode> movies = new ArrayDeque<>();
-	NodeListener castListener = (cast, person) -> {
+	NodeListener castListener = person -> {
 		XMLNode movie = movies.peekLast();
 	
 		// your code here
 	};
 	
 	SlurpNode cast = xmlSlurper.getNodes("**", "Movie", "Cast");
-	cast.findAll((movie, cast) -> movies.addLast(movie), (movie, cast) -> movies.removeLast());
+	cast.findAll(cast -> movies.addLast(cast.getParent()), cast -> movies.removeLast());
 	cast.node("*").findAll(null, castListener);
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
 	```
@@ -358,7 +358,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	```java
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-	xmlSlurper.getNodes("**", "fr:Franchise", "Movie").get(2).find(null, (franchise, movie) -> {
+	xmlSlurper.getNodes("**", "fr:Franchise", "Movie").get(2).find(null, movie -> {
 		// your code here
 	});
 	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
@@ -368,7 +368,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Event Id | Data available
 	--- | ---
-	1 | `franchise=XMLNodeImpl{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attributeByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}, movie=XMLNodeImpl{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attributeByQName={director=John Singleton, title=2 Fast 2 Furious}}`
+	1 | `movie=XMLNodeImpl{id=10, namespace='null', prefix='null', localName='Movie', text='\n\t\t\t\n\t\t', attributeByQName={director=John Singleton, title=2 Fast 2 Furious}}, movie.getParent()=XMLNodeImpl{id=5, namespace='http://franchise', prefix='fr', localName='Franchise', text='\n\t\t\n\t\t', attributeByQName={fr:title=Fast and Furious, xmlns:fr=http://franchise}}`
 	
 
 # XMLSpitter
@@ -431,7 +431,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 	Deque<XMLStream> streams = new ArrayDeque<XMLStream>();
 	
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
-	xmlSlurper.getNodes("**", "Movie").findAll((parent, movie) -> {
+	xmlSlurper.getNodes("**", "Movie").findAll(movie -> {
 		try {
 			XMLStream stream = xmlSpitter.createStream(
 				new FileOutputStream("movie" + movie.getId() + ".xml"), "1.0", "UTF-8");
@@ -441,7 +441,7 @@ It is also possible to retrieve all elements being descendants of the given elem
 		} catch (FileNotFoundException e) {
 			// handle IO related exception
 		}
-	}, (parent, movie) -> {
+	}, movie -> {
 		XMLStream stream = streams.removeLast();
 
 		stream.writeEndElement();
@@ -449,8 +449,8 @@ It is also possible to retrieve all elements being descendants of the given elem
 	});
 
 	xmlSlurper.getNodes("**", "Movie", "**").findAll(
-	(movie, node) -> streams.peekLast().writeStartElement(node),
-	(movie, node) -> {
+	node -> streams.peekLast().writeStartElement(node),
+	node -> {
 		XMLStream stream = streams.peekLast();
 
 		stream.writeCharacters(node.getText());
@@ -488,7 +488,7 @@ It is also possible to retrieve all elements being descendants of the given elem
     	
 	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 	SlurpNode movieNode = xmlSlurper.getNodes("**", "Movie");
-	movieNode.findAll((parent, movie) -> {
+	movieNode.findAll(movie -> {
 		try {
 			osSupplier.set(new FileOutputStream("movie" + movie.getId() + ".xml"));
 		} catch (FileNotFoundException e) {
