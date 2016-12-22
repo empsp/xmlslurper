@@ -320,6 +320,19 @@ It is also possible to retrieve all elements being descendants of the given elem
 	2 | `movie=XMLNode{id=1, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=James Cameron, title=Titanic}}, person=XMLNode{id=4, namespace='null', prefix='null', localName='LeadActress', text='Kate Winslet', attrByQName={}}`
 	3 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=18, namespace='null', prefix='null', localName='LeadActor', text='Tom Hanks', attrByQName={}}`
 	4 | `movie=XMLNode{id=16, namespace='null', prefix='null', localName='Movie', text='\n\t\t', attrByQName={director=Robert Zemeckis, title=Forest Gump}}, person=XMLNode{id=19, namespace='null', prefix='null', localName='LeadActress', text='Robin Wright', attrByQName={}}`
+	
+	Still, there is even simpler way to get movie information from children nodes of the 'Cast' nodes:
+	
+	```java
+	XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
+	SlurpNode cast = xmlSlurper.getNodes("MovieDb", "Movie", "Cast", "*").findAll(null, person -> {
+		XMLNode cast = person.getParent();
+		XMLNode movie = cast.getParent();
+		
+		// your code here
+	});
+	xmlSlurper.parse(new FileInputStream("samplefile.xml"));
+	```
 
 6. Read cast from all movies (including franchises)
 	
