@@ -297,7 +297,8 @@ It is also possible to retrieve all elements being descendants of the given elem
 	
 	Map<XMLNode, XMLNode> movieByCast = new HashMap<>();
 	NodeListener castListener = person -> {
-		XMLNode movie = movieByCast.get(person.getParent());
+		XMLNode cast = person.getParent();
+		XMLNode movie = movieByCast.get(cast);
 		
 		// your code here
 	};
