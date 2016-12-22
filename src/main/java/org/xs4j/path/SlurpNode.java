@@ -2,7 +2,7 @@ package org.xs4j.path;
 
 import org.xs4j.XMLSlurper;
 
-import com.sun.istack.NotNull;
+import org.xs4j.util.NotNull;
 
 /**
  * A search node API that narrows the search to particular XPath/GPath similar pattern.

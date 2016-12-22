@@ -1,7 +1,7 @@
 package org.xs4j;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
+import org.xs4j.util.NotNull;
+import org.xs4j.util.Nullable;
 import org.xs4j.listener.NodeListener;
 import org.xs4j.path.Slurp;
 
@@ -11,6 +11,8 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.OutputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
+
+import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 12/8/2016.
@@ -33,37 +35,37 @@ public class StAXSpitter implements XMLSpitter {
     }
 
     @Override
-    public void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier) {
+    public void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier) {
         startWriteOne(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
     }
 
     @Override
-    public void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version) {
+    public void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version) {
         startWriteOne(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
     }
 
     @Override
-    public void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding) {
+    public void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version, @NotNull final String encoding) {
         startWriteOne(documentNode, contentNodes, outputStreamSupplier, encoding, version);
     }
 
     @Override
-    public void writeAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier) {
+    public void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier) {
         startWriteAll(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
     }
 
     @Override
-    public void writeAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version) {
+    public void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, final String version) {
         startWriteAll(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
     }
 
     @Override
-    public void writeAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding) {
+    public void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version, @NotNull final String encoding) {
         startWriteAll(documentNode, contentNodes, outputStreamSupplier, encoding, version);
     }
 
     @Override
-    public XMLStream createStream(OutputStream outputStream) {
+    public XMLStream createStream(@NotNull OutputStream outputStream) {
         try {
             return createStreamAndStartWrite(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
         } catch (XMLStreamException e) {
@@ -72,7 +74,7 @@ public class StAXSpitter implements XMLSpitter {
     }
 
     @Override
-    public XMLStream createStream(OutputStream outputStream, String version) {
+    public XMLStream createStream(@NotNull OutputStream outputStream, @NotNull String version) {
         try {
             return createStreamAndStartWrite(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, version);
         } catch (XMLStreamException e) {
@@ -81,7 +83,7 @@ public class StAXSpitter implements XMLSpitter {
     }
 
     @Override
-    public XMLStream createStream(OutputStream outputStream, String version, String encoding) {
+    public XMLStream createStream(@NotNull OutputStream outputStream, @NotNull String version, @NotNull String encoding) {
         try {
             return createStreamAndStartWrite(outputStream, encoding, version);
         } catch (XMLStreamException e) {
@@ -90,6 +92,10 @@ public class StAXSpitter implements XMLSpitter {
     }
 
     private XMLStream createStreamAndStartWrite(OutputStream outputStream, String encoding, String version) throws XMLStreamException {
+        requireNonNull(outputStream);
+        requireNonNull(encoding);
+        requireNonNull(version);
+
         XMLStreamWriter writer = xmlOutputFactory.createXMLStreamWriter(outputStream);
         writer.writeStartDocument(encoding, version);
 
@@ -97,6 +103,12 @@ public class StAXSpitter implements XMLSpitter {
     }
 
     private void startWriteOne(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier osSupplier, final String encoding, final String version) {
+        requireNonNull(documentNode);
+        requireNonNull(contentNodes);
+        requireNonNull(osSupplier);
+        requireNonNull(encoding);
+        requireNonNull(version);
+
         final XMLStream[] streams = new XMLStream[1];
         final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
 
@@ -109,6 +121,12 @@ public class StAXSpitter implements XMLSpitter {
     }
 
     private void startWriteAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier osSupplier, final String encoding, final String version) {
+        requireNonNull(documentNode);
+        requireNonNull(contentNodes);
+        requireNonNull(osSupplier);
+        requireNonNull(encoding);
+        requireNonNull(version);
+
         final XMLStream[] streams = new XMLStream[1];
         final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
 
@@ -136,7 +154,7 @@ public class StAXSpitter implements XMLSpitter {
         }
 
         @Override
-        public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+        public void onNode(@NotNull XMLNode node) {
             try {
                 streams[0] = createStreamAndStartWrite(osSupplier.supply(), encoding, version);
                 streams[0].writeCharacters(NEWLINE);
@@ -159,7 +177,7 @@ public class StAXSpitter implements XMLSpitter {
         }
 
         @Override
-        public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+        public void onNode(@NotNull XMLNode node) {
             descendants.removeLast();
 
             streams[0].writeCharacters(NEWLINE);
@@ -179,7 +197,7 @@ public class StAXSpitter implements XMLSpitter {
         }
 
         @Override
-        public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+        public void onNode(@NotNull XMLNode node) {
             streams[0].writeCharacters(NEWLINE);
             formatIndent(streams[0], descendants);
             streams[0].writeStartElement(node);
@@ -198,7 +216,7 @@ public class StAXSpitter implements XMLSpitter {
         }
 
         @Override
-        public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+        public void onNode(@NotNull XMLNode node) {
             descendants.removeLast();
 
             String characters = node.getText();

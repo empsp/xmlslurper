@@ -2,8 +2,6 @@ package org.xs4j;
 
 import org.xml.sax.Attributes;
 
-import javax.xml.stream.XMLStreamReader;
-
 /**
  * Created by mturski on 11/29/2016.
  */

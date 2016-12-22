@@ -1,7 +1,7 @@
 package org.xs4j;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
+import org.xs4j.util.NotNull;
+import org.xs4j.util.Nullable;
 import org.xs4j.NodeNotifier.FindData;
 import org.xs4j.listener.NodeListener;
 import org.xs4j.path.Slurp;
@@ -10,7 +10,7 @@ import org.xs4j.path.SlurpNode;
 
 import java.util.List;
 
-import static org.xs4j.util.NotNullValidator.requireNonNull;
+import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/21/2016.

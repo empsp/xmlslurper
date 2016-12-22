@@ -41,9 +41,9 @@ public class XMLSlurperIT {
         XMLNode firstObject = createNode(1L, "Object");
 
         InOrder inOrder = inOrder(listener);
-        inOrder.verify(listener).onNode(null, root);
-        inOrder.verify(listener, times(2)).onNode(root, firstObject);
-        inOrder.verify(listener).onNode(null, root);
+        inOrder.verify(listener).onNode(root);
+        inOrder.verify(listener, times(2)).onNode(firstObject);
+        inOrder.verify(listener).onNode(root);
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -56,7 +56,7 @@ public class XMLSlurperIT {
         parse("simpleTestCase.xml", "ObjectTree");
 
         // then
-        verify(listener, times(2)).onNode(null, createNode(0L, "ObjectTree"));
+        verify(listener, times(2)).onNode(createNode(0L, "ObjectTree"));
         verifyNoMoreInteractions(listener);
     }
 
@@ -73,7 +73,7 @@ public class XMLSlurperIT {
         XMLNode object = createNode(1L, "Object");
 
         InOrder inOrder = inOrder(listener);
-        inOrder.verify(listener, times(2)).onNode(root, object);
+        inOrder.verify(listener, times(2)).onNode(object);
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -87,7 +87,7 @@ public class XMLSlurperIT {
 
         // then
         ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
-        verify(listener, times(2)).onNode(nodeCaptor.capture(), nodeCaptor.capture());
+        verify(listener, times(2)).onNode(nodeCaptor.capture());
         verifyNoMoreInteractions(listener);
         List<XMLNode> actualNodes = nodeCaptor.getAllValues();
 
@@ -95,10 +95,11 @@ public class XMLSlurperIT {
         expectedAttributes.put("attr1", "SOMEOBJ");
         expectedAttributes.put("attr2", "E=1");
 
-        XMLNode actualNode = actualNodes.get(1);
+        XMLNode actualNode = actualNodes.get(0);
         assertThat(actualNode.getLocalName(), is("Object"));
         assertThat(actualNode.getText(), is("attrValue"));
         assertThat(actualNode.getAttributes(), is(expectedAttributes));
+        assertThat(actualNode.getParent().getLocalName(), is("ObjectTree"));
     }
 
     @Test
@@ -110,11 +111,10 @@ public class XMLSlurperIT {
         parse("borderTestCase.xml", "ObjectTree", "Object", "OtherObject");
 
         // then
-        XMLNode object = createNode(1L, "Object");
         XMLNode other = createNode(2L, "OtherObject");
 
         InOrder inOrder = inOrder(listener);
-        inOrder.verify(listener, times(2)).onNode(object, other);
+        inOrder.verify(listener, times(2)).onNode(other);
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -144,14 +144,13 @@ public class XMLSlurperIT {
         parser.parse(getResource(this, "borderTestCase.xml"));
 
         // then
-        XMLNode root = createNode(0L, "ObjectTree");
         XMLNode object = createNode(1L, "Object");
         XMLNode other = createNode(2L, "OtherObject");
 
         InOrder inOrder = inOrder(objectListener, otherObjectListener);
-        inOrder.verify(objectListener).onNode(root, object);
-        inOrder.verify(otherObjectListener, times(2)).onNode(object, other);
-        inOrder.verify(objectListener).onNode(root, object);
+        inOrder.verify(objectListener).onNode(object);
+        inOrder.verify(otherObjectListener, times(2)).onNode(other);
+        inOrder.verify(objectListener).onNode(object);
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -164,7 +163,7 @@ public class XMLSlurperIT {
 
         listener = spy(new NodeListener() {
             @Override
-            public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+            public void onNode(@NotNull XMLNode node) {
                 assertThat(node.getLocalName(), is("Object"));
                 assertNull(node.getText());
                 assertThat(node.getAttributes(), is(expectedAttributes));
@@ -176,7 +175,7 @@ public class XMLSlurperIT {
         parser.parse(getResource(this, "simpleTestCase.xml"));
 
         // then
-        verify(listener).onNode(any(XMLNode.class), any(XMLNode.class));
+        verify(listener).onNode(any(XMLNode.class));
         verifyNoMoreInteractions(listener);
     }
 
@@ -189,7 +188,7 @@ public class XMLSlurperIT {
 
         listener = spy(new NodeListener() {
             @Override
-            public void onNode(@Nullable XMLNode parent, @NotNull XMLNode node) {
+            public void onNode(@NotNull XMLNode node) {
                 assertThat(node.getLocalName(), is("Object"));
                 assertThat(node.getText(), is("attrValue"));
                 assertThat(node.getAttributes(), is(expectedAttributes));
@@ -201,7 +200,7 @@ public class XMLSlurperIT {
         parser.parse(getResource(this, "simpleTestCase.xml"));
 
         // then
-        verify(listener).onNode(any(XMLNode.class), any(XMLNode.class));
+        verify(listener).onNode(any(XMLNode.class));
         verifyNoMoreInteractions(listener);
     }
 
@@ -214,14 +213,13 @@ public class XMLSlurperIT {
         parse("borderTestCase.xml", getNodes().attr("attr1"));
 
         // then
-        XMLNode root = createNode(0L, "ObjectTree");
         XMLNode object = createNode(1L, "Object");
         XMLNode otherObject = createNode(2L, "OtherObject");
 
         InOrder inOrder = inOrder(listener);
-        inOrder.verify(listener).onNode(root, object);
-        inOrder.verify(listener, times(2)).onNode(object, otherObject);
-        inOrder.verify(listener).onNode(root, object);
+        inOrder.verify(listener).onNode(object);
+        inOrder.verify(listener, times(2)).onNode(otherObject);
+        inOrder.verify(listener).onNode(object);
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -234,10 +232,9 @@ public class XMLSlurperIT {
         parse("borderTestCase.xml", getNodes("ObjectTree", "Object").attr("attr2"));
 
         // then
-        XMLNode root = createNode(0L, "ObjectTree");
         XMLNode object = createNode(1L, "Object");
 
-        verify(listener, times(2)).onNode(root, object);
+        verify(listener, times(2)).onNode(object);
         verifyNoMoreInteractions(listener);
     }
 
@@ -262,13 +259,12 @@ public class XMLSlurperIT {
         parse("siblingsTestCase.xml", "Transport", "*");
 
         // then
-        XMLNode root = createNode(0L, "Transport");
         XMLNode sibling1st = createNode(1L, "Car");
         XMLNode sibling2nd = createNode(5L, "Plane");
 
         InOrder inOrder = inOrder(listener);
-        inOrder.verify(listener, times(2)).onNode(root, sibling1st);
-        inOrder.verify(listener, times(2)).onNode(root, sibling2nd);
+        inOrder.verify(listener, times(2)).onNode(sibling1st);
+        inOrder.verify(listener, times(2)).onNode(sibling2nd);
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -293,10 +289,9 @@ public class XMLSlurperIT {
         parse("siblingsTestCase.xml", getNodes("Transport", "*").attr("modelVersion"));
 
         // then
-        XMLNode root = createNode(0L, "Transport");
         XMLNode object = createNode(1L, "Car");
 
-        verify(listener, times(2)).onNode(root, object);
+        verify(listener, times(2)).onNode(object);
         verifyNoMoreInteractions(listener);
     }
 
@@ -309,10 +304,9 @@ public class XMLSlurperIT {
         parse("siblingsTestCase.xml", getNodes("Transport", "*").attr("manufacturer").is("Boeing"));
 
         // then
-        XMLNode root = createNode(0L, "Transport");
         XMLNode object = createNode(5L, "Plane");
 
-        verify(listener, times(2)).onNode(root, object);
+        verify(listener, times(2)).onNode(object);
         verifyNoMoreInteractions(listener);
     }
 
@@ -325,10 +319,9 @@ public class XMLSlurperIT {
         parse("siblingsTestCase.xml", getNodes("Transport", "*", "Engine").attr("type").isNot("Turbofan"));
 
         // then
-        XMLNode object = createNode(1L, "Car");
         XMLNode child = createNode(2L, "Engine");
 
-        verify(listener, times(2)).onNode(object, child);
+        verify(listener, times(2)).onNode(child);
         verifyNoMoreInteractions(listener);
     }
 
@@ -353,10 +346,9 @@ public class XMLSlurperIT {
         parse("borderTestCase.xml", getNodes().attr("attr2").regex("[^,]?OTHER[\\w_]*[\\s=]+\\d{2}4"));
 
         // then
-        XMLNode object = createNode(3L, "OtherObject");
         XMLNode child = createNode(4L, "OtherObject");
 
-        verify(listener, times(2)).onNode(object, child);
+        verify(listener, times(2)).onNode(child);
         verifyNoMoreInteractions(listener);
     }
 
@@ -370,23 +362,38 @@ public class XMLSlurperIT {
         parser.parse(getResource(this, "namespaceTestCase.xml"));
 
         // then
+        Map<String, String> parentObjectAttrs = new HashMap<String, String>();
+        parentObjectAttrs.put("xmlns:other", "http://other");
+        parentObjectAttrs.put("other:attr3", "123");
+        XMLNode parentObject = createNode(3L, "http://other", "other", "OtherObject", parentObjectAttrs);
+
         Map<String, String> otherObjectAttrs = new HashMap<String, String>();
         otherObjectAttrs.put("xmlns:other", "http://other");
         otherObjectAttrs.put("other:attr2", "OTHER = 123,OTHER_OBJECT = 125");
-        XMLNode otherObject = createNode(3L, "http://general", null, "OtherObject", otherObjectAttrs);
+        XMLNode otherObject = createNode(5L, "http://general", null, "OtherObject", otherObjectAttrs);
 
         ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
-        verify(listener).onNode(nodeCaptor.capture(), nodeCaptor.capture());
+        verify(listener).onNode(nodeCaptor.capture());
         verifyNoMoreInteractions(listener);
 
         List<XMLNode> actualNodes = nodeCaptor.getAllValues();
-        XMLNode actualOtherObject = actualNodes.get(1);
+        XMLNode actualOtherObject = actualNodes.get(0);
 
+        assertThat(actualOtherObject.getId(), is(otherObject.getId()));
         assertThat(actualOtherObject.getNamespace(), is(otherObject.getNamespace()));
         assertThat(actualOtherObject.getPrefix(), is(otherObject.getPrefix()));
         assertThat(actualOtherObject.getLocalName(), is(otherObject.getLocalName()));
         assertThat(actualOtherObject.getQName(), is(otherObject.getQName()));
         assertThat(actualOtherObject.getAttributes(), is(otherObject.getAttributes()));
+
+        XMLNode actualParentObject = actualOtherObject.getParent();
+
+        assertThat(actualParentObject.getId(), is(parentObject.getId()));
+        assertThat(actualParentObject.getNamespace(), is(parentObject.getNamespace()));
+        assertThat(actualParentObject.getPrefix(), is(parentObject.getPrefix()));
+        assertThat(actualParentObject.getLocalName(), is(parentObject.getLocalName()));
+        assertThat(actualParentObject.getQName(), is(parentObject.getQName()));
+        assertThat(actualParentObject.getAttributes(), is(parentObject.getAttributes()));
     }
 
     @Test
@@ -400,11 +407,11 @@ public class XMLSlurperIT {
 
         // then
         ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
-        verify(listener).onNode(nodeCaptor.capture(), nodeCaptor.capture());
+        verify(listener).onNode(nodeCaptor.capture());
         verifyNoMoreInteractions(listener);
 
         List<XMLNode> actualNodes = nodeCaptor.getAllValues();
-        XMLNode actualOtherObject = actualNodes.get(1);
+        XMLNode actualOtherObject = actualNodes.get(0);
 
         assertNull(actualOtherObject.getText());
     }
@@ -420,11 +427,11 @@ public class XMLSlurperIT {
 
         // then
         ArgumentCaptor<XMLNode> nodeCaptor = ArgumentCaptor.forClass(XMLNode.class);
-        verify(listener).onNode(nodeCaptor.capture(), nodeCaptor.capture());
+        verify(listener).onNode(nodeCaptor.capture());
         verifyNoMoreInteractions(listener);
 
         List<XMLNode> actualNodes = nodeCaptor.getAllValues();
-        XMLNode actualOtherObject = actualNodes.get(1);
+        XMLNode actualOtherObject = actualNodes.get(0);
 
         assertThat(actualOtherObject.getText(), is("\n        \n        \n    "));
     }

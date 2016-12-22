@@ -1,5 +1,8 @@
 package org.xs4j;
 
+import org.xs4j.util.NotNull;
+import org.xs4j.util.Nullable;
+
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -7,6 +10,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 12/8/2016.
@@ -31,14 +36,14 @@ public class StAXStream implements XMLStream {
     }
 
     @Override
-    public void writeElement(XMLNode node) {
+    public void writeElement(@NotNull XMLNode node) {
         writeStartElement(node);
         writeCharacters(node.getText());
         writeEndElement();
     }
 
     @Override
-    public void writeStartElement(XMLNode node) {
+    public void writeStartElement(@NotNull XMLNode node) {
         try {
             doWriteStartElement(node);
         } catch (XMLStreamException e) {
@@ -47,6 +52,8 @@ public class StAXStream implements XMLStream {
     }
 
     private void doWriteStartElement(XMLNode node) throws XMLStreamException {
+        requireNonNull(node);
+
         descendants.addLast(node);
 
         writeStartElementWithNamespaces(node);
@@ -132,7 +139,7 @@ public class StAXStream implements XMLStream {
     }
 
     @Override
-    public void writeCharacters(String characters) {
+    public void writeCharacters(@Nullable String characters) {
         try {
             writer.writeCharacters(characters);
         } catch (XMLStreamException e) {
@@ -152,7 +159,9 @@ public class StAXStream implements XMLStream {
     }
 
     @Override
-    public void writeEndElement(XMLNode node) {
+    public void writeEndElement(@NotNull XMLNode node) {
+        requireNonNull(node);
+
         try {
             while (!node.equals(descendants.peekLast())) {
                 writer.writeEndElement();

@@ -1,7 +1,7 @@
 package org.xs4j;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
+import org.xs4j.util.NotNull;
+import org.xs4j.util.Nullable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.xs4j.util.NotNullValidator.requireNonNull;
+import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/15/2016.

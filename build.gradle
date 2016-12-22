@@ -19,7 +19,7 @@ apply plugin: 'maven-publish'
 
 group = 'org.xs4j'
 archivesBaseName = 'xmlslurper'
-version = '2.0.0'
+version = 'DYNAMIC-SNAPSHOT'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -37,8 +37,6 @@ repositories {
 dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.21'
-    // NotNull Nullable annotations
-    compile 'com.sun.istack:istack-commons-runtime:2.21'
 
     // Declare the dependency for your favourite test framework you want to use in your tests.
     // TestNG is also supported by the Gradle Test task. Just change the
@@ -71,7 +69,7 @@ publishing {
             from components.java
             groupId 'org.xs4j'
             artifactId 'xmlslurper'
-            version '2.0.0'
+            version project.version
             pom.withXml {
                 def root = asNode()
                 root.appendNode('description', 'An attempt to port parsing capabilities offered by Groovy XMLSlurper into the Java world. The following is not planned to be accurate projection, instead the most useful functions will be implemented.')
@@ -93,8 +91,7 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/empsp/xmlslurper.git'
         version {
-            name = '2.0.0'
-            vcsTag = 'v2.0.0'
+            name = project.version
         }
         publications = ['XMLSlurperPublication']
 

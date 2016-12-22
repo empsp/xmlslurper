@@ -1,6 +1,6 @@
 package org.xs4j.path;
 
-import com.sun.istack.NotNull;
+import org.xs4j.util.NotNull;
 
 /**
  * A search node API that narrows the search to attribute related information.

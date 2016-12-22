@@ -1,13 +1,13 @@
 package org.xs4j;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
+import org.xs4j.util.NotNull;
+import org.xs4j.util.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.xs4j.util.NotNullValidator.requireNonNull;
+import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 11/9/2016.
@@ -16,6 +16,7 @@ public final class XMLNodeImpl implements XMLNode {
     public static final int DEFAULT_SIZE = 16;
 
     private final long id;
+    private XMLNode parent;
 
     private String namespace;
     private String prefix;
@@ -37,6 +38,15 @@ public final class XMLNodeImpl implements XMLNode {
     @Override
     public long getId() {
         return id;
+    }
+
+    void setParent(XMLNode parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public XMLNode getParent() {
+        return parent;
     }
 
     @Override

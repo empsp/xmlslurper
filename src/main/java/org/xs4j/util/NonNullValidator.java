@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Created by mturski on 11/4/2016.
  */
-public final class NotNullValidator {
+public final class NonNullValidator {
     public static final <T> T requireNonNull(T obj) {
         if (obj == null)
             throw new NullPointerException();

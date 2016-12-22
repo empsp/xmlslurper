@@ -1,6 +1,6 @@
 package org.xs4j.path;
 
-import com.sun.istack.Nullable;
+import org.xs4j.util.Nullable;
 import org.xs4j.listener.NodeListener;
 
 /**

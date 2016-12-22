@@ -1,6 +1,7 @@
 package org.xs4j;
 
 import org.xs4j.path.Slurp;
+import org.xs4j.util.NotNull;
 
 import java.io.OutputStream;
 
@@ -21,7 +22,7 @@ public interface XMLSpitter {
      * @param outputStreamSupplier supplier of the {@link OutputStream}
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier);
+    void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier);
 
     /**
      * Writes single document node and it's content as a new XML document. Upon end writing, underlying
@@ -35,7 +36,7 @@ public interface XMLSpitter {
      * @param version new document's XML version
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version);
+    void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version);
 
     /**
      * Writes single document node and it's content as a new XML document. Upon end writing, underlying
@@ -50,7 +51,7 @@ public interface XMLSpitter {
      * @param encoding new document's XML encoding
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void write(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding);
+    void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version, @NotNull final String encoding);
 
     /**
      * Writes all document nodes matching {@link Slurp} <code>documentNode</code> parameter as new XML documents. Please
@@ -65,7 +66,7 @@ public interface XMLSpitter {
      * @param outputStreamSupplier supplier of the {@link OutputStream}
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void writeAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier);
+    void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier);
 
     /**
      * Writes all document nodes matching {@link Slurp} <code>documentNode</code> parameter as new XML documents. Please
@@ -81,7 +82,7 @@ public interface XMLSpitter {
      * @param version new document's XML version
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void writeAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version);
+    void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version);
 
     /**
      * Writes all document nodes matching {@link Slurp} <code>documentNode</code> parameter as new XML documents. Please
@@ -98,7 +99,7 @@ public interface XMLSpitter {
      * @param encoding new document's XML encoding
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void writeAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier outputStreamSupplier, final String version, final String encoding);
+    void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version, @NotNull final String encoding);
 
     /**
      * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
@@ -109,7 +110,8 @@ public interface XMLSpitter {
      * @return a new instance of <code>XMLStream</code> for writing XML documents
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    XMLStream createStream(OutputStream outputStream);
+    @NotNull
+    XMLStream createStream(@NotNull OutputStream outputStream);
 
     /**
      * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
@@ -121,7 +123,8 @@ public interface XMLSpitter {
      * @return a new instance of <code>XMLStream</code> for writing XML documents
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    XMLStream createStream(OutputStream outputStream, String version);
+    @NotNull
+    XMLStream createStream(@NotNull OutputStream outputStream, @NotNull String version);
 
     /**
      * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
@@ -134,7 +137,8 @@ public interface XMLSpitter {
      * @return a new instance of <code>XMLStream</code> for writing XML documents
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    XMLStream createStream(OutputStream outputStream, String version, String encoding);
+    @NotNull
+    XMLStream createStream(@NotNull OutputStream outputStream, @NotNull String version, @NotNull String encoding);
 
     /**
      * A data structure holding information about an {@link OutputStream}. The following is mutable to allow for dynamic
@@ -146,6 +150,7 @@ public interface XMLSpitter {
          *
          * @return a stream to which the document will be written
          */
+        @NotNull
         OutputStream supply();
 
         /**
@@ -154,6 +159,6 @@ public interface XMLSpitter {
          * @param outputStream
          * @return this instance of <code>OutputStreamSupplier</code>. Used for convenience for method chaining.
          */
-        OutputStreamSupplier set(OutputStream outputStream);
+        OutputStreamSupplier set(@NotNull OutputStream outputStream);
     }
 }

@@ -6,7 +6,6 @@ import org.xs4j.NodeNotifier.FindData;
 import org.xs4j.listener.NodeListener;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class SAXSlurperIT {
         // then
         XMLNode root = createNode(0L, "ObjectTree");
 
-        verify(listener, times(2)).onNode(null, root);
+        verify(listener, times(2)).onNode(root);
         verifyNoMoreInteractions(listener);
     }
 
@@ -51,7 +50,7 @@ public class SAXSlurperIT {
         // then
         XMLNode root = createNode(0L, "ObjectTree");
 
-        verify(listener).onNode(null, root);
+        verify(listener).onNode(root);
         verifyNoMoreInteractions(listener);
 
         verify(nodeNotifier, never()).peekLastDescendant();
@@ -73,7 +72,7 @@ public class SAXSlurperIT {
         XMLNode root = createNode(0L, "ObjectTree");
         XMLNode object = createNode(1L, "Object");
 
-        verify(listener).onNode(root, object);
+        verify(listener).onNode(object);
         verifyNoMoreInteractions(listener);
 
         verify(nodeNotifier, times(2)).peekLastDescendant();
