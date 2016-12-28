@@ -66,6 +66,16 @@ final class SlurpAlignmentFactory {
                 copiedAttrValues);
     }
 
+
+    public SlurpAlignment copyAlignmentAndAddAttributeStartsWithValue(SlurpAlignment slurpAlignment, String value) {
+        List<String> qNamePath = new ArrayList<String>(slurpAlignment.getPath());
+
+        return new StartsWithValueSlurpAttributeAlignmentWrapper(
+                getSlurpAlignment(qNamePath),
+                ((SlurpAttributeAlignmentWrapper)slurpAlignment).attrQName,
+                value);
+    }
+
     SlurpAlignment copyAlignmentAndAddAttributeRegexValue(SlurpAlignment slurpAlignment, String regex) {
         List<String> qNamePath = new ArrayList<String>(slurpAlignment.getPath());
         Pattern valuePattern = Pattern.compile(regex);
@@ -362,7 +372,7 @@ final class SlurpAlignmentFactory {
             if (slurpAlignment.checkAlignment(depth, lastNode)) {
                 String actualAttrValue = lastNode.getAttribute(attrQName);
 
-                return actualAttrValue != null && valuePattern.matcher(lastNode.getAttribute(attrQName)).find();
+                return actualAttrValue != null && valuePattern.matcher(actualAttrValue).find();
             }
 
             return false;
@@ -374,6 +384,45 @@ final class SlurpAlignmentFactory {
                 String actualAttrValue = descendants.peekLast().getAttribute(attrQName);
 
                 return actualAttrValue != null && valuePattern.matcher(actualAttrValue).find();
+            }
+
+            return false;
+        }
+
+        @Override
+        List<String> getPath() {
+            return slurpAlignment.getPath();
+        }
+    }
+
+    private class StartsWithValueSlurpAttributeAlignmentWrapper extends SlurpAlignment {
+        private final SlurpAlignment slurpAlignment;
+        private final String attrQName;
+        private final String value;
+
+        public StartsWithValueSlurpAttributeAlignmentWrapper(SlurpAlignment slurpAlignment, String attrQName, String value) {
+            this.slurpAlignment = slurpAlignment;
+            this.attrQName = attrQName;
+            this.value = value;
+        }
+
+        @Override
+        boolean checkAlignment(int depth, XMLNode lastNode) {
+            if (slurpAlignment.checkAlignment(depth, lastNode)) {
+                String actualAttrValue = lastNode.getAttribute(attrQName);
+
+                return actualAttrValue != null && actualAttrValue.startsWith(value);
+            }
+
+            return false;
+        }
+
+        @Override
+        boolean checkAlignment(Deque<XMLNode> descendants) {
+            if (slurpAlignment.checkAlignment(descendants)) {
+                String actualAttrValue = descendants.peekLast().getAttribute(attrQName);
+
+                return actualAttrValue != null && actualAttrValue.startsWith(value);
             }
 
             return false;

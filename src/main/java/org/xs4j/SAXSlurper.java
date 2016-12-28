@@ -37,8 +37,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private InputStream inputStream;
     private SAXParser parser;
 
-    private boolean isOnlyFindDataAvailable;
-
     SAXSlurper(SAXParserFactory saxParserFactory,
                SchemaFactory schemaFactory,
                SlurpFactory slurpFactory,
@@ -61,8 +59,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     @Override
     public void parse(@NotNull InputStream inputStream) throws ParserConfigurationException, SAXException, IOException {
         requireNonNull(inputStream);
-
-        isOnlyFindDataAvailable = nodeNotifier.isOnlyFindDataAvailable();
 
         this.inputStream = inputStream;
         try {
@@ -87,8 +83,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     public void parse(@NotNull InputStream inputStream, @NotNull File schemaFile) throws ParserConfigurationException, SAXException, IOException {
         requireNonNull(inputStream);
         requireNonNull(schemaFile);
-
-        isOnlyFindDataAvailable = nodeNotifier.isOnlyFindDataAvailable();
 
         this.inputStream = inputStream;
         try {
@@ -134,7 +128,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     private void terminateParsingIfPossible() throws SAXException {
-        if (isOnlyFindDataAvailable && nodeNotifier.isFindDataEmpty())
+        if (nodeNotifier.isFindAllDataEmpty() && nodeNotifier.isFindDataEmpty())
             throw new ParsingTerminationException();
     }
 

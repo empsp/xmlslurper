@@ -5,18 +5,17 @@ import org.xs4j.listener.NodeListener;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by mturski on 11/25/2016.
  */
 class NodeNotifier {
     private final PositionCounter positionCounter;
+    private final Deque<FindData> findData;
+    private final Deque<FindData> findAllData;
     private final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
-    private final List<FindData> findData;
-    private final List<FindData> findAllData;
 
-    NodeNotifier(PositionCounter positionCounter, List<FindData> findData, List<FindData> findAllData) {
+    NodeNotifier(PositionCounter positionCounter, Deque<FindData> findData, Deque<FindData> findAllData) {
         this.positionCounter = positionCounter;
         this.findData = findData;
         this.findAllData = findAllData;
@@ -52,13 +51,18 @@ class NodeNotifier {
     }
 
     private void notifyFindAllListenersOnStartNode(XMLNode node) {
-        for (FindData data : findAllData)
+        Iterator<FindData> findAllDataIt = findAllData.iterator();
+
+        while(findAllDataIt.hasNext()) {
+            FindData data = findAllDataIt.next();
+
             if (data.slurpAlignment.checkAlignment(descendants)) {
                 if (data.startNodeListener != null)
                     data.startNodeListener.onNode(node);
 
                 data.alignedNodeIds.add(node.getId());
             }
+        }
     }
 
     void onEndNode() {
@@ -84,7 +88,10 @@ class NodeNotifier {
     }
 
     private void notifyFindAllListenersOnEndNode(XMLNode node) {
-        for (FindData data : findAllData) {
+        Iterator<FindData> findAllDataIt = findAllData.iterator();
+
+        while(findAllDataIt.hasNext()) {
+            FindData data = findAllDataIt.next();
             long nodeId = node.getId();
 
             if (data.alignedNodeIds.contains(nodeId)) {
@@ -107,12 +114,12 @@ class NodeNotifier {
         findAllData.clear();
     }
 
-    boolean isOnlyFindDataAvailable() {
-        return findAllData.isEmpty();
-    }
-
     boolean isFindDataEmpty() {
         return findData.isEmpty();
+    }
+
+    public boolean isFindAllDataEmpty() {
+        return findAllData.isEmpty();
     }
 
     static class FindData {

@@ -439,6 +439,38 @@ public class XMLSlurperIT {
         assertThat(actualOtherObject.getText(), is("\n        \n        \n    "));
     }
 
+    @Test
+    public void givenListenerSetOnSlurpNodeAndThenRemovedFindAllReturnsNothing() throws Exception {
+        // given
+        NodeListener allNodeslistener = mock(NodeListener.class);
+        NodeListener objectListener = mock(NodeListener.class);
+
+        // when
+        final SlurpNode allNodes = getNodes();
+        allNodes.findAll(allNodeslistener);
+
+        SlurpNode objectSlurp = getNodes("ObjectTree", "Object");
+        objectSlurp.findAll(new NodeListener() {
+            @Override
+            public void onNode(@NotNull XMLNode node) {
+                allNodes.stopFindAll();
+            }
+        }, null);
+        objectSlurp.findAll(objectListener);
+
+        parser.parse(getResource(this, "simpleTestCase.xml"));
+
+        // then
+        XMLNode root = createNode(0L, "ObjectTree");
+        XMLNode firstObject = createNode(1L, "Object");
+
+        InOrder inOrder = inOrder(allNodeslistener, objectListener);
+        inOrder.verify(allNodeslistener).onNode(root);
+        inOrder.verify(allNodeslistener).onNode(firstObject);
+        inOrder.verify(objectListener, times(2)).onNode(firstObject);
+        inOrder.verifyNoMoreInteractions();
+    }
+
     @After
     public void teardown() {
         listener = null;

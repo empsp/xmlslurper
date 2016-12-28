@@ -6,8 +6,8 @@ import org.xs4j.NodeNotifier.FindData;
 import org.xs4j.listener.NodeListener;
 
 import javax.xml.stream.XMLStreamException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import static org.mockito.Mockito.*;
 import static org.xs4j.TestUtil.createNode;
@@ -87,8 +87,8 @@ public class SAXSlurperIT {
     }
 
     private NodeNotifier createSlurperWithSpyNodeNotifier() throws XMLStreamException {
-        List<FindData> findData = new ArrayList<FindData>();
-        List<FindData> findAllData = new ArrayList<FindData>();
+        Deque<FindData> findData = new ArrayDeque<FindData>();
+        Deque<FindData> findAllData = new ArrayDeque<FindData>();
 
         NodeNotifier nodeNotifier = spy(getNodeNotifier(findData, findAllData));
 

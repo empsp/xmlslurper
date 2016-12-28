@@ -18,6 +18,15 @@ public interface SlurpAttribute extends Slurp {
     Slurp is(@NotNull String value);
 
     /**
+     * Limits the search to given attribute's value starting with the given value on the current element.
+     *
+     * @param value that attribute's value starts with
+     * @return a new instance of <code>Slurp</code> search API to listen for node related events
+     */
+    @NotNull
+    Slurp startsWith(@NotNull String value);
+
+    /**
      * Limits the search to given attribute having value matching given Regex expression on the current element.
      *
      * @param regex expression to match attribute's value with

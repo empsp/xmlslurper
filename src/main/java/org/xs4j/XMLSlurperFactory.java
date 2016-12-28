@@ -8,7 +8,9 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.SchemaFactory;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -44,8 +46,8 @@ public class XMLSlurperFactory {
      * @return a new instance of <code>XMLSlurper</code>
      */
     public XMLSlurper createXMLSlurper() {
-        List<FindData> findData = new ArrayList<FindData>();
-        List<FindData> findAllData = new ArrayList<FindData>();
+        Deque<FindData> findData = new ArrayDeque<FindData>();
+        Deque<FindData> findAllData = new ArrayDeque<FindData>();
 
         XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
@@ -58,8 +60,8 @@ public class XMLSlurperFactory {
                 getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, xmlNodeFactory));
     }
 
-    static NodeNotifier getNodeNotifier(List<FindData> findData,
-                                        List<FindData> findAllData) {
+    static NodeNotifier getNodeNotifier(Deque<FindData> findData,
+                                        Deque<FindData> findAllData) {
         return new NodeNotifier(new PositionCounter(), findData, findAllData);
     }
 
@@ -68,8 +70,8 @@ public class XMLSlurperFactory {
     }
 
     static SlurpFactory getSlurpFactory(
-            List<FindData> findData,
-            List<FindData> findAllData,
+            Deque<FindData> findData,
+            Deque<FindData> findAllData,
             SlurpAlignmentFactory slurpAlignmentFactory) {
         return new SlurpFactory(findData, findAllData, slurpAlignmentFactory);
     }

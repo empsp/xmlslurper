@@ -13,7 +13,7 @@ public interface Slurp {
     /**
      * Upon finding first element matching the search pattern, the following will signal and provide relevant node
      * information to the given {@link NodeListener} instance. The parsing will end if all listeners are granted with
-     * the data and there are no listeners to the {@link Slurp#findAll} events. Typically, it will be used as anonymous
+     * the data and there are no listeners to any {@link Slurp#findAll} events. Typically, it will be used as anonymous
      * class relaying important information to the outside logic.
      *
      * @param nodeListener to provide data to
@@ -24,7 +24,7 @@ public interface Slurp {
      * Upon finding first element matching the search pattern, the following will signal and provide relevant node
      * information to the given {@link NodeListener} instances. Depending on which parameter supplies the listeners,
      * upon start-tag/end-tag the signaling will occur. The parsing will end if all listeners are granted with the data
-     * and there are no listeners to the {@link Slurp#findAll} events. Typically, it will be used as anonymous class
+     * and there are no listeners to any {@link Slurp#findAll} events. Typically, it will be used as anonymous class
      * relaying important information to the outside logic.
      *
      * @param startNodeListener to provide start-tag related element data to
@@ -34,8 +34,8 @@ public interface Slurp {
 
     /**
      * Upon finding an element matching the search pattern, the following will signal and provide relevant node
-     * information to the given {@link NodeListener} instance. The parsing will end on end of file (even if there are
-     * listeners to {@link Slurp#find} events). Typically, it will be used as anonymous class relaying important
+     * information to the given {@link NodeListener} instance. Unless stopped, the parsing will end on end of file.
+     * Typically, it will be used as anonymous class relaying important
      * information to the outside logic.
      *
      * @param nodeListener to provide data to
@@ -45,12 +45,18 @@ public interface Slurp {
     /**
      * Upon finding an element matching the search pattern, the following will signal and provide relevant node
      * information to the given {@link NodeListener} instances. Depending on which parameter supplies the listeners,
-     * upon start-tag/end-tag the signaling will occur. The parsing will end on end of file (even if there are
-     * listeners to {@link Slurp#find} events). Typically, it will be used as anonymous class relaying important
-     * information to the outside logic.
+     * upon start-tag/end-tag the signaling will occur. Unless stopped, the parsing will end on end of file. Typically,
+     * it will be used as anonymous class relaying important information to the outside logic.
      *
      * @param startNodeListener to provide start-tag related element data to
      * @param endNodeListener to provide end-tag related element data to
      */
     void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener);
+
+    /**
+     * Stops finding further elements matching the search pattern. All {@link NodeListener} instances listening to this
+     * {@link Slurp#findAll} will stop receiving signals. The parsing will end if there are none of {@link NodeListener}
+     * instances left for any {@link Slurp#find} and {@link Slurp#findAll} events.
+     */
+    void stopFindAll();
 }
