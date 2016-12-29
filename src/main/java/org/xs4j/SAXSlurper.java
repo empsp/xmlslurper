@@ -146,11 +146,21 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
             parser = null;
     }
 
-    static class SAXNamespaceAwareElementParser extends NamespaceSensitiveElementParser {
-        private final XMLNodeFactory xmlNodeFactory;
+    static abstract class NamespaceSensitiveElementParser {
+        final XMLNodeFactory xmlNodeFactory;
 
-        SAXNamespaceAwareElementParser(XMLNodeFactory xmlNodeFactory) {
+        NamespaceSensitiveElementParser(XMLNodeFactory xmlNodeFactory) {
             this.xmlNodeFactory = xmlNodeFactory;
+        }
+
+        XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    static class SAXNamespaceAwareElementParser extends NamespaceSensitiveElementParser {
+        SAXNamespaceAwareElementParser(XMLNodeFactory xmlNodeFactory) {
+            super(xmlNodeFactory);
         }
 
         @Override
@@ -186,10 +196,8 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     }
 
     static class SAXNamespaceBlindElementParser extends NamespaceSensitiveElementParser {
-        private final XMLNodeFactory xmlNodeFactory;
-
         SAXNamespaceBlindElementParser(XMLNodeFactory xmlNodeFactory) {
-            this.xmlNodeFactory = xmlNodeFactory;
+            super(xmlNodeFactory);
         }
 
         @Override
