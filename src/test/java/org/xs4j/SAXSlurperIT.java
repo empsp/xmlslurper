@@ -2,12 +2,9 @@ package org.xs4j;
 
 import org.junit.After;
 import org.junit.Test;
-import org.xs4j.NodeNotifier.FindData;
 import org.xs4j.listener.NodeListener;
 
 import javax.xml.stream.XMLStreamException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 import static org.mockito.Mockito.*;
 import static org.xs4j.TestUtil.createNode;
@@ -87,16 +84,13 @@ public class SAXSlurperIT {
     }
 
     private NodeNotifier createSlurperWithSpyNodeNotifier() throws XMLStreamException {
-        Deque<FindData> findData = new ArrayDeque<FindData>();
-        Deque<FindData> findAllData = new ArrayDeque<FindData>();
-
-        NodeNotifier nodeNotifier = spy(getNodeNotifier(findData, findAllData));
+        NodeNotifier nodeNotifier = spy(getNodeNotifier());
 
         XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
         slurper = new SAXSlurper(
                 getSaxParserFactory(true),
                 getSchemaFactory(),
-                getSlurpFactory(findData, findAllData, getSlurpAlignmentFactory()),
+                getSlurpFactory(nodeNotifier, getSlurpAlignmentFactory()),
                 nodeNotifier,
                 getSAXNamespaceSensitiveElementParser(false, xmlNodeFactory));
 

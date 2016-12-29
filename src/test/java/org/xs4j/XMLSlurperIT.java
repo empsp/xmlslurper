@@ -1,6 +1,7 @@
 package org.xs4j;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -9,6 +10,7 @@ import org.xs4j.path.Slurp;
 import org.xs4j.path.SlurpNode;
 import org.xs4j.util.NotNull;
 
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -440,34 +442,32 @@ public class XMLSlurperIT {
     }
 
     @Test
-    public void givenListenerSetOnSlurpNodeAndThenRemovedFindAllReturnsNothing() throws Exception {
+    public void givenListenerSetDuringOtherListenerOnNodeEventFindAllIncludesAdditionalListener() throws Exception {
         // given
-        NodeListener allNodeslistener = mock(NodeListener.class);
-        NodeListener objectListener = mock(NodeListener.class);
+        NodeListener carListener = mock(NodeListener.class);
+        final NodeListener planeListener = mock(NodeListener.class);
 
         // when
-        final SlurpNode allNodes = getNodes();
-        allNodes.findAll(allNodeslistener);
+        SlurpNode carSlurp = getNodes("Transport", "Car");
+        final SlurpNode planeSlurp = getNodes("Transport", "Plane");
 
-        SlurpNode objectSlurp = getNodes("ObjectTree", "Object");
-        objectSlurp.findAll(new NodeListener() {
+        carSlurp.findAll(null, carListener);
+        carSlurp.findAll(null, new NodeListener() {
             @Override
             public void onNode(@NotNull XMLNode node) {
-                allNodes.stopFindAll();
+                planeSlurp.find(null, planeListener);
             }
-        }, null);
-        objectSlurp.findAll(objectListener);
+        });
 
-        parser.parse(getResource(this, "simpleTestCase.xml"));
+        parser.parse(getResource(this, "siblingsTestCase.xml"));
 
         // then
-        XMLNode root = createNode(0L, "ObjectTree");
-        XMLNode firstObject = createNode(1L, "Object");
+        XMLNode car = createNode(1L, "Car");
+        XMLNode plane = createNode(5L, "Plane");
 
-        InOrder inOrder = inOrder(allNodeslistener, objectListener);
-        inOrder.verify(allNodeslistener).onNode(root);
-        inOrder.verify(allNodeslistener).onNode(firstObject);
-        inOrder.verify(objectListener, times(2)).onNode(firstObject);
+        InOrder inOrder = inOrder(carListener, planeListener);
+        inOrder.verify(carListener).onNode(car);
+        inOrder.verify(planeListener).onNode(plane);
         inOrder.verifyNoMoreInteractions();
     }
 

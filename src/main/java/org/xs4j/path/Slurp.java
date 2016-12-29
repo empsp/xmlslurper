@@ -1,7 +1,7 @@
 package org.xs4j.path;
 
-import org.xs4j.util.Nullable;
 import org.xs4j.listener.NodeListener;
+import org.xs4j.util.Nullable;
 
 /**
  * Base API for node/attribute name/attribute value searching. Provides methods to attach {@link NodeListener} instances
@@ -52,11 +52,4 @@ public interface Slurp {
      * @param endNodeListener to provide end-tag related element data to
      */
     void findAll(@Nullable NodeListener startNodeListener, @Nullable NodeListener endNodeListener);
-
-    /**
-     * Stops finding further elements matching the search pattern. All {@link NodeListener} instances listening to this
-     * {@link Slurp#findAll} will stop receiving signals. The parsing will end if there are none of {@link NodeListener}
-     * instances left for any {@link Slurp#find} and {@link Slurp#findAll} events.
-     */
-    void stopFindAll();
 }

@@ -4,6 +4,7 @@ import org.xs4j.path.Slurp;
 import org.xs4j.util.NotNull;
 
 import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * Defines a provider/wrapper API for node based XML documents writer.
@@ -12,94 +13,94 @@ import java.io.OutputStream;
  */
 public interface XMLSpitter {
     /**
-     * Writes single document node and it's content as a new XML document. Upon end writing, underlying
-     * {@link OutputStream} will be closed automatically.
+     * Writes single document node and it's content as a new XML document. Upon end writing, underlying output source
+     * will be closed automatically.
      *
      * @param documentNode <code>Slurp</code> identifying parsed input XML document element that will act as root
      *                     element in a new document
      * @param contentNodes <code>Slurp</code> identifying parsed input XML document elements that will be included as a
      *                     content into a new document
-     * @param outputStreamSupplier supplier of the {@link OutputStream}
+     * @param outputSupplier supplier of the {@link OutputStream} or {@link Writer}
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier);
+    void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier);
 
     /**
-     * Writes single document node and it's content as a new XML document. Upon end writing, underlying
-     * {@link OutputStream} will be closed automatically.
+     * Writes single document node and it's content as a new XML document. Upon end writing, underlying output source
+     * will be closed automatically.
      *
      * @param documentNode <code>Slurp</code> identifying parsed input XML document element that will act as root
      *                     element in a new document
      * @param contentNodes <code>Slurp</code> identifying parsed input XML document elements that will be included as a
      *                     content into a new document
-     * @param outputStreamSupplier supplier of the {@link OutputStream}
+     * @param outputSupplier supplier of the {@link OutputStream} or {@link Writer}
      * @param version new document's XML version
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version);
+    void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier, @NotNull final String version);
 
     /**
-     * Writes single document node and it's content as a new XML document. Upon end writing, underlying
-     * {@link OutputStream} will be closed automatically.
+     * Writes single document node and it's content as a new XML document. Upon end writing, underlying output source
+     * will be closed automatically.
      *
      * @param documentNode <code>Slurp</code> identifying parsed input XML document element that will act as root
      *                     element in a new document
      * @param contentNodes <code>Slurp</code> identifying parsed input XML document elements that will be included as a
      *                     content into a new document
-     * @param outputStreamSupplier supplier of the {@link OutputStream}
-     * @param version new document's XML version
-     * @param encoding new document's XML encoding
-     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
-     */
-    void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version, @NotNull final String encoding);
-
-    /**
-     * Writes all document nodes matching {@link Slurp} <code>documentNode</code> parameter as new XML documents. Please
-     * remember to provide new instance of {@link OutputStream} via {@link OutputStreamSupplier} each time new
-     * documentNode is detected, otherwise {@link XMLStreamRuntimeException} will be thrown as the {@link OutputStream}
-     * is automatically closed upon end writing.
-     *
-     * @param documentNode <code>Slurp</code> identifying parsed input XML document element that will act as root
-     *                     element in a new document
-     * @param contentNodes <code>Slurp</code> identifying parsed input XML document elements that will be included as a
-     *                     content into a new document
-     * @param outputStreamSupplier supplier of the {@link OutputStream}
-     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
-     */
-    void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier);
-
-    /**
-     * Writes all document nodes matching {@link Slurp} <code>documentNode</code> parameter as new XML documents. Please
-     * remember to provide new instance of {@link OutputStream} via {@link OutputStreamSupplier} each time new
-     * documentNode is detected, otherwise {@link XMLStreamRuntimeException} will be thrown as the {@link OutputStream}
-     * is automatically closed upon end writing.
-     *
-     * @param documentNode <code>Slurp</code> identifying parsed input XML document element that will act as root
-     *                     element in a new document
-     * @param contentNodes <code>Slurp</code> identifying parsed input XML document elements that will be included as a
-     *                     content into a new document
-     * @param outputStreamSupplier supplier of the {@link OutputStream}
-     * @param version new document's XML version
-     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
-     */
-    void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version);
-
-    /**
-     * Writes all document nodes matching {@link Slurp} <code>documentNode</code> parameter as new XML documents. Please
-     * remember to provide new instance of {@link OutputStream} via {@link OutputStreamSupplier} each time new
-     * documentNode is detected, otherwise {@link XMLStreamRuntimeException} will be thrown as the {@link OutputStream}
-     * is automatically closed upon end writing.
-     *
-     * @param documentNode <code>Slurp</code> identifying parsed input XML document element that will act as root
-     *                     element in a new document
-     * @param contentNodes <code>Slurp</code> identifying parsed input XML document elements that will be included as a
-     *                     content into a new document
-     * @param outputStreamSupplier supplier of the {@link OutputStream}
+     * @param outputSupplier supplier of the {@link OutputStream} or {@link Writer}
      * @param version new document's XML version
      * @param encoding new document's XML encoding
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
-    void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version, @NotNull final String encoding);
+    void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier, @NotNull final String version, @NotNull final String encoding);
+
+    /**
+     * Writes all document nodes matching {@link Slurp} <code>documentNode</code> parameter as new XML documents. Please
+     * remember to provide new instance of output source via {@link OutputSupplier} each time new documentNode is
+     * detected, otherwise {@link XMLStreamRuntimeException} will be thrown as the output source is automatically closed
+     * upon end of writing.
+     *
+     * @param documentNode <code>Slurp</code> identifying parsed input XML document element that will act as root
+     *                     element in a new document
+     * @param contentNodes <code>Slurp</code> identifying parsed input XML document elements that will be included as a
+     *                     content into a new document
+     * @param outputSupplier supplier of the {@link OutputStream} or {@link Writer}
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
+     */
+    void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier);
+
+    /**
+     * Writes all document nodes matching {@link Slurp} <code>documentNode</code> parameter as new XML documents. Please
+     * remember to provide new instance of output source via {@link OutputSupplier} each time new documentNode is
+     * detected, otherwise {@link XMLStreamRuntimeException} will be thrown as the output source is automatically closed
+     * upon end of writing.
+     *
+     * @param documentNode <code>Slurp</code> identifying parsed input XML document element that will act as root
+     *                     element in a new document
+     * @param contentNodes <code>Slurp</code> identifying parsed input XML document elements that will be included as a
+     *                     content into a new document
+     * @param outputSupplier supplier of the {@link OutputStream} or {@link Writer}
+     * @param version new document's XML version
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
+     */
+    void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier, @NotNull final String version);
+
+    /**
+     * Writes all document nodes matching {@link Slurp} <code>documentNode</code> parameter as new XML documents. Please
+     * remember to provide new instance of output source via {@link OutputSupplier} each time new documentNode is
+     * detected, otherwise {@link XMLStreamRuntimeException} will be thrown as the output source is automatically closed
+     * upon end of writing.
+     *
+     * @param documentNode <code>Slurp</code> identifying parsed input XML document element that will act as root
+     *                     element in a new document
+     * @param contentNodes <code>Slurp</code> identifying parsed input XML document elements that will be included as a
+     *                     content into a new document
+     * @param outputSupplier supplier of the {@link OutputStream} or {@link Writer}
+     * @param version new document's XML version
+     * @param encoding new document's XML encoding
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
+     */
+    void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier, @NotNull final String version, @NotNull final String encoding);
 
     /**
      * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
@@ -141,24 +142,63 @@ public interface XMLSpitter {
     XMLStream createStream(@NotNull OutputStream outputStream, @NotNull String version, @NotNull String encoding);
 
     /**
+     * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
+     * provides more freedom in new document construction. It allows creating XML documents from scratch without the
+     * need to previously parse any input XML documents.
+     *
+     * @param writer to which the document will be written
+     * @return a new instance of <code>XMLStream</code> for writing XML documents
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
+     */
+    @NotNull
+    XMLStream createStream(@NotNull Writer writer);
+
+    /**
+     * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
+     * provides more freedom in new document construction. It allows creating XML documents from scratch without the
+     * need to previously parse any input XML documents.
+     *
+     * @param writer to which the document will be written
+     * @param version new document's XML version
+     * @return a new instance of <code>XMLStream</code> for writing XML documents
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
+     */
+    @NotNull
+    XMLStream createStream(@NotNull Writer writer, @NotNull String version);
+
+    /**
+     * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
+     * provides more freedom in new document construction. It allows creating XML documents from scratch without the
+     * need to previously parse any input XML documents.
+     *
+     * @param writer to which the document will be written
+     * @param version new document's XML version
+     * @param encoding new document's XML encoding
+     * @return a new instance of <code>XMLStream</code> for writing XML documents
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
+     */
+    @NotNull
+    XMLStream createStream(@NotNull Writer writer, @NotNull String version, @NotNull String encoding);
+
+    /**
      * A data structure holding information about an {@link OutputStream}. The following is mutable to allow for dynamic
      * switches of the streams for multiple writing events.
      */
-    interface OutputStreamSupplier {
+    interface OutputSupplier<T> {
         /**
-         * Used internally to supply {@link XMLSpitter} with {@link OutputStream}.
+         * Used internally to supply {@link XMLSpitter} with output.
          *
-         * @return a stream to which the document will be written
+         * @return an output to which the document will be written
          */
         @NotNull
-        OutputStream supply();
+        T supply();
 
         /**
-         * Sets the {@link OutputStream} to be used for new XML document writing.
+         * Sets the output to be used for new XML document writing.
          *
-         * @param outputStream
-         * @return this instance of <code>OutputStreamSupplier</code>. Used for convenience for method chaining.
+         * @param output being the supply
+         * @return this instance of <code>OutputSupplier</code>. Used for convenience for method chaining.
          */
-        OutputStreamSupplier set(@NotNull OutputStream outputStream);
+        OutputSupplier<T> set(@NotNull T output);
     }
 }

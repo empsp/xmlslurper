@@ -1,9 +1,11 @@
 package org.xs4j;
 
-import org.xs4j.XMLSpitter.OutputStreamSupplier;
+import org.xs4j.XMLSpitter.OutputSupplier;
+import org.xs4j.util.NotNull;
 
 import javax.xml.stream.XMLOutputFactory;
-import java.io.OutputStream;
+
+import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 12/8/2016.
@@ -28,25 +30,41 @@ public class XMLSpitterFactory {
     }
 
     /**
-     * A convenient method to acquire generic {@link OutputStreamSupplier}.
+     * A convenient method to acquire generic {@link OutputSupplier}.
      *
-     * @return a new instance of <code>OutputStreamSupplier</code>
+     * @param <T> type of output
+     * @return a new instance of <code>OutputSupplier</code>
      */
-    public OutputStreamSupplier createOutputStreamSupplier() {
-        return new OutputStreamSupplier() {
-            private OutputStream outputStream;
+    public <T> OutputSupplier<T> createOutputSupplier() {
+        return new GenericOutputSupplier<T>();
+    }
 
-            @Override
-            public OutputStream supply() {
-                return outputStream;
-            }
+    /**
+     * A convenient method to acquire generic {@link OutputSupplier}.
+     *
+     * @param clazz instance of declared type of output
+     * @param <T> type of output
+     * @return a new instance of <code>OutputSupplier</code>
+     */
+    public <T> OutputSupplier<T> createOutputSupplier(Class<T> clazz) {
+        return new GenericOutputSupplier<T>();
+    }
 
-            @Override
-            public OutputStreamSupplier set(OutputStream outputStream) {
-                this.outputStream = outputStream;
+    public static class GenericOutputSupplier<T> implements OutputSupplier<T> {
+        private T output;
 
-                return this;
-            }
-        };
+        @Override
+        public T supply() {
+            return output;
+        }
+
+        @Override
+        public OutputSupplier<T> set(@NotNull T output) {
+            requireNonNull(output);
+
+            this.output = output;
+
+            return this;
+        }
     }
 }

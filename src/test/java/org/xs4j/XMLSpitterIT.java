@@ -3,7 +3,7 @@ package org.xs4j;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xml.sax.SAXException;
-import org.xs4j.XMLSpitter.OutputStreamSupplier;
+import org.xs4j.XMLSpitter.OutputSupplier;
 import org.xs4j.listener.NodeListener;
 import org.xs4j.util.NotNull;
 
@@ -129,7 +129,7 @@ public class XMLSpitterIT {
     public void givenInputXMLWithSchemaExtractWithFormattingIntoNewXML() throws Exception {
         // given
         final OutputStream outputStream = mock(OutputStream.class);
-        OutputStreamSupplier osSupplier = xmlSpitterFactory.createOutputStreamSupplier().set(outputStream);
+        OutputSupplier<OutputStream> osSupplier = xmlSpitterFactory.<OutputStream> createOutputSupplier().set(outputStream);
 
         // when
         xmlSpitter.writeAll(xmlSlurper.getNodes("**", "Object"), xmlSlurper.getNodes("**", "Object", "**"), osSupplier, "1.0", "UTF-8");

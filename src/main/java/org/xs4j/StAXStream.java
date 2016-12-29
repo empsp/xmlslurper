@@ -38,7 +38,11 @@ public class StAXStream implements XMLStream {
     @Override
     public void writeElement(@NotNull XMLNode node) {
         writeStartElement(node);
-        writeCharacters(node.getText());
+
+        String characters = node.getText();
+        if (characters != null && !characters.isEmpty())
+            writeCharacters(characters);
+
         writeEndElement();
     }
 

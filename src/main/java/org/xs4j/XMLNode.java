@@ -15,6 +15,8 @@ public interface XMLNode {
 
     long getPosition();
 
+    int getDepth();
+
     @Nullable
     XMLNode getParent();
 

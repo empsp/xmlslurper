@@ -30,11 +30,11 @@ public final class XMLNodeFactory {
         ((XMLNodeImpl)node).appendText(ch, start, length);
     }
 
-    static void setParent(XMLNode parent, XMLNode node) {
-        ((XMLNodeImpl)node).setParent(parent);
-    }
+    static void setPositionalData(XMLNode node, XMLNode parent, long position, int depth) {
+        XMLNodeImpl nodeImpl = (XMLNodeImpl)node;
 
-    static void setPosition(XMLNode node, long position) {
-        ((XMLNodeImpl)node).setPosition(position);
+        nodeImpl.setParent(parent);
+        nodeImpl.setPosition(position);
+        nodeImpl.setDepth(depth);
     }
 }

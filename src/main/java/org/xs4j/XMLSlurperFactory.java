@@ -2,16 +2,11 @@ package org.xs4j;
 
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
-import org.xs4j.NodeNotifier.FindData;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.SchemaFactory;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
 
 /**
  * Created by mturski on 11/8/2016.
@@ -46,23 +41,20 @@ public class XMLSlurperFactory {
      * @return a new instance of <code>XMLSlurper</code>
      */
     public XMLSlurper createXMLSlurper() {
-        Deque<FindData> findData = new ArrayDeque<FindData>();
-        Deque<FindData> findAllData = new ArrayDeque<FindData>();
-
         XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
+        NodeNotifier nodeNotifier = getNodeNotifier();
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
 
         return new SAXSlurper(
                 getSaxParserFactory(isNamespaceAwarenessDisabled),
                 getSchemaFactory(),
-                getSlurpFactory(findData, findAllData, slurpAlignmentFactory),
-                getNodeNotifier(findData, findAllData),
+                getSlurpFactory(nodeNotifier, slurpAlignmentFactory),
+                nodeNotifier,
                 getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, xmlNodeFactory));
     }
 
-    static NodeNotifier getNodeNotifier(Deque<FindData> findData,
-                                        Deque<FindData> findAllData) {
-        return new NodeNotifier(new PositionCounter(), findData, findAllData);
+    static NodeNotifier getNodeNotifier() {
+        return new NodeNotifier(new PositionCounter());
     }
 
     static SlurpAlignmentFactory getSlurpAlignmentFactory() {
@@ -70,10 +62,9 @@ public class XMLSlurperFactory {
     }
 
     static SlurpFactory getSlurpFactory(
-            Deque<FindData> findData,
-            Deque<FindData> findAllData,
+            NodeNotifier nodeNotifier,
             SlurpAlignmentFactory slurpAlignmentFactory) {
-        return new SlurpFactory(findData, findAllData, slurpAlignmentFactory);
+        return new SlurpFactory(nodeNotifier, slurpAlignmentFactory);
     }
 
     static SAXParserFactory getSaxParserFactory(boolean isNamespaceAwarenessDisabled) {

@@ -1,7 +1,6 @@
 package org.xs4j;
 
 import org.xs4j.util.NotNull;
-import org.xs4j.util.Nullable;
 import org.xs4j.listener.NodeListener;
 import org.xs4j.path.Slurp;
 
@@ -9,6 +8,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -35,33 +35,33 @@ public class StAXSpitter implements XMLSpitter {
     }
 
     @Override
-    public void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier) {
-        startWriteOne(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
+    public void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier) {
+        startWriteOne(documentNode, contentNodes, outputSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
     }
 
     @Override
-    public void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version) {
-        startWriteOne(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
+    public void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier, @NotNull final String version) {
+        startWriteOne(documentNode, contentNodes, outputSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
     }
 
     @Override
-    public void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version, @NotNull final String encoding) {
-        startWriteOne(documentNode, contentNodes, outputStreamSupplier, encoding, version);
+    public void write(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier, @NotNull final String version, @NotNull final String encoding) {
+        startWriteOne(documentNode, contentNodes, outputSupplier, encoding, version);
     }
 
     @Override
-    public void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier) {
-        startWriteAll(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
+    public void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier) {
+        startWriteAll(documentNode, contentNodes, outputSupplier, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
     }
 
     @Override
-    public void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, final String version) {
-        startWriteAll(documentNode, contentNodes, outputStreamSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
+    public void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier, final String version) {
+        startWriteAll(documentNode, contentNodes, outputSupplier, DEFAULT_XML_DOCUMENT_ENCODING, version);
     }
 
     @Override
-    public void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputStreamSupplier outputStreamSupplier, @NotNull final String version, @NotNull final String encoding) {
-        startWriteAll(documentNode, contentNodes, outputStreamSupplier, encoding, version);
+    public void writeAll(@NotNull Slurp documentNode, @NotNull Slurp contentNodes, @NotNull final OutputSupplier<?> outputSupplier, @NotNull final String version, @NotNull final String encoding) {
+        startWriteAll(documentNode, contentNodes, outputSupplier, encoding, version);
     }
 
     @Override
@@ -91,18 +91,58 @@ public class StAXSpitter implements XMLSpitter {
         }
     }
 
+    @Override
+    public XMLStream createStream(@NotNull Writer writer) {
+        try {
+            return createStreamAndStartWrite(writer, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
+        } catch (XMLStreamException e) {
+            throw new XMLStreamRuntimeException(e);
+        }
+    }
+
+    @Override
+    public XMLStream createStream(@NotNull Writer writer, @NotNull String version) {
+        try {
+            return createStreamAndStartWrite(writer, DEFAULT_XML_DOCUMENT_ENCODING, version);
+        } catch (XMLStreamException e) {
+            throw new XMLStreamRuntimeException(e);
+        }
+    }
+
+    @Override
+    public XMLStream createStream(@NotNull Writer writer, @NotNull String version, @NotNull String encoding) {
+        try {
+            return createStreamAndStartWrite(writer, encoding, version);
+        } catch (XMLStreamException e) {
+            throw new XMLStreamRuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("Duplicates")
     private XMLStream createStreamAndStartWrite(OutputStream outputStream, String encoding, String version) throws XMLStreamException {
         requireNonNull(outputStream);
         requireNonNull(encoding);
         requireNonNull(version);
 
-        XMLStreamWriter writer = xmlOutputFactory.createXMLStreamWriter(outputStream);
-        writer.writeStartDocument(encoding, version);
+        XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(outputStream);
+        stream.writeStartDocument(encoding, version);
 
-        return new StAXStream(idFeed++, writer);
+        return new StAXStream(idFeed++, stream);
     }
 
-    private void startWriteOne(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier osSupplier, final String encoding, final String version) {
+    @SuppressWarnings("Duplicates")
+    private XMLStream createStreamAndStartWrite(Writer writer, String encoding, String version) throws XMLStreamException {
+        requireNonNull(writer);
+        requireNonNull(encoding);
+        requireNonNull(version);
+
+        XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(writer);
+        stream.writeStartDocument(encoding, version);
+
+        return new StAXStream(idFeed++, stream);
+    }
+
+    private void startWriteOne(Slurp documentNode, Slurp contentNodes, final OutputSupplier<?> osSupplier, final String encoding, final String version) {
         requireNonNull(documentNode);
         requireNonNull(contentNodes);
         requireNonNull(osSupplier);
@@ -120,7 +160,7 @@ public class StAXSpitter implements XMLSpitter {
                 new EndContentHandler(streams, descendants));
     }
 
-    private void startWriteAll(Slurp documentNode, Slurp contentNodes, final OutputStreamSupplier osSupplier, final String encoding, final String version) {
+    private void startWriteAll(Slurp documentNode, Slurp contentNodes, final OutputSupplier<?> osSupplier, final String encoding, final String version) {
         requireNonNull(documentNode);
         requireNonNull(contentNodes);
         requireNonNull(osSupplier);
@@ -141,11 +181,11 @@ public class StAXSpitter implements XMLSpitter {
     private class StartDocumentHandler implements NodeListener {
         private final XMLStream[] streams;
         private final Deque<XMLNode> descendants;
-        private final OutputStreamSupplier osSupplier;
+        private final OutputSupplier<?> osSupplier;
         private final String encoding;
         private final String version;
 
-        private StartDocumentHandler(XMLStream[] streams, Deque<XMLNode> descendants, OutputStreamSupplier osSupplier, String encoding, String version) {
+        private StartDocumentHandler(XMLStream[] streams, Deque<XMLNode> descendants, OutputSupplier<?> osSupplier, String encoding, String version) {
             this.streams = streams;
             this.descendants = descendants;
             this.osSupplier = osSupplier;
@@ -156,7 +196,12 @@ public class StAXSpitter implements XMLSpitter {
         @Override
         public void onNode(@NotNull XMLNode node) {
             try {
-                streams[0] = createStreamAndStartWrite(osSupplier.supply(), encoding, version);
+                Object output = osSupplier.supply();
+                if (output instanceof Writer)
+                    streams[0] = createStreamAndStartWrite((Writer)output, encoding, version);
+                else
+                    streams[0] = createStreamAndStartWrite((OutputStream)output, encoding, version);
+
                 streams[0].writeCharacters(NEWLINE);
                 streams[0].writeStartElement(node);
 
@@ -180,7 +225,12 @@ public class StAXSpitter implements XMLSpitter {
         public void onNode(@NotNull XMLNode node) {
             descendants.removeLast();
 
-            streams[0].writeCharacters(NEWLINE);
+            String characters = node.getText();
+            if (characters != null && !characters.isEmpty()) {
+                streams[0].writeCharacters(characters);
+            } else {
+                streams[0].writeCharacters(NEWLINE);
+            }
             streams[0].writeEndElement();
             streams[0].close();
             streams[0] = null;
@@ -220,9 +270,9 @@ public class StAXSpitter implements XMLSpitter {
             descendants.removeLast();
 
             String characters = node.getText();
-            if (characters != null && !characters.isEmpty())
+            if (characters != null && !characters.isEmpty()) {
                 streams[0].writeCharacters(characters);
-            else {
+            } else {
                 streams[0].writeCharacters(NEWLINE);
                 formatIndent(streams[0], descendants);
             }

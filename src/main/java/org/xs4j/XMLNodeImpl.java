@@ -16,7 +16,9 @@ public final class XMLNodeImpl implements XMLNode {
     public static final int DEFAULT_SIZE = 16;
 
     private final long id;
+
     private long position;
+    private int depth;
     private XMLNode parent;
 
     private String namespace;
@@ -41,22 +43,31 @@ public final class XMLNodeImpl implements XMLNode {
         return id;
     }
 
-    void setPosition(long position) {
-        this.position = position;
-    }
-
     @Override
     public long getPosition() {
         return position;
     }
 
-    void setParent(XMLNode parent) {
-        this.parent = parent;
+    void setPosition(long position) {
+        this.position = position;
+    }
+
+    @Override
+    public int getDepth() {
+        return depth;
+    }
+
+    void setDepth(int depth) {
+        this.depth = depth;
     }
 
     @Override
     public XMLNode getParent() {
         return parent;
+    }
+
+    void setParent(XMLNode parent) {
+        this.parent = parent;
     }
 
     @Override
@@ -160,6 +171,7 @@ public final class XMLNodeImpl implements XMLNode {
         return "XMLNodeImpl{" +
                 "id=" + id +
                 ", position=" + position +
+                ", depth=" + depth +
                 ", namespace='" + namespace + '\'' +
                 ", prefix='" + prefix + '\'' +
                 ", localName='" + localName + '\'' +
