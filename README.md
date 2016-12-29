@@ -20,7 +20,7 @@ In order to use the library in your maven project, just declare the dependency i
 <dependency>
 	<groupId>org.xs4j</groupId>
 	<artifactId>xmlslurper</artifactId>
-	<version>2.0.0</version>
+	<version>2.2.0</version>
 </dependency>
 ```
 
@@ -30,7 +30,7 @@ In order to use the library in your gradle project, just declare the dependency 
 
 ```gradle
 dependencies {
-    compile 'org.xs4j:xmlslurper:2.0.0'
+    compile 'org.xs4j:xmlslurper:2.2.0'
 }
 ```
 
