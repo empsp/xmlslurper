@@ -61,7 +61,7 @@ class NodeNotifier {
     }
 
     boolean isFindDataEmpty() {
-        return findOneDataCounter == 0;
+        return findOneDataCounter == 0L;
     }
 
     boolean isFindAllDataEmpty() {
