@@ -1,7 +1,11 @@
 package org.xs4j;
 
+import org.xs4j.SAXSlurper.NamespaceSensitiveElementParser;
+
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
+import org.xs4j.SAXSlurper.SAXNamespaceAwareElementParser;
+import org.xs4j.SAXSlurper.SAXNamespaceBlindElementParser;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
@@ -95,10 +99,12 @@ public class XMLSlurperFactory {
                 .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     }
 
-    static NamespaceSensitiveElementParser getSAXNamespaceSensitiveElementParser(boolean isNamespaceAwarenessDisabled, XMLNodeFactory xmlNodeFactory) {
+    static NamespaceSensitiveElementParser getSAXNamespaceSensitiveElementParser(
+            boolean isNamespaceAwarenessDisabled, XMLNodeFactory xmlNodeFactory) {
+
         if (isNamespaceAwarenessDisabled)
-            return new SAXSlurper.SAXNamespaceBlindElementParser(xmlNodeFactory);
+            return new SAXNamespaceBlindElementParser(xmlNodeFactory);
         else
-            return new SAXSlurper.SAXNamespaceAwareElementParser(xmlNodeFactory);
+            return new SAXNamespaceAwareElementParser(xmlNodeFactory);
     }
 }

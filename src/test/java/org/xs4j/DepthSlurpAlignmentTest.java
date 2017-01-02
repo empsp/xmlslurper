@@ -98,6 +98,8 @@ public class DepthSlurpAlignmentTest {
         assertNotAlign("Child", "Offspring");
         assertNotAlign("Child", "Offspring", "Child");
         assertAlign("Child", "Offspring", "Child", "Kin");
+        assertNotAlign("Child", "Offspring", "Child");
+        assertNotAlign("Child", "Offspring");
         assertNotAlign("Root");
         assertNotAlign("Root", "Sibling");
         assertNotAlign("Root", "Sibling", "Child");

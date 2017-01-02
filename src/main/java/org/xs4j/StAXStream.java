@@ -11,6 +11,8 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_ENCODING;
+import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_VERSION;
 import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
@@ -44,6 +46,29 @@ public class StAXStream implements XMLStream {
             writeCharacters(characters);
 
         writeEndElement();
+    }
+
+    @Override
+    public void writeStartDocument() {
+        doWriteStartDocument(DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
+    }
+
+    @Override
+    public void writeStartDocument(String encoding) {
+        doWriteStartDocument(encoding, DEFAULT_XML_DOCUMENT_VERSION);
+    }
+
+    @Override
+    public void writeStartDocument(String encoding, String version) {
+        doWriteStartDocument(encoding, version);
+    }
+
+    public void doWriteStartDocument(String encoding, String version) {
+        try {
+            writer.writeStartDocument(encoding, version);
+        } catch (XMLStreamException e) {
+            throw new XMLStreamRuntimeException(e);
+        }
     }
 
     @Override
@@ -189,7 +214,6 @@ public class StAXStream implements XMLStream {
     @Override
     public void close() {
         try {
-            writer.writeEndDocument();
             writer.close();
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);

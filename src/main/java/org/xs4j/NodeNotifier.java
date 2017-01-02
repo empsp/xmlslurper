@@ -77,7 +77,7 @@ class NodeNotifier {
         findData.addLast(data);
     }
 
-    abstract static class FindData {
+    static abstract class FindData {
         SlurpAlignment slurpAlignment;
         NodeListener startNodeListener;
         NodeListener endNodeListener;

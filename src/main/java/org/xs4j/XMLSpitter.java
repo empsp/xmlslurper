@@ -104,7 +104,7 @@ public interface XMLSpitter {
 
     /**
      * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
-     * provides more freedom in new document construction. It allows creating XML documents from scratch without the
+     * provides more freedom in XML document construction. It allows creating XML documents from scratch without the
      * need to previously parse any input XML documents.
      *
      * @param outputStream the stream to which the document will be written
@@ -116,34 +116,7 @@ public interface XMLSpitter {
 
     /**
      * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
-     * provides more freedom in new document construction. It allows creating XML documents from scratch without the
-     * need to previously parse any input XML documents.
-     *
-     * @param outputStream the stream to which the document will be written
-     * @param version new document's XML version
-     * @return a new instance of <code>XMLStream</code> for writing XML documents
-     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
-     */
-    @NotNull
-    XMLStream createStream(@NotNull OutputStream outputStream, @NotNull String version);
-
-    /**
-     * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
-     * provides more freedom in new document construction. It allows creating XML documents from scratch without the
-     * need to previously parse any input XML documents.
-     *
-     * @param outputStream the stream to which the document will be written
-     * @param version new document's XML version
-     * @param encoding new document's XML encoding
-     * @return a new instance of <code>XMLStream</code> for writing XML documents
-     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
-     */
-    @NotNull
-    XMLStream createStream(@NotNull OutputStream outputStream, @NotNull String version, @NotNull String encoding);
-
-    /**
-     * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
-     * provides more freedom in new document construction. It allows creating XML documents from scratch without the
+     * provides more freedom in XML document construction. It allows creating XML documents from scratch without the
      * need to previously parse any input XML documents.
      *
      * @param writer to which the document will be written
@@ -152,33 +125,6 @@ public interface XMLSpitter {
      */
     @NotNull
     XMLStream createStream(@NotNull Writer writer);
-
-    /**
-     * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
-     * provides more freedom in new document construction. It allows creating XML documents from scratch without the
-     * need to previously parse any input XML documents.
-     *
-     * @param writer to which the document will be written
-     * @param version new document's XML version
-     * @return a new instance of <code>XMLStream</code> for writing XML documents
-     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
-     */
-    @NotNull
-    XMLStream createStream(@NotNull Writer writer, @NotNull String version);
-
-    /**
-     * Creates a new instance of {@link XMLStream} that does the actual XML document write. <code>XMLStream</code>
-     * provides more freedom in new document construction. It allows creating XML documents from scratch without the
-     * need to previously parse any input XML documents.
-     *
-     * @param writer to which the document will be written
-     * @param version new document's XML version
-     * @param encoding new document's XML encoding
-     * @return a new instance of <code>XMLStream</code> for writing XML documents
-     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
-     */
-    @NotNull
-    XMLStream createStream(@NotNull Writer writer, @NotNull String version, @NotNull String encoding);
 
     /**
      * A data structure holding information about an {@link OutputStream}. The following is mutable to allow for dynamic
