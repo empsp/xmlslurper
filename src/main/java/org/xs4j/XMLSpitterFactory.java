@@ -11,6 +11,9 @@ import static org.xs4j.util.NonNullValidator.requireNonNull;
  * Created by mturski on 12/8/2016.
  */
 public class XMLSpitterFactory {
+    public static final String DEFAULT_XML_DOCUMENT_VERSION = "1.0";
+    public static final String DEFAULT_XML_DOCUMENT_ENCODING = "UTF-8";
+
     public static XMLSpitterFactory getInstance() {
         return new XMLSpitterFactory();
     }

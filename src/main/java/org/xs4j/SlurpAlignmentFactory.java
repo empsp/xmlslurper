@@ -146,7 +146,7 @@ final class SlurpAlignmentFactory {
 
         @Override
         boolean checkAlignment(Deque<XMLNode> descendants) {
-            return checkAlignment(descendants.size(), descendants.peekLast()); // +1 for lastNode which is a detached part of descendants
+            return checkAlignment(descendants.size(), descendants.peekLast());
         }
 
         @Override

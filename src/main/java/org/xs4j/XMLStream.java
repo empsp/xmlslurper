@@ -19,6 +19,29 @@ public interface XMLStream {
     long getId();
 
     /**
+     * Write start document element containing start-tag with encoding and version attributes. By default
+     * {@link XMLSpitterFactory#DEFAULT_XML_DOCUMENT_ENCODING} and
+     * {@link XMLSpitterFactory#DEFAULT_XML_DOCUMENT_VERSION} are used.
+     */
+    void writeStartDocument();
+
+    /**
+     * Write start document element containing start-tag with encoding and version attributes. By default
+     * {@link XMLSpitterFactory#DEFAULT_XML_DOCUMENT_VERSION} is used.
+     *
+     * @param encoding document's XML encoding
+     */
+    void writeStartDocument(String encoding);
+
+    /**
+     * Write start-tag of the start document element with encoding and version attributes.
+     *
+     * @param version document's XML version
+     * @param encoding document's XML encoding
+     */
+    void writeStartDocument(String encoding, String version);
+
+    /**
      * Write simple (not having descendants) element containing start-tag (with attributes), text, end-tag.
      *
      * @param node to retrieve data from
@@ -59,11 +82,15 @@ public interface XMLStream {
 
     /**
      * Flush the content into the underlying {@link OutputStream}.
+     *
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
     void flush();
 
     /**
      * Close underlying {@link OutputStream}.
+     *
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
     void close();
 }

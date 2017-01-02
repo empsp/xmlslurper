@@ -176,6 +176,7 @@ public class XMLSpitterIT {
             @Override
             public void onNode(@NotNull XMLNode node) {
                 streams[0] = xmlSpitter.createStream(outputStream);
+                streams[0].writeStartDocument();
                 streams[0].writeStartElement(node);
             }
         }, new NodeListener() {

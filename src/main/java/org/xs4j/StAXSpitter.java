@@ -12,6 +12,8 @@ import java.io.Writer;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_ENCODING;
+import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_VERSION;
 import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
@@ -20,9 +22,6 @@ import static org.xs4j.util.NonNullValidator.requireNonNull;
 public class StAXSpitter implements XMLSpitter {
     private static final String NEWLINE = "\n";
     private static final String INDENT = "    ";
-
-    public static final String DEFAULT_XML_DOCUMENT_VERSION = "1.0";
-    public static final String DEFAULT_XML_DOCUMENT_ENCODING = "UTF-8";
 
     private static long idFeed;
 
@@ -67,25 +66,7 @@ public class StAXSpitter implements XMLSpitter {
     @Override
     public XMLStream createStream(@NotNull OutputStream outputStream) {
         try {
-            return createStreamAndStartWrite(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
-        } catch (XMLStreamException e) {
-            throw new XMLStreamRuntimeException(e);
-        }
-    }
-
-    @Override
-    public XMLStream createStream(@NotNull OutputStream outputStream, @NotNull String version) {
-        try {
-            return createStreamAndStartWrite(outputStream, DEFAULT_XML_DOCUMENT_ENCODING, version);
-        } catch (XMLStreamException e) {
-            throw new XMLStreamRuntimeException(e);
-        }
-    }
-
-    @Override
-    public XMLStream createStream(@NotNull OutputStream outputStream, @NotNull String version, @NotNull String encoding) {
-        try {
-            return createStreamAndStartWrite(outputStream, encoding, version);
+            return createStreamAndStartWrite(outputStream);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
@@ -94,50 +75,26 @@ public class StAXSpitter implements XMLSpitter {
     @Override
     public XMLStream createStream(@NotNull Writer writer) {
         try {
-            return createStreamAndStartWrite(writer, DEFAULT_XML_DOCUMENT_ENCODING, DEFAULT_XML_DOCUMENT_VERSION);
-        } catch (XMLStreamException e) {
-            throw new XMLStreamRuntimeException(e);
-        }
-    }
-
-    @Override
-    public XMLStream createStream(@NotNull Writer writer, @NotNull String version) {
-        try {
-            return createStreamAndStartWrite(writer, DEFAULT_XML_DOCUMENT_ENCODING, version);
-        } catch (XMLStreamException e) {
-            throw new XMLStreamRuntimeException(e);
-        }
-    }
-
-    @Override
-    public XMLStream createStream(@NotNull Writer writer, @NotNull String version, @NotNull String encoding) {
-        try {
-            return createStreamAndStartWrite(writer, encoding, version);
+            return createStreamAndStartWrite(writer);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
     }
 
     @SuppressWarnings("Duplicates")
-    private XMLStream createStreamAndStartWrite(OutputStream outputStream, String encoding, String version) throws XMLStreamException {
+    private XMLStream createStreamAndStartWrite(OutputStream outputStream) throws XMLStreamException {
         requireNonNull(outputStream);
-        requireNonNull(encoding);
-        requireNonNull(version);
 
         XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(outputStream);
-        stream.writeStartDocument(encoding, version);
 
         return new StAXStream(idFeed++, stream);
     }
 
     @SuppressWarnings("Duplicates")
-    private XMLStream createStreamAndStartWrite(Writer writer, String encoding, String version) throws XMLStreamException {
+    private XMLStream createStreamAndStartWrite(Writer writer) throws XMLStreamException {
         requireNonNull(writer);
-        requireNonNull(encoding);
-        requireNonNull(version);
 
         XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(writer);
-        stream.writeStartDocument(encoding, version);
 
         return new StAXStream(idFeed++, stream);
     }
@@ -198,10 +155,11 @@ public class StAXSpitter implements XMLSpitter {
             try {
                 Object output = osSupplier.supply();
                 if (output instanceof Writer)
-                    streams[0] = createStreamAndStartWrite((Writer)output, encoding, version);
+                    streams[0] = createStreamAndStartWrite((Writer)output);
                 else
-                    streams[0] = createStreamAndStartWrite((OutputStream)output, encoding, version);
+                    streams[0] = createStreamAndStartWrite((OutputStream)output);
 
+                streams[0].writeStartDocument(encoding, version);
                 streams[0].writeCharacters(NEWLINE);
                 streams[0].writeStartElement(node);
 
