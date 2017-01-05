@@ -12,9 +12,9 @@ import java.io.Writer;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import static org.xs4j.OutputSupplierFactory.GenericOutputSupplier.ILLEGAL_SUPPLIER_ARGUMENT;
 import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_ENCODING;
 import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_VERSION;
-import static org.xs4j.XMLSpitterFactory.GenericOutputSupplier.ILLEGAL_SUPPLIER_ARGUMENT;
 import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**

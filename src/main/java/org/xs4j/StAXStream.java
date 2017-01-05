@@ -180,6 +180,11 @@ public class StAXStream implements XMLStream {
         }
     }
 
+    /**
+     * Due to how {@link XMLStreamWriter} keeps start/end-tag stack it's impossible to support this function.
+     *
+     * @param node to match the end-tag
+     */
     @Override
     public void writeEndElement(@NotNull XMLNode node) {
         throw new UnsupportedOperationException();

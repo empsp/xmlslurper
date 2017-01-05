@@ -2,7 +2,8 @@ package org.xs4j;
 
 import org.xs4j.util.NotNull;
 
-import static org.xs4j.util.NonNullValidator.requireNonNull;
+import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * Created by mturski on 1/5/2017.
@@ -48,7 +49,8 @@ public class OutputSupplierFactory {
 
         @Override
         public OutputSupplier<T> set(@NotNull T output) {
-            requireNonNull(output);
+            if (!(output instanceof Writer) && !(output instanceof OutputStream) )
+                throw new IllegalArgumentException(String.format(ILLEGAL_SUPPLIER_ARGUMENT, OutputSupplier.class.getName(), Writer.class.getName(), OutputStream.class.getName()));
 
             this.output = output;
 
