@@ -3,7 +3,6 @@ package org.xs4j;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xml.sax.SAXException;
-import org.xs4j.XMLSpitter.OutputSupplier;
 import org.xs4j.listener.NodeListener;
 import org.xs4j.util.NotNull;
 
@@ -23,8 +22,9 @@ import static org.xs4j.TestUtil.getResourceAsFile;
 /**
  * Created by mturski on 12/12/2016.
  */
-public class XMLSpitterIT {
-    private static final XMLSpitterFactory xmlSpitterFactory = XMLSpitterFactory.getInstance();
+public class StAXSpitterIT {
+    private static final XMLSpitterFactory xmlSpitterFactory = StAXSpitterFactory.getInstance();
+    private static final OutputSupplierFactory outputSupplierFactory = OutputSupplierFactory.getInstance();
     private static final XMLSpitter xmlSpitter = xmlSpitterFactory.createXMLSpitter();
     private static final XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
 
@@ -129,7 +129,7 @@ public class XMLSpitterIT {
     public void givenInputXMLWithSchemaExtractWithFormattingIntoNewXML() throws Exception {
         // given
         final OutputStream outputStream = mock(OutputStream.class);
-        OutputSupplier<OutputStream> osSupplier = xmlSpitterFactory.<OutputStream> createOutputSupplier().set(outputStream);
+        OutputSupplier<OutputStream> osSupplier = outputSupplierFactory.<OutputStream> createOutputSupplier().set(outputStream);
 
         // when
         xmlSpitter.writeAll(xmlSlurper.getNodes("**", "Object"), xmlSlurper.getNodes("**", "Object", "**"), osSupplier, "1.0", "UTF-8");

@@ -28,7 +28,7 @@ public final class XMLNodeImpl implements XMLNode {
     private int charactersSize = 0;
     private char[] characters = new char[DEFAULT_SIZE];
 
-    private Map<String, String> attributeByQName;
+    Map<String, String> attributeByQName;
 
     XMLNodeImpl(long id, String namespace, String prefix, String localName, Map<String, String> attributeByQName) {
         this.id = id;

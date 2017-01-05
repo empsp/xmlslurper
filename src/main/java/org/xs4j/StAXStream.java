@@ -6,8 +6,6 @@ import org.xs4j.util.Nullable;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,14 +20,13 @@ public class StAXStream implements XMLStream {
     private static final String EMPTY_PREFIX = "";
 
     private final long id;
-    private final XMLStreamWriter writer;
+    private final XMLStreamWriter stream;
 
-    private Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
     private Map<String, String> namespaceByPrefix = new HashMap<String, String>();
 
-    StAXStream(long id, XMLStreamWriter writer) {
+    StAXStream(long id, XMLStreamWriter stream) {
         this.id = id;
-        this.writer = writer;
+        this.stream = stream;
     }
 
     @Override
@@ -65,7 +62,7 @@ public class StAXStream implements XMLStream {
 
     public void doWriteStartDocument(String encoding, String version) {
         try {
-            writer.writeStartDocument(encoding, version);
+            stream.writeStartDocument(encoding, version);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
@@ -83,8 +80,6 @@ public class StAXStream implements XMLStream {
     private void doWriteStartElement(XMLNode node) throws XMLStreamException {
         requireNonNull(node);
 
-        descendants.addLast(node);
-
         writeStartElementWithNamespaces(node);
         writeAttributesWithNamespaces(node);
     }
@@ -97,19 +92,19 @@ public class StAXStream implements XMLStream {
             if (prefix != null) { // handle element names eg. prefix:name
                 namespaceByPrefix.put(prefix, namespace);
 
-                writer.writeStartElement(prefix, node.getLocalName(), namespace);
+                stream.writeStartElement(prefix, node.getLocalName(), namespace);
             } else { // handle element names eg. name with default namespace
                 if (!namespaceByPrefix.containsKey(EMPTY_PREFIX)) {
                     namespaceByPrefix.put(EMPTY_PREFIX, namespace);
 
-                    writer.writeStartElement(node.getLocalName());
-                    writer.writeDefaultNamespace(namespace);
+                    stream.writeStartElement(node.getLocalName());
+                    stream.writeDefaultNamespace(namespace);
                 } else {
-                    writer.writeStartElement(EMPTY_PREFIX, node.getLocalName(), namespace);
+                    stream.writeStartElement(EMPTY_PREFIX, node.getLocalName(), namespace);
                 }
             }
         } else // handle element names eg. name without default namespace
-            writer.writeStartElement(node.getLocalName());
+            stream.writeStartElement(node.getLocalName());
     }
 
     private void writeAttributesWithNamespaces(XMLNode node) throws XMLStreamException {
@@ -131,7 +126,7 @@ public class StAXStream implements XMLStream {
                     if(!namespaceByPrefix.containsKey(prefix)) { // if new
                         namespaceByPrefix.put(prefix, value);
 
-                        writer.writeNamespace(prefix, value);
+                        stream.writeNamespace(prefix, value);
                     }
                 } else { // handle attribute names eg. prefix:name
                     prefix = name.substring(0, separatorIndex);
@@ -140,18 +135,18 @@ public class StAXStream implements XMLStream {
                         namespace = findNamespaceByPrefix(prefix, node.getAttributes()); // the namespace is yet to be extracted from attributes
                         namespaceByPrefix.put(prefix, namespace);
 
-                        writer.writeNamespace(prefix, namespace);
+                        stream.writeNamespace(prefix, namespace);
                     } else
                         namespace = namespaceByPrefix.get(prefix);
 
-                    writer.writeAttribute(prefix, namespace, name.substring(separatorIndex + 1), value);
+                    stream.writeAttribute(prefix, namespace, name.substring(separatorIndex + 1), value);
                 }
             } else if (name.startsWith(XMLConstants.XMLNS_ATTRIBUTE) && !namespaceByPrefix.containsKey(EMPTY_PREFIX)) { // handle attribute names eg. xlmns, if new
                 namespaceByPrefix.put(EMPTY_PREFIX, value);
 
-                writer.writeDefaultNamespace(value);
+                stream.writeDefaultNamespace(value);
             } else // handle attribute names eg. name
-                writer.writeAttribute(name, value);
+                stream.writeAttribute(name, value);
         }
     }
 
@@ -170,7 +165,7 @@ public class StAXStream implements XMLStream {
     @Override
     public void writeCharacters(@Nullable String characters) {
         try {
-            writer.writeCharacters(characters);
+            stream.writeCharacters(characters);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
@@ -179,9 +174,7 @@ public class StAXStream implements XMLStream {
     @Override
     public void writeEndElement() {
         try {
-            writer.writeEndElement();
-
-            descendants.removeLast();
+            stream.writeEndElement();
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
@@ -189,23 +182,13 @@ public class StAXStream implements XMLStream {
 
     @Override
     public void writeEndElement(@NotNull XMLNode node) {
-        requireNonNull(node);
-
-        try {
-            while (!node.equals(descendants.peekLast())) {
-                writer.writeEndElement();
-
-                descendants.removeLast();
-            }
-        } catch (XMLStreamException e) {
-            throw new XMLStreamRuntimeException(e);
-        }
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void flush() {
         try {
-            writer.flush();
+            stream.flush();
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
@@ -214,7 +197,7 @@ public class StAXStream implements XMLStream {
     @Override
     public void close() {
         try {
-            writer.close();
+            stream.close();
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }

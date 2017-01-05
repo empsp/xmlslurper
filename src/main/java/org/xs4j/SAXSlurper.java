@@ -32,7 +32,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private final SchemaFactory schemaFactory;
     private final SlurpFactory slurpFactory;
     private final NodeNotifier nodeNotifier;
-    private final NamespaceSensitiveElementParser elementParser;
+    private final ElementParser elementParser;
 
     private InputStream inputStream;
     private SAXParser parser;
@@ -41,7 +41,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
                SchemaFactory schemaFactory,
                SlurpFactory slurpFactory,
                NodeNotifier nodeNotifier,
-               NamespaceSensitiveElementParser elementParser) {
+               ElementParser elementParser) {
         idFeed = 0L;
 
         this.saxParserFactory = saxParserFactory;
@@ -146,19 +146,17 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
             parser = null;
     }
 
-    static abstract class NamespaceSensitiveElementParser {
+    static abstract class ElementParser {
         final XMLNodeFactory xmlNodeFactory;
 
-        NamespaceSensitiveElementParser(XMLNodeFactory xmlNodeFactory) {
+        ElementParser(XMLNodeFactory xmlNodeFactory) {
             this.xmlNodeFactory = xmlNodeFactory;
         }
 
-        XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes) {
-            throw new UnsupportedOperationException();
-        }
+        abstract XMLNode parseStartElement(String uri, String localName, String qName, Attributes attributes);
     }
 
-    static class SAXNamespaceAwareElementParser extends NamespaceSensitiveElementParser {
+    static class SAXNamespaceAwareElementParser extends ElementParser {
         SAXNamespaceAwareElementParser(XMLNodeFactory xmlNodeFactory) {
             super(xmlNodeFactory);
         }
@@ -195,7 +193,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         }
     }
 
-    static class SAXNamespaceBlindElementParser extends NamespaceSensitiveElementParser {
+    static class SAXNamespaceBlindElementParser extends ElementParser {
         SAXNamespaceBlindElementParser(XMLNodeFactory xmlNodeFactory) {
             super(xmlNodeFactory);
         }
@@ -215,6 +213,6 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         }
     }
 
-    static class ParsingTerminationException extends SAXException {
+    private static class ParsingTerminationException extends SAXException {
     }
 }

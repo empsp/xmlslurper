@@ -1,6 +1,6 @@
 package org.xs4j;
 
-import org.xs4j.SAXSlurper.NamespaceSensitiveElementParser;
+import org.xs4j.SAXSlurper.ElementParser;
 
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -99,7 +99,7 @@ public class XMLSlurperFactory {
                 .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     }
 
-    static NamespaceSensitiveElementParser getSAXNamespaceSensitiveElementParser(
+    static ElementParser getSAXNamespaceSensitiveElementParser(
             boolean isNamespaceAwarenessDisabled, XMLNodeFactory xmlNodeFactory) {
 
         if (isNamespaceAwarenessDisabled)

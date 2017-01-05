@@ -37,4 +37,8 @@ public final class XMLNodeFactory {
         nodeImpl.setPosition(position);
         nodeImpl.setDepth(depth);
     }
+
+    static Map<String, String> getAttributesDirectly(XMLNode node) {
+        return ((XMLNodeImpl)node).attributeByQName;
+    }
 }

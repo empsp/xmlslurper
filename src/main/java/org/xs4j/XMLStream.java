@@ -31,7 +31,7 @@ public interface XMLStream {
      *
      * @param encoding document's XML encoding
      */
-    void writeStartDocument(String encoding);
+    void writeStartDocument(@NotNull String encoding);
 
     /**
      * Write start-tag of the start document element with encoding and version attributes.
@@ -39,7 +39,7 @@ public interface XMLStream {
      * @param version document's XML version
      * @param encoding document's XML encoding
      */
-    void writeStartDocument(String encoding, String version);
+    void writeStartDocument(@NotNull String encoding, @NotNull String version);
 
     /**
      * Write simple (not having descendants) element containing start-tag (with attributes), text, end-tag.
@@ -66,14 +66,16 @@ public interface XMLStream {
     void writeCharacters(@Nullable String characters);
 
     /**
-     * Write end-tag of the element opened with start-tag.
+     * Write end-tag of the element opened with corresponding start-tag. If no start-tag is found, exception will be
+     * thrown.
      *
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
      */
     void writeEndElement();
 
     /**
-     * Write multiple end-tag closing all opened elements until end-tag of {@link XMLNode} is found.
+     * Write end-tag from the given node. No corresponding start-tag is needed, no exception in relation to that will be
+     * thrown.
      *
      * @param node to match the end-tag
      * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>

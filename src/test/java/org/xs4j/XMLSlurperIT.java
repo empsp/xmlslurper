@@ -1,7 +1,6 @@
 package org.xs4j;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -10,7 +9,6 @@ import org.xs4j.path.Slurp;
 import org.xs4j.path.SlurpNode;
 import org.xs4j.util.NotNull;
 
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

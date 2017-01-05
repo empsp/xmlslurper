@@ -14,23 +14,25 @@ import java.util.Deque;
 
 import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_ENCODING;
 import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_VERSION;
+import static org.xs4j.XMLSpitterFactory.GenericOutputSupplier.ILLEGAL_SUPPLIER_ARGUMENT;
 import static org.xs4j.util.NonNullValidator.requireNonNull;
 
 /**
  * Created by mturski on 12/8/2016.
  */
-public class StAXSpitter implements XMLSpitter {
+public class XMLSpitterImpl implements XMLSpitter {
     private static final String NEWLINE = "\n";
     private static final String INDENT = "    ";
 
     private static long idFeed;
 
-    private final XMLOutputFactory xmlOutputFactory;
+    private final StreamProvider streamProvider;
 
-    StAXSpitter(XMLOutputFactory xmlOutputFactory) {
+
+    XMLSpitterImpl(StreamProvider streamProvider) {
         idFeed = 0L;
 
-        this.xmlOutputFactory = xmlOutputFactory;
+        this.streamProvider = streamProvider;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class StAXSpitter implements XMLSpitter {
     @Override
     public XMLStream createStream(@NotNull OutputStream outputStream) {
         try {
-            return createStreamAndStartWrite(outputStream);
+            return streamProvider.getStream(outputStream);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
@@ -75,28 +77,10 @@ public class StAXSpitter implements XMLSpitter {
     @Override
     public XMLStream createStream(@NotNull Writer writer) {
         try {
-            return createStreamAndStartWrite(writer);
+            return streamProvider.getStream(writer);
         } catch (XMLStreamException e) {
             throw new XMLStreamRuntimeException(e);
         }
-    }
-
-    @SuppressWarnings("Duplicates")
-    private XMLStream createStreamAndStartWrite(OutputStream outputStream) throws XMLStreamException {
-        requireNonNull(outputStream);
-
-        XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(outputStream);
-
-        return new StAXStream(idFeed++, stream);
-    }
-
-    @SuppressWarnings("Duplicates")
-    private XMLStream createStreamAndStartWrite(Writer writer) throws XMLStreamException {
-        requireNonNull(writer);
-
-        XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(writer);
-
-        return new StAXStream(idFeed++, stream);
     }
 
     private void startWriteOne(Slurp documentNode, Slurp contentNodes, final OutputSupplier<?> osSupplier, final String encoding, final String version) {
@@ -155,9 +139,11 @@ public class StAXSpitter implements XMLSpitter {
             try {
                 Object output = osSupplier.supply();
                 if (output instanceof Writer)
-                    streams[0] = createStreamAndStartWrite((Writer)output);
+                    streams[0] = streamProvider.getStream((Writer)output);
+                else if (output instanceof OutputStream)
+                    streams[0] = streamProvider.getStream((OutputStream)output);
                 else
-                    streams[0] = createStreamAndStartWrite((OutputStream)output);
+                    throw new IllegalArgumentException(String.format(ILLEGAL_SUPPLIER_ARGUMENT, OutputSupplier.class.getName(), Writer.class.getName(), OutputStream.class.getName()));
 
                 streams[0].writeStartDocument(encoding, version);
                 streams[0].writeCharacters(NEWLINE);
@@ -236,6 +222,46 @@ public class StAXSpitter implements XMLSpitter {
             }
             streams[0].writeEndElement();
             streams[0].flush();
+        }
+    }
+
+    interface StreamProvider {
+        XMLStream getStream(OutputStream outputStream) throws XMLStreamException;
+
+        XMLStream getStream(Writer writer) throws XMLStreamException;
+    }
+
+    static class InternalStreamProvider implements StreamProvider {
+        @Override
+        public XMLStream getStream(OutputStream outputStream) throws XMLStreamException {
+            return new InternalStream(idFeed++, outputStream);
+        }
+
+        @Override
+        public XMLStream getStream(Writer writer) throws XMLStreamException {
+            return new InternalStream(idFeed++, writer);
+        }
+    }
+
+    static class StAXStreamProvider implements StreamProvider {
+        private final XMLOutputFactory xmlOutputFactory;
+
+        StAXStreamProvider(XMLOutputFactory xmlOutputFactory) {
+            this.xmlOutputFactory = xmlOutputFactory;
+        }
+
+        @Override
+        public XMLStream getStream(OutputStream outputStream) throws XMLStreamException {
+            XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(outputStream);
+
+            return new StAXStream(idFeed++, stream);
+        }
+
+        @Override
+        public XMLStream getStream(Writer writer) throws XMLStreamException {
+            XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(writer);
+
+            return new StAXStream(idFeed++, stream);
         }
     }
 
