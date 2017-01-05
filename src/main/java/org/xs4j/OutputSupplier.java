@@ -2,11 +2,9 @@ package org.xs4j;
 
 import org.xs4j.util.NotNull;
 
-import java.io.OutputStream;
-
 /**
- * A data structure holding information about an {@link OutputStream}. The following is mutable to allow for dynamic
- * switches of the streams for multiple writing events.
+ * A data structure holding an output source for the {@link XMLSpitter}. The following is mutable to enable
+ * setting/changing the output source during runtime.
  */
 public interface OutputSupplier<T> {
     /**
