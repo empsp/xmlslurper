@@ -53,7 +53,8 @@ public final class XMLNodeImpl implements XMLNode {
         return position;
     }
 
-    void setPosition(long position) {
+    @Override
+    public void setPosition(long position) {
         this.position = position;
     }
 
@@ -62,7 +63,8 @@ public final class XMLNodeImpl implements XMLNode {
         return depth;
     }
 
-    void setDepth(int depth) {
+    @Override
+    public void setDepth(int depth) {
         this.depth = depth;
     }
 
@@ -71,7 +73,8 @@ public final class XMLNodeImpl implements XMLNode {
         return parent;
     }
 
-    void setParent(XMLNode parent) {
+    @Override
+    public void setParent(XMLNode parent) {
         this.parent = parent;
     }
 
@@ -135,7 +138,10 @@ public final class XMLNodeImpl implements XMLNode {
         appendText(text.toCharArray(), 0, text.length());
     }
 
-    void appendText(char[] ch, int start, int length) {
+    @Override
+    public void appendText(char[] text, int startPosition, int length) {
+        requireNonNull((Object)text);
+
         lastAppendIndex = charactersSize;
         lastAppendLength = length;
 
@@ -151,7 +157,7 @@ public final class XMLNodeImpl implements XMLNode {
                     lenAfterConcat < extLength ? extLength : ArraysUtil.safelyDoubleLengthValue(lenAfterConcat));
         }
 
-        System.arraycopy(ch, start, characters, charactersSize, length);
+        System.arraycopy(text, startPosition, characters, charactersSize, length);
         charactersSize += length;
     }
 

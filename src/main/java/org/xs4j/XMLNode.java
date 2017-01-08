@@ -19,10 +19,16 @@ public interface XMLNode {
 
     long getPosition();
 
+    void setPosition(long position);
+
     int getDepth();
+
+    void setDepth(int depth);
 
     @Nullable
     XMLNode getParent();
+
+    void setParent(@Nullable XMLNode node);
 
     @Nullable
     String getNamespace();
@@ -51,6 +57,8 @@ public interface XMLNode {
     String getAppendedText();
 
     void appendText(@Nullable String text);
+
+    void appendText(@NotNull char[] text, int startPosition, int length);
 
     @NotNull
     Map<String, String> getAttributes();

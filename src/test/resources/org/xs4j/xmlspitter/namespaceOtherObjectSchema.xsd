@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://other" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:gen="http://general">
+    <xs:import namespace="http://general" schemaLocation="namespaceTestCaseSchema.xsd"/>
+    <xs:element name="OtherObject">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="gen:OtherObject" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="attr3" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:attribute type="xs:string" name="attr2"/>
+</xs:schema>
