@@ -1,10 +1,8 @@
 package org.xs4j;
 
+import org.xml.sax.*;
 import org.xs4j.util.NotNull;
 import org.xs4j.util.Nullable;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xs4j.path.SlurpNode;
 
@@ -17,6 +15,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +32,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     private final SlurpFactory slurpFactory;
     private final NodeNotifier nodeNotifier;
     private final ElementParser elementParser;
+    private final EntityResolver entityResolver;
 
     private InputStream inputStream;
     private SAXParser parser;
@@ -41,7 +41,8 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
                SchemaFactory schemaFactory,
                SlurpFactory slurpFactory,
                NodeNotifier nodeNotifier,
-               ElementParser elementParser) {
+               ElementParser elementParser,
+               EntityResolver entityResolver) {
         idFeed = 0L;
 
         this.saxParserFactory = saxParserFactory;
@@ -49,6 +50,7 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
         this.slurpFactory = slurpFactory;
         this.nodeNotifier = nodeNotifier;
         this.elementParser = elementParser;
+        this.entityResolver = entityResolver;
     }
 
     @Override
@@ -125,6 +127,11 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
     @Override
     public void error(SAXParseException e) throws SAXException {
         throw e;
+    }
+
+    @Override
+    public InputSource resolveEntity (String publicId, String systemId) throws IOException, SAXException {
+        return entityResolver.resolveEntity(publicId, systemId);
     }
 
     private void terminateParsingIfPossible() throws SAXException {
@@ -210,6 +217,20 @@ public class SAXSlurper extends DefaultHandler implements XMLSlurper {
                 attributeByName.put(attributes.getLocalName(index), attributes.getValue(index));
 
             return attributeByName;
+        }
+    }
+
+    static class SkipDTDDownloadEntityResolver implements EntityResolver {
+        @Override
+        public InputSource resolveEntity(String publicID, String systemID) throws SAXException, IOException {
+            return new InputSource(new StringReader(""));
+        }
+    }
+
+    static class DefaultEntityResolver implements EntityResolver {
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+            return null;
         }
     }
 

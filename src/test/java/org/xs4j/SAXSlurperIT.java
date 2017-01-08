@@ -92,7 +92,8 @@ public class SAXSlurperIT {
                 getSchemaFactory(),
                 getSlurpFactory(nodeNotifier, getSlurpAlignmentFactory()),
                 nodeNotifier,
-                getSAXNamespaceSensitiveElementParser(false, xmlNodeFactory));
+                getSAXNamespaceSensitiveElementParser(true, xmlNodeFactory),
+                getEntityResolver(false));
 
         return nodeNotifier;
     }

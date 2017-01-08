@@ -3,6 +3,7 @@ package org.xs4j;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -14,11 +15,11 @@ import static org.xs4j.TestUtil.getResource;
 import static org.xs4j.TestUtil.getResourceAsFile;
 
 /**
- * Created by mturski on 12/12/2016.
+ * Created by mturski on 1/7/2017.
  */
 @SuppressWarnings("Duplicates")
-public class StAXSpitterIT {
-    private static final XMLSpitterFactory xmlSpitterFactory = StAXSpitterFactory.getInstance();
+public class InternalSpitterIT {
+    private static final XMLSpitterFactory xmlSpitterFactory = InternalSpitterFactory.getInstance();
     private static final OutputSupplierFactory outputSupplierFactory = OutputSupplierFactory.getInstance();
     private static final XMLSpitter xmlSpitter = xmlSpitterFactory.createXMLSpitter();
     private static final XMLSlurper xmlSlurper = XMLSlurperFactory.getInstance().createXMLSlurper();
@@ -27,15 +28,17 @@ public class StAXSpitterIT {
     @Test
     public void givenInputXMLWithoutSchemaExtractAPartIntoNewXMLWithIgnorableWhitespaceCharacters() throws Exception {
         // given
-        OutputStream outputStream = mock(OutputStream.class);
+        OutputStream outputStream = spy(new OutputStreamStub());
 
         // when
         spitterUtil.createXML(outputStream, asList("**", "Plane"), asList("**", "Plane", "**"), "siblingsTestCase.xml");
 
         // then
         ArgumentCaptor<Integer> streamCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(outputStream, atLeastOnce()).write(any(byte[].class), anyInt(), anyInt());
         verify(outputStream, atLeastOnce()).write(streamCaptor.capture());
-        verify(outputStream, times(2)).flush();
+        verify(outputStream).flush();
+        verify(outputStream).close();
         verifyNoMoreInteractions(outputStream);
 
         String actualXML = getXMLData(streamCaptor.getAllValues());
@@ -48,15 +51,17 @@ public class StAXSpitterIT {
     @Test
     public void givenInputXMLWithSchemaExtractAPartIntoNewXMLWithoutIgnorableWhitespaceCharacters() throws Exception {
         // given
-        final OutputStream outputStream = mock(OutputStream.class);
+        OutputStream outputStream = spy(new OutputStreamStub());
 
         // when
         spitterUtil.createXML(outputStream, asList("ObjectTree"), asList("ObjectTree", "Object"), "borderTestCase.xml", "borderTestCaseSchema.xsd");
 
         // then
         ArgumentCaptor<Integer> streamCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(outputStream, atLeastOnce()).write(any(byte[].class), anyInt(), anyInt());
         verify(outputStream, atLeastOnce()).write(streamCaptor.capture());
-        verify(outputStream, times(2)).flush();
+        verify(outputStream).flush();
+        verify(outputStream).close();
         verifyNoMoreInteractions(outputStream);
 
         String actualXML = getXMLData(streamCaptor.getAllValues());
@@ -67,15 +72,17 @@ public class StAXSpitterIT {
     @Test
     public void givenInputXMLWithSchemaExtractAPartIntoNewXMLWithSignificantWhitespaceCharacters() throws Exception {
         // given
-        final OutputStream outputStream = mock(OutputStream.class);
+        OutputStream outputStream = spy(new OutputStreamStub());
 
         // when
         spitterUtil.createXML(outputStream, asList("ObjectTree"), asList("ObjectTree", "OtherObject"), "borderTestCase.xml", "borderTestCaseSchema.xsd");
 
         // then
         ArgumentCaptor<Integer> streamCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(outputStream, atLeastOnce()).write(any(byte[].class), anyInt(), anyInt());
         verify(outputStream, atLeastOnce()).write(streamCaptor.capture());
-        verify(outputStream, times(2)).flush();
+        verify(outputStream).flush();
+        verify(outputStream).close();
         verifyNoMoreInteractions(outputStream);
 
         String actualXML = getXMLData(streamCaptor.getAllValues());
@@ -86,15 +93,17 @@ public class StAXSpitterIT {
     @Test
     public void givenInputXMLWithSchemaExtractAPartIntoNewXMLWithForeignNamespaceDefinitionIncluded() throws Exception {
         // given
-        final OutputStream outputStream = mock(OutputStream.class);
+        OutputStream outputStream = spy(new OutputStreamStub());
 
         // when
         spitterUtil.createXML(outputStream, asList("**", "other:OtherObject"), asList("**", "other:OtherObject", "**"), "namespaceTestCase.xml", "namespaceTestCaseSchema.xsd");
 
         // then
         ArgumentCaptor<Integer> streamCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(outputStream, atLeastOnce()).write(any(byte[].class), anyInt(), anyInt());
         verify(outputStream, atLeastOnce()).write(streamCaptor.capture());
-        verify(outputStream, times(2)).flush();
+        verify(outputStream).flush();
+        verify(outputStream).close();
         verifyNoMoreInteractions(outputStream);
 
         String actualXML = getXMLData(streamCaptor.getAllValues());
@@ -105,15 +114,17 @@ public class StAXSpitterIT {
     @Test
     public void givenInputXMLWithSchemaExtractAPartIntoNewXMLWithDefaultNamespaceDefinitionIncluded() throws Exception {
         // given
-        final OutputStream outputStream = mock(OutputStream.class);
+        OutputStream outputStream = spy(new OutputStreamStub());
 
         // when
         spitterUtil.createXML(outputStream, asList("**", "Object"), asList("**", "Object", "**"), "namespaceTestCase.xml", "namespaceTestCaseSchema.xsd");
 
         // then
         ArgumentCaptor<Integer> streamCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(outputStream, atLeastOnce()).write(any(byte[].class), anyInt(), anyInt());
         verify(outputStream, atLeastOnce()).write(streamCaptor.capture());
-        verify(outputStream, times(2)).flush();
+        verify(outputStream).flush();
+        verify(outputStream).close();
         verifyNoMoreInteractions(outputStream);
 
         String actualXML = getXMLData(streamCaptor.getAllValues());
@@ -124,7 +135,7 @@ public class StAXSpitterIT {
     @Test
     public void givenInputXMLWithSchemaExtractWithFormattingIntoNewXML() throws Exception {
         // given
-        final OutputStream outputStream = mock(OutputStream.class);
+        OutputStream outputStream = spy(new OutputStreamStub());
         OutputSupplier<OutputStream> osSupplier = outputSupplierFactory.<OutputStream> createOutputSupplier().set(outputStream);
 
         // when
@@ -133,13 +144,21 @@ public class StAXSpitterIT {
 
         // then
         ArgumentCaptor<Integer> streamCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(outputStream, atLeastOnce()).write(any(byte[].class), anyInt(), anyInt());
         verify(outputStream, atLeastOnce()).write(streamCaptor.capture());
-        verify(outputStream, times(2)).flush();
+        verify(outputStream).flush();
+        verify(outputStream).close();
         verifyNoMoreInteractions(outputStream);
 
         String actualXML = getXMLData(streamCaptor.getAllValues());
         String expectedXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Object xmlns=\"http://general\" attr2=\"E=1\" attr1=\"SOMEOBJ\">\n    <OtherObject attr1=\"OTHEROBJ\">\n    </OtherObject>\n</Object>";
         assertThat(actualXML, is(expectedXML));
+    }
+
+    private class OutputStreamStub extends OutputStream {
+        @Override
+        public void write(int b) throws IOException {
+        }
     }
 
     private static String getXMLData(List<Integer> actualData) {

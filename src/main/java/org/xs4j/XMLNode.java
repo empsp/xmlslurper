@@ -11,6 +11,10 @@ import java.util.Map;
  * @author <a href="mailto:turski.marek@gmail.com">Marek Turski</a>
  */
 public interface XMLNode {
+    /**
+     *
+     * @return id unique to the scope of one parsing execution
+     */
     long getId();
 
     long getPosition();
@@ -42,6 +46,11 @@ public interface XMLNode {
     String getText();
 
     void setText(@Nullable String text);
+
+    @Nullable
+    String getAppendedText();
+
+    void appendText(@Nullable String text);
 
     @NotNull
     Map<String, String> getAttributes();

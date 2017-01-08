@@ -1,11 +1,11 @@
 package org.xs4j;
 
-import org.xs4j.SAXSlurper.ElementParser;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xs4j.SAXSlurper.*;
 
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
-import org.xs4j.SAXSlurper.SAXNamespaceAwareElementParser;
-import org.xs4j.SAXSlurper.SAXNamespaceBlindElementParser;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
@@ -15,12 +15,14 @@ import javax.xml.validation.SchemaFactory;
 /**
  * Created by mturski on 11/8/2016.
  */
-public class XMLSlurperFactory {
+public final class XMLSlurperFactory {
+
     public static XMLSlurperFactory getInstance() {
         return new XMLSlurperFactory();
     }
 
     private boolean isNamespaceAwarenessDisabled;
+    private boolean isDTDValidationDisabled;
 
     private XMLSlurperFactory() {
     }
@@ -32,8 +34,21 @@ public class XMLSlurperFactory {
      *
      * @return <code>this</code> instance of <code>XMLSlurperFactory</code>
      */
-    public XMLSlurperFactory disableNamespaceAwareness() {
+    public final XMLSlurperFactory disableNamespaceAwareness() {
         this.isNamespaceAwarenessDisabled = true;
+
+        return this;
+    }
+
+    /**
+     * Upon finding &lt;!DOCTYPE &gt; no schema will be searched for both locally and via web. By default, a
+     * {@link DefaultHandler} will be used to resolve entities. For convenience the following method returns
+     * <code>this</code> instance of {@link XMLSlurperFactory}.
+     *
+     * @return <code>this</code> instance of <code>XMLSlurperFactory</code>
+     */
+    public final XMLSlurperFactory disableDTDValidation() {
+        this.isDTDValidationDisabled = true;
 
         return this;
     }
@@ -44,7 +59,7 @@ public class XMLSlurperFactory {
      *
      * @return a new instance of <code>XMLSlurper</code>
      */
-    public XMLSlurper createXMLSlurper() {
+    public final XMLSlurper createXMLSlurper() {
         XMLNodeFactory xmlNodeFactory = XMLNodeFactory.getInstance();
         NodeNotifier nodeNotifier = getNodeNotifier();
         SlurpAlignmentFactory slurpAlignmentFactory = getSlurpAlignmentFactory();
@@ -54,7 +69,15 @@ public class XMLSlurperFactory {
                 getSchemaFactory(),
                 getSlurpFactory(nodeNotifier, slurpAlignmentFactory),
                 nodeNotifier,
-                getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, xmlNodeFactory));
+                getSAXNamespaceSensitiveElementParser(isNamespaceAwarenessDisabled, xmlNodeFactory),
+                getEntityResolver(isDTDValidationDisabled));
+    }
+
+    static EntityResolver getEntityResolver(boolean isDTDValidationDisabled) {
+        if (isDTDValidationDisabled)
+            return new SkipDTDDownloadEntityResolver();
+        else
+            return new DefaultEntityResolver();
     }
 
     static NodeNotifier getNodeNotifier() {

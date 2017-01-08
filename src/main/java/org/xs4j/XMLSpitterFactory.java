@@ -1,9 +1,5 @@
 package org.xs4j;
 
-import org.xs4j.util.NotNull;
-
-import static org.xs4j.util.NonNullValidator.requireNonNull;
-
 /**
  * Created by mturski on 12/8/2016.
  */

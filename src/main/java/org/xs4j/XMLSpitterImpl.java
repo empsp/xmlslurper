@@ -1,8 +1,8 @@
 package org.xs4j;
 
-import org.xs4j.util.NotNull;
 import org.xs4j.listener.NodeListener;
 import org.xs4j.path.Slurp;
+import org.xs4j.util.NotNull;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;

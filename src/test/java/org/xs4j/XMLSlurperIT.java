@@ -9,6 +9,7 @@ import org.xs4j.path.Slurp;
 import org.xs4j.path.SlurpNode;
 import org.xs4j.util.NotNull;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -467,6 +468,16 @@ public class XMLSlurperIT {
         inOrder.verify(carListener).onNode(car);
         inOrder.verify(planeListener).onNode(plane);
         inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void givenDoctypeAndNoDTDParseThrowsException() throws Exception {
+        parser.parse(getResource(this, "noDTDTestCase.xml"));
+    }
+
+    @Test
+    public void givenDoctypeAndNoDTDWithDTDValidationDisabledParseCompletes() throws Exception {
+        XMLSlurperFactory.getInstance().disableDTDValidation().createXMLSlurper().parse(getResource(this, "noDTDTestCase.xml"));
     }
 
     @After

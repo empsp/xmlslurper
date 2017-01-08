@@ -18,16 +18,12 @@ public final class XMLNodeFactory {
     }
 
 
-    public XMLNode createNode(long id, String localName, Map<String, String> attributeByName) {
+    public final XMLNode createNode(long id, String localName, Map<String, String> attributeByName) {
         return new XMLNodeImpl(id, null, null, localName, attributeByName);
     }
 
-    public XMLNode createNode(long id, String namespace, String prefix, String localName, Map<String, String> attributeByName) {
+    public final XMLNode createNode(long id, String namespace, String prefix, String localName, Map<String, String> attributeByName) {
         return new XMLNodeImpl(id, namespace, prefix, localName, attributeByName);
-    }
-
-    static void appendText(XMLNode node, char[] ch, int start, int length) {
-        ((XMLNodeImpl)node).appendText(ch, start, length);
     }
 
     static void setPositionalData(XMLNode node, XMLNode parent, long position, int depth) {
@@ -38,7 +34,11 @@ public final class XMLNodeFactory {
         nodeImpl.setDepth(depth);
     }
 
-    static Map<String, String> getAttributesDirectly(XMLNode node) {
-        return ((XMLNodeImpl)node).attributeByQName;
+    static void appendText(XMLNode node, char[] ch, int start, int length) {
+        ((XMLNodeImpl)node).appendText(ch, start, length);
+    }
+
+    static Map<String, String> getAttributeByQName(XMLNode node) {
+        return ((XMLNodeImpl)node).getAttributeByQName();
     }
 }

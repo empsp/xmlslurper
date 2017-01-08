@@ -66,6 +66,32 @@ public interface XMLStream {
     void writeCharacters(@Nullable String characters);
 
     /**
+     * Write number of <code>chars</code> from the characters array of the element currently opened with start-tag.
+     *
+     * @param characters array to write
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
+     */
+    void writeCharacters(@NotNull char[] characters);
+
+    /**
+     * Write number of <code>chars</code> from the characters array of the element currently opened with start-tag.
+     *
+     * @param characters array to write
+     * @param startPos starting position of characters array to be written
+     * @param length the number of array elements to be written
+     */
+    void writeCharacters(@NotNull char[] characters, int startPos, int length);
+
+    /**
+     * Write {@link XMLNode#getText()} of the element currently opened with start-tag. If the text is found to be null,
+     * none will be written.
+     *
+     * @param node from which the text will be written
+     * @throws XMLStreamRuntimeException wrapped <code>RuntimeException</code> of <code>XMLStreamException</code>
+     */
+    void writeCharacters(@NotNull XMLNode node);
+
+    /**
      * Write end-tag of the element opened with corresponding start-tag. If no start-tag is found, exception will be
      * thrown.
      *

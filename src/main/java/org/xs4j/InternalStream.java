@@ -3,6 +3,7 @@ package org.xs4j;
 import org.xs4j.util.NotNull;
 import org.xs4j.util.Nullable;
 
+import javax.xml.XMLConstants;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -11,7 +12,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 
-import static org.xs4j.XMLNodeFactory.getAttributesDirectly;
 import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_ENCODING;
 import static org.xs4j.XMLSpitterFactory.DEFAULT_XML_DOCUMENT_VERSION;
 import static org.xs4j.util.NonNullValidator.requireNonNull;
@@ -24,17 +24,21 @@ public class InternalStream implements XMLStream {
 
     private static final String START_DOCUMENT_PATTERN = "<?xml version=\"%s\" encoding=\"%s\"?>";
 
-    private static final String TAG_OPENING_CHAR = "<";
-    private static final String CLOSING_ELEMENT_TAG_OPENING_CHARS = "</";
+    private static final char TAG_OPENING_CHAR = '<';
+    private static final String END_TAG_OPENING_CHAR = "</";
     private static final String EMPTY_ELEMENT_TAG_CLOSING_CHARS = " />";
-    private static final String TAG_CLOSING_CHAR = ">";
-    private static final String ATTR_LEADING_SPACE = " ";
+    private static final char TAG_CLOSING_CHAR = '>';
+    private static final char ATTR_LEADING_SPACE = ' ';
     private static final String ATTR_EQUALS_AND_QUOTE = "=\"";
     private static final String ATTR_CLOSING_QUOTE = "\"";
+    private static final String DEFAULT_NAMESPACE = ATTR_LEADING_SPACE + XMLConstants.XMLNS_ATTRIBUTE + ATTR_EQUALS_AND_QUOTE;
 
     private final long id;
     private final Writer writer;
+
     private final Deque<XMLNode> descendants = new ArrayDeque<XMLNode>();
+
+    private int defaultNamespaceAtDepth = Integer.MAX_VALUE;
 
     InternalStream(long id, Writer writer) {
         this.id = id;
@@ -71,11 +75,19 @@ public class InternalStream implements XMLStream {
     }
 
     @Override
+    public void writeStartElement(@NotNull XMLNode node) {
+        requireNonNull(node);
+
+        doWrite(TAG_OPENING_CHAR + node.getQName() + doWriteDefaultNamespaceAttribute(node) + doWriteAttributes(XMLNodeFactory.getAttributeByQName(node)) + TAG_CLOSING_CHAR);
+        descendants.addLast(node);
+    }
+
+    @Override
     public void writeElement(@NotNull XMLNode node) {
         requireNonNull(node);
 
         if (node.getText() == null) {
-            doWrite(TAG_OPENING_CHAR + node.getQName() + doWriteAttributes(getAttributesDirectly(node)) + EMPTY_ELEMENT_TAG_CLOSING_CHARS);
+            doWrite(TAG_OPENING_CHAR + node.getQName() + doWriteDefaultNamespaceAttribute(node) + doWriteAttributes(XMLNodeFactory.getAttributeByQName(node)) + EMPTY_ELEMENT_TAG_CLOSING_CHARS);
         } else {
             writeStartElement(node);
             writeCharacters(node.getText());
@@ -83,21 +95,26 @@ public class InternalStream implements XMLStream {
         }
     }
 
-    private String doWriteAttributes(Map<String, String> attributes) {
-        String result = "";
+    private String doWriteDefaultNamespaceAttribute(XMLNode node) {
+        if (node.getDepth() <= defaultNamespaceAtDepth) {
+            if (node.getPrefix() == null && node.getNamespace() != null) {
+                defaultNamespaceAtDepth = node.getDepth();
 
-        for (String key : attributes.keySet())
-            result += ATTR_LEADING_SPACE + key + ATTR_EQUALS_AND_QUOTE + attributes.get(key) + ATTR_CLOSING_QUOTE;
+                return DEFAULT_NAMESPACE + node.getNamespace() + ATTR_CLOSING_QUOTE;
+            } else
+                defaultNamespaceAtDepth = Integer.MAX_VALUE;
+        }
 
-        return result;
+        return "";
     }
 
-    @Override
-    public void writeStartElement(@NotNull XMLNode node) {
-        requireNonNull(node);
+    private String doWriteAttributes(Map<String, String> attributeByQName) {
+        String result = "";
 
-        doWrite(TAG_OPENING_CHAR + node.getQName() + doWriteAttributes(getAttributesDirectly(node)) + TAG_CLOSING_CHAR);
-        descendants.addLast(node);
+        for (String qName : attributeByQName.keySet())
+            result += ATTR_LEADING_SPACE + qName + ATTR_EQUALS_AND_QUOTE + attributeByQName.get(qName) + ATTR_CLOSING_QUOTE;
+
+        return result;
     }
 
     @Override
@@ -107,19 +124,43 @@ public class InternalStream implements XMLStream {
     }
 
     @Override
+    public void writeCharacters(@NotNull char[] characters) {
+        requireNonNull((Object)characters);
+
+        doWrite(characters);
+    }
+
+    @Override
+    public void writeCharacters(@NotNull char[] characters, int startPos, int length) {
+        requireNonNull((Object)characters);
+
+        doWrite(characters, startPos, length);
+    }
+
+    @Override
+    public void writeCharacters(@NotNull XMLNode node) {
+        requireNonNull(node);
+
+        String text = node.getText();
+        if (text != null)
+            doWrite(text);
+    }
+
+    @Override
     public void writeEndElement() {
         XMLNode node = descendants.removeLast();
         if (node == null)
             throw new XMLStreamRuntimeException(NO_START_FOR_END_ELEMENT_EXCEPTION);
 
-        doWrite(CLOSING_ELEMENT_TAG_OPENING_CHARS + node.getQName() + TAG_CLOSING_CHAR);
+        doWrite(END_TAG_OPENING_CHAR + node.getQName() + TAG_CLOSING_CHAR);
     }
 
     @Override
     public void writeEndElement(@NotNull XMLNode node) {
         requireNonNull(node);
+        descendants.removeLastOccurrence(node);
 
-        doWrite(CLOSING_ELEMENT_TAG_OPENING_CHARS + node.getQName() + TAG_CLOSING_CHAR);
+        doWrite(END_TAG_OPENING_CHAR + node.getQName() + TAG_CLOSING_CHAR);
     }
 
     @Override
@@ -151,6 +192,22 @@ public class InternalStream implements XMLStream {
     private void doWrite(String text) {
         try {
             writer.write(text);
+        } catch (IOException e) {
+            throw new XMLStreamRuntimeException(e);
+        }
+    }
+
+    private void doWrite(char[] text) {
+        try {
+            writer.write(text);
+        } catch (IOException e) {
+            throw new XMLStreamRuntimeException(e);
+        }
+    }
+
+    private void doWrite(char[] text, int startPosition, int length) {
+        try {
+            writer.write(text, startPosition, length);
         } catch (IOException e) {
             throw new XMLStreamRuntimeException(e);
         }
