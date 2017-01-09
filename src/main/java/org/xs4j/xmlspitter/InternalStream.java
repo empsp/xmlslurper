@@ -1,7 +1,6 @@
 package org.xs4j.xmlspitter;
 
 import org.xs4j.XMLNode;
-import org.xs4j.XMLNodeFactory;
 import org.xs4j.util.NotNull;
 import org.xs4j.util.Nullable;
 
@@ -78,7 +77,8 @@ public class InternalStream implements XMLStream {
     public void writeStartElement(@NotNull XMLNode node) {
         requireNonNull(node);
 
-        doWrite(TAG_OPENING_CHAR + node.getQName() + doWriteDefaultNamespaceAttribute(node) + doWriteAttributes(node.getAttributes()) + TAG_CLOSING_CHAR);
+        doWrite(TAG_OPENING_CHAR + node.getQName() + doWriteDefaultNamespaceAttribute(node));
+        doWrite(doWriteAttributes(node.getAttributes()) + TAG_CLOSING_CHAR);
         descendants.addLast(node);
     }
 
@@ -87,7 +87,8 @@ public class InternalStream implements XMLStream {
         requireNonNull(node);
 
         if (node.getText() == null) {
-            doWrite(TAG_OPENING_CHAR + node.getQName() + doWriteDefaultNamespaceAttribute(node) + doWriteAttributes(node.getAttributes()) + EMPTY_ELEMENT_TAG_CLOSING_CHARS);
+            doWrite(TAG_OPENING_CHAR + node.getQName() + doWriteDefaultNamespaceAttribute(node));
+            doWrite(doWriteAttributes(node.getAttributes()) + EMPTY_ELEMENT_TAG_CLOSING_CHARS);
         } else {
             writeStartElement(node);
             writeCharacters(node.getText());
