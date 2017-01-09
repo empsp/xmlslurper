@@ -245,6 +245,8 @@ public class XMLSpitterImpl implements XMLSpitter {
     }
 
     static class StAXStreamProvider implements StreamProvider {
+        private static final String DEFAULT_ENCODING = "UTF-8";
+
         private final XMLOutputFactory xmlOutputFactory;
 
         StAXStreamProvider(XMLOutputFactory xmlOutputFactory) {
@@ -253,7 +255,7 @@ public class XMLSpitterImpl implements XMLSpitter {
 
         @Override
         public XMLStream getStream(OutputStream outputStream) throws XMLStreamException {
-            XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(outputStream);
+            XMLStreamWriter stream = xmlOutputFactory.createXMLStreamWriter(outputStream, DEFAULT_ENCODING);
 
             return new StAXStream(idFeed++, stream);
         }
