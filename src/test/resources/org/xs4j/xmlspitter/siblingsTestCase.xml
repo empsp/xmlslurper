@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Transport>
+    <Car name="Prius" manufacturer="Toyota" modelVersion="4">
+        <Engine type="Hybrid Electric-Gasoline"/>
+        <Specification>
+            <Speed max="180km/h"/>
+        </Specification>
+    </Car>
+    <Plane name="Boeing 747" manufacturer="Boeing">
+        <Engine type="Turbofan"/>
+        <Cargo>
+            <Capacity>110m3</Capacity>
+        </Cargo>
+    </Plane>
+</Transport>

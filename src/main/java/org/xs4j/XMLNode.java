@@ -11,14 +11,24 @@ import java.util.Map;
  * @author <a href="mailto:turski.marek@gmail.com">Marek Turski</a>
  */
 public interface XMLNode {
+    /**
+     *
+     * @return id unique to the scope of one parsing execution
+     */
     long getId();
 
     long getPosition();
 
+    void setPosition(long position);
+
     int getDepth();
+
+    void setDepth(int depth);
 
     @Nullable
     XMLNode getParent();
+
+    void setParent(@Nullable XMLNode node);
 
     @Nullable
     String getNamespace();
@@ -42,6 +52,13 @@ public interface XMLNode {
     String getText();
 
     void setText(@Nullable String text);
+
+    @Nullable
+    String getAppendedText();
+
+    void appendText(@Nullable String text);
+
+    void appendText(@NotNull char[] text, int startPosition, int length);
 
     @NotNull
     Map<String, String> getAttributes();

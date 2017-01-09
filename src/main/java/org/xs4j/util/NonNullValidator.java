@@ -28,11 +28,11 @@ public final class NonNullValidator {
         if (map == null)
             throw new NullPointerException();
 
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            if (entry.getKey() == null)
+        for (K key : map.keySet()) {
+            if (key == null)
                 throw new NullPointerException();
 
-            if (entry.getValue() == null)
+            if (map.get(key) == null)
                 throw new NullPointerException();
         }
 

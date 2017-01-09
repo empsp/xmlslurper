@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="OtherObject">
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:element ref="OtherObject" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="attr1" use="optional"/>
+            <xs:attribute type="xs:string" name="attr2" use="optional"/>
+            <xs:attribute type="xs:byte" name="attr3" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Object">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="OtherObject"/>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="attr1"/>
+            <xs:attribute type="xs:string" name="attr2"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ObjectTree">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Object"/>
+                <xs:element ref="OtherObject"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

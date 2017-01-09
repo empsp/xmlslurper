@@ -1,5 +1,6 @@
 package org.xs4j;
 
+import org.xs4j.util.ArraysUtil;
 import org.xs4j.util.NotNull;
 import org.xs4j.util.Nullable;
 
@@ -13,7 +14,9 @@ import static org.xs4j.util.NonNullValidator.requireNonNull;
  * Created by mturski on 11/9/2016.
  */
 public final class XMLNodeImpl implements XMLNode {
-    public static final int DEFAULT_SIZE = 16;
+    private static final String TOO_LARGE_TEXT_LENGTH = "Requested array size exceeds VM limit";
+
+    private static final int DEFAULT_SIZE = 16;
 
     private final long id;
 
@@ -25,8 +28,10 @@ public final class XMLNodeImpl implements XMLNode {
     private String prefix;
     private String localName;
 
-    private int charactersSize = 0;
+    private int lastAppendIndex = 0;
+    private int lastAppendLength = 0;
     private char[] characters = new char[DEFAULT_SIZE];
+    private int charactersSize = 0;
 
     private Map<String, String> attributeByQName;
 
@@ -48,7 +53,8 @@ public final class XMLNodeImpl implements XMLNode {
         return position;
     }
 
-    void setPosition(long position) {
+    @Override
+    public void setPosition(long position) {
         this.position = position;
     }
 
@@ -57,7 +63,8 @@ public final class XMLNodeImpl implements XMLNode {
         return depth;
     }
 
-    void setDepth(int depth) {
+    @Override
+    public void setDepth(int depth) {
         this.depth = depth;
     }
 
@@ -66,7 +73,8 @@ public final class XMLNodeImpl implements XMLNode {
         return parent;
     }
 
-    void setParent(XMLNode parent) {
+    @Override
+    public void setParent(XMLNode parent) {
         this.parent = parent;
     }
 
@@ -113,8 +121,44 @@ public final class XMLNodeImpl implements XMLNode {
     }
 
     public void setText(@Nullable String text) {
-        this.characters = text.toCharArray();
-        this.charactersSize = characters.length;
+        lastAppendIndex = charactersSize;
+        lastAppendLength = text.length();
+
+        characters = text.toCharArray();
+        charactersSize = characters.length;
+    }
+
+    @Override
+    public String getAppendedText() {
+        return new String(characters, lastAppendIndex, lastAppendLength);
+    }
+
+    @Override
+    public void appendText(@Nullable String text) {
+        appendText(text.toCharArray(), 0, text.length());
+    }
+
+    @Override
+    public void appendText(char[] text, int startPosition, int length) {
+        requireNonNull((Object)text);
+
+        lastAppendIndex = charactersSize;
+        lastAppendLength = length;
+
+        int lenAfterConcat = charactersSize + length;
+        if (lenAfterConcat < charactersSize)
+            throw new java.lang.OutOfMemoryError(TOO_LARGE_TEXT_LENGTH);
+
+        if (lenAfterConcat > characters.length) {
+            int extLength = ArraysUtil.safelyDoubleLengthValue(characters.length);
+
+            characters = Arrays.copyOf(
+                    characters,
+                    lenAfterConcat < extLength ? extLength : ArraysUtil.safelyDoubleLengthValue(lenAfterConcat));
+        }
+
+        System.arraycopy(text, startPosition, characters, charactersSize, length);
+        charactersSize += length;
     }
 
     @Override
@@ -122,16 +166,19 @@ public final class XMLNodeImpl implements XMLNode {
         return new HashMap<String, String>(attributeByQName);
     }
 
+    Map<String, String> getAttributeByQName() {
+        return attributeByQName;
+    }
+
     @Override
     public void setAttributes(@NotNull Map<String, String> attributeByQName) {
-        this.attributeByQName = new HashMap<String, String>();
+        requireNonNull((Object)attributeByQName);
 
-        for(Map.Entry<String, String> entry : attributeByQName.entrySet()) {
-            String attrName = requireNonNull(entry.getKey());
-            String attrValue = requireNonNull(entry.getValue());
-
-            this.attributeByQName.put(attrName, attrValue);
-        }
+        this.attributeByQName = new HashMap<String, String>(attributeByQName.size());
+        for(String attrName : attributeByQName.keySet())
+            this.attributeByQName.put(
+                    requireNonNull(attrName),
+                    requireNonNull(attributeByQName.get(attrName)));
     }
 
     @Override
@@ -176,19 +223,8 @@ public final class XMLNodeImpl implements XMLNode {
                 ", prefix='" + prefix + '\'' +
                 ", localName='" + localName + '\'' +
                 ", text='" + getText() + '\'' +
+                ", appendedText='" + getAppendedText() + '\'' +
                 ", attributeByQName=" + attributeByQName +
                 '}';
-    }
-
-
-    void appendText(char[] ch, int start, int length) {
-        int lenAfterConcat = charactersSize + length;
-        int extLength = characters.length << 1;
-
-        if (lenAfterConcat > characters.length - 1)
-            characters = Arrays.copyOf(characters, extLength < lenAfterConcat ? lenAfterConcat << 1 : extLength );
-
-        System.arraycopy(ch, start, characters, charactersSize, length);
-        charactersSize += length;
     }
 }

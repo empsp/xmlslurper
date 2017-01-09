@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://general" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:gen="http://general" xmlns:oth="http://other">
+    <xs:import namespace="http://other" schemaLocation="namespaceOtherObjectSchema.xsd"/>
+    <xs:element name="OtherObject">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute type="xs:string" name="attr1" use="optional"/>
+                    <xs:attribute type="xs:string" name="attr2" use="optional"/>
+                    <xs:attribute ref="oth:attr2" use="optional"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Object">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="gen:OtherObject"/>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="attr1"/>
+            <xs:attribute type="xs:string" name="attr2"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ObjectTree">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="gen:Object"/>
+                <xs:element ref="oth:OtherObject"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
