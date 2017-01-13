@@ -1,6 +1,6 @@
 Table of contents:
 ---------------
-* [XMLSlurper](#xmlslurper-for-java)<br />An attempt to port parsing capabilities offered by Groovy XMLSlurper into the Java world. The following is not planned to be accurate projection, instead the most useful functions will be implemented.
+* [XMLSlurper](#xmlslurper-for-java)<br />An attempt to port parsing capabilities offered by Groovy XMLSlurper into the Java world. The following is not planned to be accurate conversion, instead the most useful functions will be implemented.
 * [XMLSpitter](#xmlspitter)<br />A convenient API for writing XML documents using `XMLNode` objects which can be either created via `XMLNodeFactory` or obtained from the documents currently being parsed, hence allowing developers to split/overwrite the existing documents.
 
 XMLSlurper for Java
@@ -20,7 +20,7 @@ In order to use the library in your maven project, just declare the dependency i
 <dependency>
 	<groupId>org.xs4j</groupId>
 	<artifactId>xmlslurper</artifactId>
-	<version>2.2.0</version>
+	<version>3.0.0</version>
 </dependency>
 ```
 
@@ -30,7 +30,7 @@ In order to use the library in your gradle project, just declare the dependency 
 
 ```gradle
 dependencies {
-    compile 'org.xs4j:xmlslurper:2.2.0'
+    compile 'org.xs4j:xmlslurper:3.0.0'
 }
 ```
 
@@ -44,7 +44,7 @@ dependencies {
 
 ### Design
 
-Contrary to the low level API SAX provides, XMLSlurper exposes start/end element tag related events. Upon reading XML document, each tag triggers `NodeListener.onNode()` method on a condition that current element matches the given path. The path is configured via `XMLSlurper.getNodes()` method. Every element of the path can have a `NodeListener` attached to, moreover start-tag/end-tag/or both can be selected if needed. Upon those events, `XMLNode` data structure is available, however with different information. Among element prefix, namespace, local name and attributes, end-tag event suplements `XMLNode` with text data.
+Contrary to the low level API SAX provides, XMLSlurper exposes start/end element tag related events. Upon reading XML document, each parsed tag triggers `NodeListener.onNode()` method provided that the current element matches the given path. The path is configured via `XMLSlurper.getNodes()` method. Every element of the path can have a `NodeListener` attached to, moreover start-tag/end-tag/or both can be selected if needed. Upon those events, `XMLNode` data structure is available, however with different information. End tag event additionally provides the node with complete text information that the element held.
 
 ### Capabilities
 
@@ -58,16 +58,18 @@ The following is a list of XMLSlurper capabilities:
 6. Read all elements that are descendants of the given element (wildcard `**`).
 7. Read n-th/all n-th elements with respect to capabilities above.
 
-All of the above will return nodes, each having a reference to it's parent. This way, the developers have the possibility to deduce where the node is placed within the descendants tree of the XML document.
+All of the above will return nodes, each having a reference to it's parent. This way, an ancestor/descendant tree structure within the XML document is available.
 
 Additionally the library ensures that:
 
 1. `@NotNull`/`@Nullable` interfaces will be adhered to.
 2. XMLSlurper will release all of the resources after the execution (including the `InputStream` given).
 3. Single XMLSlurper instance can be reused many times, however the paths must be redefined.
-4. `XMLNode` objects are meaningfully equal only by the ids which will be unique only to the scope of a single xml file processing. Consecutive parsing of a different xml file will produce nodes with different data but matching ids. Therefore `XMLNode` objects are not fit and designed to be stored, instead the information should be extracted and the objects should be left for garbage collection.
-5. Namespace awareness can be turned on/off (feature turned on by default).
-6. Without schema validation, formatting information (indentations/carriage returns etc) will be available within text data.
+4. `XMLNode` objects are meaningfully equal by the ids which will be unique only to the scope of a single xml file processing. Consecutive parsing of a different xml file will produce nodes with different data but matching ids. Therefore `XMLNode` objects are not fit and designed to be stored long term, instead the information should be extracted and the objects should be left for garbage collection.
+5. Namespace awareness can be turned off (turned on by default).
+6. DTD validation can be turned off (turned on by default).
+7. Without schema validation, formatting information (indentations/carriage returns etc) will be available within text data.
+8. Node's position and depth are counted starting from 1.
 
 #### Advanced search
 
